@@ -11,7 +11,7 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/A7Club/life/main/website.jpg">
     
     <!-- 📊 Google Analytics (GA4)追蹤代碼放置區 -->
-    <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJ9RJC2DRS"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -1776,13 +1776,12 @@
             const query = input.value.trim();
             if(!query) return;
             
-            const route = 'search=' + encodeURIComponent(query);
-            try {
-                history.pushState(null, '', '#' + route);
-            } catch (e) {
-            }
-            handleRoute(route);
-        }
+            const searchVal = document.getElementById('homeSearchInput').value;
+    if (searchVal) {
+        // 跳轉到探索頁，並帶上參數
+        window.location.href = `explore.html?search=${encodeURIComponent(searchVal)}`;
+    }
+}
 
         async function executeSearchLogic(query) {
             const display = document.getElementById('search-query-display');
