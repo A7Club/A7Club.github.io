@@ -11,16 +11,17 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/A7Club/life/main/website.jpg">
     
     <!-- 📊 Google Analytics (GA4)追蹤代碼放置區 -->
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-YJ9RJC2DRS"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-YJ9RJC2DRS');
-</script>
-
+    <!-- 
+      請將您的 GA4 gtag.js 代碼貼在下方。
+      範例：
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX'); // 將 X 替換為您的評估 ID
+      </script>
+    -->
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1534,6 +1535,47 @@
 
     <!-- JavaScript 路由與注入邏輯 -->
     <script>
+        // 全域安全 ID 產生器 (用於 Hashtag 標籤轉換)
+        function getSafeId(str) {
+            return btoa(encodeURIComponent(str || '')).replace(/[^a-zA-Z0-9]/g, '');
+        }
+
+        // 處理次級 Hashtag (自動捲動與地圖定位)
+        function handleSubTarget(pageId, storeName) {
+            setTimeout(() => {
+                const targetId = 'store-' + getSafeId(storeName);
+                const targetEl = document.getElementById(targetId);
+                
+                if (targetEl) {
+                    // 若是被隱藏的元素 (例如便利商店)，先將其顯示
+                    if (targetEl.style.display === 'none') {
+                        targetEl.style.display = '';
+                    }
+                    // 平滑捲動至該元素
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    // 加入高亮提示光環
+                    let ringColor = pageId === 'shopping' ? 'ring-yellow-400' : (pageId === 'lifehub' ? 'ring-green-400' : 'ring-pink-400');
+                    targetEl.classList.add('ring-4', ringColor, 'transition-all', 'duration-500', 'shadow-lg');
+                    setTimeout(() => targetEl.classList.remove('ring-4', ringColor, 'shadow-lg'), 2500);
+                }
+
+                // 自動觸發地圖定位 (針對美食與購物)
+                if (pageId === 'food' && globalFoodData) {
+                    const item = globalFoodData.find(i => i.name === storeName);
+                    if (item && typeof updateFoodMap === 'function') {
+                        updateFoodMap(item.address || '', item.name, item.lat, item.lng, item.category || '');
+                    }
+                } else if (pageId === 'shopping' && globalShoppingData) {
+                    const item = globalShoppingData.find(i => i.name === storeName);
+                    if (item && typeof showShoppingMap === 'function') {
+                        const safeCatId = getSafeId(item.category || '');
+                        showShoppingMap(safeCatId, item.category || '', item.name, item.lat, item.lng, item.address || '');
+                    }
+                }
+            }, 500); // 稍微等待 DOM 繪製完成
+        }
+
         // 手機版選單開關
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
@@ -1568,27 +1610,33 @@
 
         // 核心路由控制處理器
         function handleRoute(customRoute) {
-            let hash = 'home';
+            let rawHash = 'home';
             if (typeof customRoute === 'string') {
-                hash = customRoute;
+                rawHash = customRoute;
             } else {
                 try {
-                    hash = window.location.hash.substring(1) || 'home';
+                    rawHash = window.location.hash.substring(1) || 'home';
                 } catch(e) {
-                    hash = 'home';
+                    rawHash = 'home';
                 }
             }
             
+            // 解析主頁面與次級目標 (支援 #food#店名 格式)
+            let parts = rawHash.split('#');
+            let pageId = parts[0];
+            let subTarget = parts.slice(1).join('#'); 
+            subTarget = subTarget ? decodeURIComponent(subTarget) : null;
+            
             // 處理搜尋的特殊路由
-            if (hash.startsWith('search=')) {
-                const query = decodeURIComponent(hash.substring(7));
+            if (pageId.startsWith('search=')) {
+                const query = decodeURIComponent(pageId.substring(7));
                 renderPage('search');
                 executeSearchLogic(query);
-            } else if (hash === 'buildings' || hash === 'explore') {
-                // 原本 explore 頁面的錨點或路由，直接導向新的獨立頁面
-                window.location.href = 'explore.html' + (hash === 'buildings' ? '#buildings' : '');
+            } else if (pageId === 'buildings' || pageId === 'explore') {
+                // 將次級目標傳遞給探索頁面
+                window.location.href = 'explore.html#' + (subTarget || 'buildings');
             } else {
-                renderPage(hash);
+                renderPage(pageId, false, subTarget);
             }
         }
 
@@ -1677,7 +1725,7 @@
         }
 
         // 頁面動態注入核心函數 
-        function renderPage(pageId, skipScrollTop = false) {
+        function renderPage(pageId, skipScrollTop = false, subTarget = null) {
             const root = document.getElementById('app-root');
             const template = document.getElementById('tpl-' + pageId);
             
@@ -1717,8 +1765,8 @@
                 // 更新導航列樣式
                 updateNavStyles(pageId);
                 
-                // 平滑滾動到頂部
-                if (!skipScrollTop) {
+                // 平滑滾動到頂部 (若無次級跳轉目標才滾到頂部)
+                if (!skipScrollTop && !subTarget) {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
 
@@ -1751,16 +1799,25 @@
                 if (pageId === 'food') {
                     setTimeout(() => {
                         initFoodMap();
-                        fetchFoodData();
+                        const p = fetchFoodData();
+                        if (p) p.then(() => {
+                            if (subTarget) handleSubTarget('food', subTarget);
+                        });
                     }, 50);
                 }
 
                 if (pageId === 'shopping') {
-                    fetchShoppingData();
+                    const p = fetchShoppingData();
+                    if (p) p.then(() => {
+                        if (subTarget) handleSubTarget('shopping', subTarget);
+                    });
                 }
 
                 if (pageId === 'lifehub') {
-                    fetchMedicalData();
+                    const p = fetchMedicalData();
+                    if (p) p.then(() => {
+                        if (subTarget) handleSubTarget('lifehub', subTarget);
+                    });
                 }
             } else {
                 console.error("找不到對應的模板: ", pageId);
@@ -2016,7 +2073,7 @@
                                     
                                     return `
                                         <div class="bg-pink-50 p-3 rounded-2xl shadow-sm border border-white flex items-center gap-3 hover:-translate-y-1 hover:shadow-md transition-all group relative">
-                                            <a href="#food" class="absolute inset-0 z-0 rounded-2xl" onclick="setTimeout(() => { if(typeof updateFoodMap === 'function') updateFoodMap('${(item.address||'').replace(/'/g, "\\'")}', '${(item.name||'').replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${(item.category||'').replace(/'/g, "\\'")}') }, 800);"></a>
+                                            <a href="#food#${encodeURIComponent(item.name)}" class="absolute inset-0 z-0 rounded-2xl"></a>
                                             <div class="w-14 h-14 bg-white rounded-xl overflow-hidden shrink-0 flex items-center justify-center relative z-10 pointer-events-none">${imgContent}</div>
                                             <div class="flex-1 overflow-hidden pr-2 relative z-10 pointer-events-none">
                                                 <div class="flex items-center gap-2 mb-0.5">
@@ -2046,10 +2103,10 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 relative z-10">
                                 ${matchedShopping.map(item => {
                                     let navTarget = encodeURIComponent(item.address || item.name);
-                                    let safeCatId = btoa(encodeURIComponent(item.category||'')).replace(/[^a-zA-Z0-9]/g, '');
+                                    let safeCatId = getSafeId(item.category || '');
                                     return `
                                         <div class="bg-yellow-50 p-3 rounded-2xl shadow-sm border border-white flex items-center gap-3 hover:-translate-y-1 hover:shadow-md transition-all group relative">
-                                            <a href="#shopping" class="absolute inset-0 z-0 rounded-2xl" onclick="setTimeout(() => { if(typeof showShoppingMap === 'function') showShoppingMap('${safeCatId}', '${(item.category||'').replace(/'/g, "\\'")}', '${(item.name||'').replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${(item.address||'').replace(/'/g, "\\'")}') }, 800);"></a>
+                                            <a href="#shopping#${encodeURIComponent(item.name)}" class="absolute inset-0 z-0 rounded-2xl"></a>
                                             <div class="w-10 h-10 bg-white rounded-full shrink-0 flex items-center justify-center text-yellow-500 text-lg shadow-sm relative z-10 pointer-events-none"><i class="fa-solid fa-bag-shopping"></i></div>
                                             <div class="flex-1 overflow-hidden pr-2 relative z-10 pointer-events-none">
                                                 <div class="flex items-center gap-2 mb-0.5">
@@ -2157,7 +2214,7 @@
                                     let navTarget = encodeURIComponent(item.address || item.name);
                                     return `
                                         <div class="bg-green-50 p-3 rounded-2xl shadow-sm border border-white flex items-center gap-3 hover:-translate-y-1 hover:shadow-md transition-all group relative">
-                                            <a href="#lifehub" class="absolute inset-0 z-0 rounded-2xl"></a>
+                                            <a href="#lifehub#${encodeURIComponent(item.name)}" class="absolute inset-0 z-0 rounded-2xl"></a>
                                             <div class="w-10 h-10 bg-white rounded-full shrink-0 flex items-center justify-center text-themeGreen text-lg shadow-sm relative z-10 pointer-events-none"><i class="fa-solid fa-stethoscope"></i></div>
                                             <div class="flex-1 overflow-hidden pr-2 relative z-10 pointer-events-none">
                                                 <div class="flex items-center gap-2 mb-0.5">
@@ -3240,9 +3297,9 @@
 
     function fetchFoodData() {
         const container = document.getElementById('food-list-container');
-        if (!container) return;
+        if (!container) return Promise.resolve();
 
-        Promise.all([loadSharedFoodData(), loadSharedLikesData()]).then(([data, likes]) => {
+        return Promise.all([loadSharedFoodData(), loadSharedLikesData()]).then(([data, likes]) => {
             if (data.length === 0) {
                 container.innerHTML = '<div class="col-span-full text-center text-gray-500 font-bold py-8">目前沒有美食資料</div>';
             } else {
@@ -3454,7 +3511,7 @@
             }
 
             return `
-            <div onclick="updateFoodMap('${item.address.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${item.category.replace(/'/g, "\\'")}')" class="bg-white p-4 rounded-3xl shadow-cute flex items-center gap-4 hover:-translate-y-1 transition-transform cursor-pointer border border-pink-50 group relative">
+            <div id="store-${getSafeId(item.name)}" onclick="updateFoodMap('${item.address.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${item.category.replace(/'/g, "\\'")}')" class="bg-white p-4 rounded-3xl shadow-cute flex items-center gap-4 hover:-translate-y-1 transition-transform cursor-pointer border border-pink-50 group relative">
                 
                 <div class="absolute top-3 right-4 ${style.bgColor} text-white text-[10px] sm:text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm tracking-wider inline-block">
                      ${item.category}
@@ -3756,7 +3813,7 @@
 
     function fetchShoppingData() {
         const container = document.getElementById('shopping-list-container');
-        if (!container) return;
+        if (!container) return Promise.resolve();
 
         for (let key in shoppingMaps) {
             if (shoppingMaps[key]) shoppingMaps[key].remove();
@@ -3765,7 +3822,7 @@
         shoppingClusterGroups = {};
         shoppingMarkersMap = {};
 
-        Promise.all([loadSharedShoppingData(), loadSharedLikesData()]).then(([data, likes]) => {
+        return Promise.all([loadSharedShoppingData(), loadSharedLikesData()]).then(([data, likes]) => {
             if (data.length === 0) {
                 container.innerHTML = '<div class="col-span-full text-center text-gray-500 font-bold py-8">目前沒有店家資料</div>';
             } else {
@@ -3888,7 +3945,7 @@
                 `;
 
                 return `
-                    <div data-brand="${storeBrand}" ${displayStyle} onclick="showShoppingMap('${safeCatId}', '${catName.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${item.address.replace(/'/g, "\\'")}')" class="store-item bg-gray-50 rounded-[1.5rem] p-2 sm:p-3 shadow-sm border-2 border-transparent hover:border-gray-200 hover:bg-white hover:-translate-y-1 transition-all cursor-pointer group flex flex-col h-full relative">
+                    <div id="store-${getSafeId(item.name)}" data-brand="${storeBrand}" ${displayStyle} onclick="showShoppingMap('${safeCatId}', '${catName.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${item.address.replace(/'/g, "\\'")}')" class="store-item bg-gray-50 rounded-[1.5rem] p-2 sm:p-3 shadow-sm border-2 border-transparent hover:border-gray-200 hover:bg-white hover:-translate-y-1 transition-all cursor-pointer group flex flex-col h-full relative">
                         <a href="https://www.google.com/maps/dir/?api=1&destination=${navTarget}" target="_blank" onclick="event.stopPropagation()" class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm w-7 h-7 rounded-lg shadow-sm hover:bg-blue-500 hover:text-white transition-colors z-20 text-gray-400 flex items-center justify-center border border-gray-100" title="開啟導航"><i class="fa-solid fa-location-arrow text-[10px]"></i></a>
                         <div class="w-full h-24 sm:h-32 rounded-[1rem] mb-2 overflow-hidden bg-white relative flex items-center justify-center shrink-0 border border-gray-100 shadow-inner">
                             ${imgContent}
@@ -3917,7 +3974,7 @@
                 }
 
                 return `
-                    <li data-brand="${storeBrand}" ${displayStyle} onclick="showShoppingMap('${safeCatId}', '${catName.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${item.address.replace(/'/g, "\\'")}')" class="store-item flex items-center justify-between bg-gray-50 p-3 rounded-xl hover:bg-white hover:shadow-sm transition-all group cursor-pointer border border-transparent hover:border-gray-100">
+                    <li id="store-${getSafeId(item.name)}" data-brand="${storeBrand}" ${displayStyle} onclick="showShoppingMap('${safeCatId}', '${catName.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${item.address.replace(/'/g, "\\'")}')" class="store-item flex items-center justify-between bg-gray-50 p-3 rounded-xl hover:bg-white hover:shadow-sm transition-all group cursor-pointer border border-transparent hover:border-gray-100">
                         <div class="flex items-start flex-1 overflow-hidden pr-2">
                             ${storeIconHtml}
                             <div class="flex flex-col overflow-hidden pl-1.5">
@@ -3939,7 +3996,7 @@
         const renderBlock = (catObj, widthClass) => {
             if (!catObj) return '';
             const { name: catName, items, isPhoto: isPhotoCategory } = catObj;
-            const safeCatId = btoa(encodeURIComponent(catName)).replace(/[^a-zA-Z0-9]/g, '');
+            const safeCatId = getSafeId(catName);
 
             let style;
             if (catName.includes('生鮮') || catName.includes('超市') || catName.includes('採買') || catName.includes('食品') || catName.includes('市場') || catName.includes('便利')) style = stylePool[0];
@@ -4219,9 +4276,9 @@
 
     function fetchMedicalData() {
         const container = document.getElementById('medical-list-container');
-        if (!container) return;
+        if (!container) return Promise.resolve();
 
-        loadSharedMedicalData().then(data => {
+        return loadSharedMedicalData().then(data => {
             renderMedicalData(data);
         }).catch(err => {
             console.error('Medical CSV Fetch Error:', err);
@@ -4265,7 +4322,7 @@
             const itemsHtml = items.map(item => {
                 const navTarget = encodeURIComponent((item.address && item.address.trim() !== '') ? item.address : item.name);
                 return `
-                    <li class="bg-gray-50 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all group flex flex-col gap-2 border border-transparent hover:border-gray-100 h-full justify-between">
+                    <li id="store-${getSafeId(item.name)}" class="bg-gray-50 p-4 rounded-2xl hover:bg-white hover:shadow-md transition-all group flex flex-col gap-2 border border-transparent hover:border-gray-100 h-full justify-between">
                         <div class="flex items-start justify-between w-full">
                             <div class="flex flex-col flex-1 pr-2">
                                 <div class="flex items-start">
