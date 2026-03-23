@@ -21,7 +21,6 @@
     </script>
 
 
-
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -975,7 +974,7 @@
                     <div class="col-span-full lg:col-span-1 bg-gradient-to-r from-purple-50 to-fuchsia-50 rounded-[2rem] p-5 sm:p-6 border-4 border-white shadow-cute relative overflow-hidden flex flex-col h-full lg:h-auto">
                         <div class="absolute -right-4 -top-4 text-6xl text-purple-100 opacity-50 pointer-events-none"><i class="fa-solid fa-map-location-dot"></i></div>
                         <div class="w-full relative z-10 flex flex-col h-full">
-                            <h3 class="text-lg font-black text-purple-800 mb-2 flex items-center flex-wrap gap-y-1"><i class="fa-solid fa-magnifying-glass-location mr-2 text-purple-500"></i> 新編鄰里查詢 <span class="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-lg ml-1 shadow-sm whitespace-nowrap">115年3月1日生效</span> (測試中)</h3>
+                            <h3 class="text-lg font-black text-purple-800 mb-2 flex items-center flex-wrap gap-y-1"><i class="fa-solid fa-magnifying-glass-location mr-2 text-purple-500"></i> 新編鄰里查詢 <span class="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-lg ml-1 shadow-sm whitespace-nowrap">115年3月1日生效</span></h3>
                             <p class="text-xs text-purple-600 font-bold mb-3">輸入路名或社區地址，查詢最新行政里別調整</p>
                             <div class="flex gap-2 w-full">
                                 <input type="text" id="address-input" placeholder="例如：文青路、樂善二路..." class="flex-1 min-w-0 rounded-xl border-2 border-purple-200 px-3 sm:px-4 py-2 text-sm font-bold text-gray-700 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-100 bg-white shadow-inner transition-all">
@@ -1223,7 +1222,7 @@
                         <div class="mb-6 relative z-10 bg-blue-50/50 p-4 md:p-6 rounded-[1.5rem] border-2 border-blue-100/60 shadow-inner flex flex-col md:flex-row gap-4 md:gap-6 items-stretch">
                             <!-- 左側：輸入區 -->
                             <div class="w-full md:w-1/2 flex flex-col justify-center">
-                                <h4 class="text-sm md:text-base font-black text-blue-700 mb-2 flex items-center"><i class="fa-solid fa-magnifying-glass-location mr-1.5 text-blue-500"></i>一鍵查詢我家學區 (測試中)</h4>
+                                <h4 class="text-sm md:text-base font-black text-blue-700 mb-2 flex items-center"><i class="fa-solid fa-magnifying-glass-location mr-1.5 text-blue-500"></i>一鍵查詢我家學區</h4>
                                 <p class="text-xs text-blue-500 font-bold mb-4">輸入完整地址即可快速對照最新學區（建議包含門牌號碼以利精確判斷）</p>
                                 <div class="flex gap-2 w-full">
                                     <input type="text" id="school-address-input" placeholder="例如：文青路100號" class="flex-1 min-w-0 rounded-xl border-2 border-blue-200 px-3 sm:px-4 py-2 text-sm font-bold text-gray-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white shadow-inner transition-all">
@@ -1231,9 +1230,12 @@
                                 </div>
                             </div>
                             <!-- 右側：結果區 -->
-                            <div class="w-full md:w-1/2 flex flex-col justify-center ">
+                            <div class="w-full md:w-1/2 flex flex-col justify-center min-h-[100px]">
                                 <!-- 預設提示狀態 -->
-                                
+                                <div id="school-result-placeholder" class="text-center text-blue-400/60 font-bold text-sm bg-white/50 rounded-xl border border-blue-200/50 p-4 h-full flex flex-col items-center justify-center">
+                                    <i class="fa-solid fa-school text-2xl mb-2 opacity-50"></i>
+                                    查詢結果將顯示於此
+                                </div>
                                 <!-- 實際結果 -->
                                 <div id="school-result" class="hidden w-full h-full"></div>
                             </div>
@@ -1364,7 +1366,7 @@
                             <div class="text-xs md:text-sm text-rose-600 bg-rose-50/50 p-4 rounded-xl border-2 border-rose-100 flex items-start gap-3">
                                 <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-rose-400"></i>
                                 <p class="font-black leading-relaxed">
-                                    具體學區劃分依照桃園市政府教育局公告「鄰里別」為準，建議設籍前先向區公所或學校教務處確認。
+                                    具體學區劃分依照當年桃園市政府教育局公告的「鄰里別」為準，建議設籍前先向區公所或學校教務處確認。
                                 </p>
                             </div>
                         </div>
@@ -2910,7 +2912,7 @@
             }
 
             if (!found) {
-                if (cleanedInput.includes('文青') || cleanedInput.includes('文藝')|| cleanedInput.includes('文學')) { newVillage = '文青里'; }
+                if (cleanedInput.includes('文青') || cleanedInput.includes('文藝')) { newVillage = '文青里'; }
                 else if (cleanedInput.includes('文桃') || cleanedInput.includes('體大') || cleanedInput.includes('牛角坡路')) { newVillage = '文桃里'; }
                 else if (cleanedInput.includes('樂善') || cleanedInput.includes('文樂')) { newVillage = '樂善里'; }
                 else if (cleanedInput.includes('長樂') || cleanedInput.includes('長慶')) { newVillage = '長樂里'; }
@@ -3604,13 +3606,16 @@
 
             const GAS_URL = "https://script.google.com/macros/s/AKfycbw0t0lUbxn6MV30sK75uGCNz6y_paQzQHtTvyFBpVd-uuPIAJ3op--wkv9TI6EjuGUxWw/exec";
             
-            // 💡 備援推算函式：依照官方時刻表推算 (每15分鐘一班)
+            // 💡 備援推算函式：依照官方時刻表推算
             const generateStaticMrtTimes = (schedule) => {
                 const now = new Date();
                 const totalCurrentSecs = now.getMinutes() * 60 + now.getSeconds();
                 let nextTotalSecs = schedule.map(m => m * 60).find(s => s >= totalCurrentSecs);
                 if (nextTotalSecs === undefined) nextTotalSecs = (60 + schedule[0]) * 60;
-                return (nextTotalSecs - totalCurrentSecs) / 60;
+    
+                // ✨ 關鍵修正：將結果減去 1 分鐘
+                const result = (nextTotalSecs - totalCurrentSecs) / 60;
+                return Math.max(0, result - 1); 
             };
 
             try {
@@ -3641,14 +3646,18 @@
 
                 // 💡 修正機捷時間解析：找出最小(最快)的時間
                 const getClosestMrt = (dirFilter) => {
-                    const trains = mrtA7Data.filter(dirFilter);
+                   const trains = mrtA7Data.filter(dirFilter);
                     if (!trains.length) return undefined;
                     const times = trains.map(t => {
                         const val = t.CountDownTime !== undefined ? t.CountDownTime : t.EstimateTime;
                         return parseFloat(val);
                     }).filter(t => !isNaN(t));
+                    
                     if (!times.length) return undefined;
-                    return Math.min(...times);
+    
+                    // ✨ 關鍵修正：取得最小值後減去 1 分鐘
+                    const closestTime = Math.min(...times);
+                    return Math.max(0, closestTime - 1); 
                 };
 
                 let northMrt = getClosestMrt(m => String(m.Direction) === "0" || (m.direction && m.direction.includes("北上")));
