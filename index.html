@@ -1813,8 +1813,8 @@ const [foodData, shoppingData, medicalData, communityData, likesData] = await Pr
 let totalLikes = 0;
 if (foodData) {
     foodData.forEach(item => {
-        const localLikes = likesData[item.name] ? likesData[item.name].users.length : 0;
-        totalLikes += Math.max((item.likesCount || 0), localLikes);
+        // 直接取 CSV 第 15 欄的數字 (item.likesCount)
+        totalLikes += (item.likesCount || 0);
     });
 }
 if (shoppingData) {
