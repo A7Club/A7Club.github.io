@@ -257,14 +257,26 @@
                         </div>
                         
                         <div class="flex items-end justify-between mt-auto relative z-10 w-full">
-                            <div class="flex flex-col gap-1">
+                            <div class="flex flex-col gap-1 w-full">
                                 <div class="flex items-baseline gap-1">
                                     <span class="aqi-status text-3xl md:text-4xl font-black text-emerald-500 tracking-tight leading-none drop-shadow-sm transition-colors">連線</span>
                                     <span class="aqi-value text-[9px] sm:text-[10px] font-bold text-emerald-600/60 ml-1 transition-colors">(AQI: --)</span>
                                 </div>
-                                <div class="flex items-baseline gap-1 mt-0.5 bg-white/50 px-2 py-0.5 rounded-lg w-max shadow-sm border border-white/60">
-                                    <span class="text-[9px] sm:text-[10px] font-black text-emerald-700/60 mr-1">PM2.5</span>
-                                    <span class="pm25-value text-lg md:text-xl font-black text-emerald-500 leading-none transition-colors">--</span>
+                                <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
+                                    <div class="flex items-baseline gap-1 bg-white/50 px-2 py-0.5 rounded-lg shadow-sm border border-white/60">
+                                        <span class="text-[9px] sm:text-[10px] font-black text-emerald-700/60 mr-1">PM2.5</span>
+                                        <span class="pm25-value text-base sm:text-lg font-black text-emerald-500 leading-none transition-colors">--</span>
+                                    </div>
+                                    <!-- 新增：濕氣 -->
+                                    <div id="humidity-badge" style="display: none;" class="flex items-baseline gap-1 bg-blue-50/70 px-2 py-0.5 rounded-lg shadow-sm border border-blue-100/60">
+                                        <i class="fa-solid fa-droplet text-[9px] text-blue-400 mr-0.5"></i>
+                                        <span class="humidity-value text-base sm:text-lg font-black text-blue-500 leading-none">--</span><span class="text-[9px] font-black text-blue-400">%</span>
+                                    </div>
+                                    <!-- 新增：起霧通知 -->
+                                    <div id="fog-alert" style="display: none;" class="flex items-center gap-1 bg-gray-500/80 px-2 py-1 rounded-lg shadow-sm border border-gray-400 backdrop-blur-sm animate-pulse">
+                                        <i class="fa-solid fa-smog text-[10px] text-gray-100"></i>
+                                        <span class="text-[10px] sm:text-xs font-black text-white leading-none">起霧注意</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -915,7 +927,7 @@
             <!-- ============================================== -->
             <div id="mod-news-full" class="content-module mb-12 hidden" data-shows-on="news">
                 <div class="flex items-center mb-6">
-                    <h2 class="text-2xl font-black text-cyan-600 flex items-center"><i class="fa-solid fa-tower-broadcast mr-3 text-3xl"></i>A7 綜合新聞頻道</h2>
+                    <h2 class="text-2xl font-black text-cyan-400 flex items-center"><i class="fa-solid fa-tower-broadcast mr-3 text-3xl"></i>A7 綜合新聞頻道</h2>
                 </div>
                 
                 <div id="news-full-container" class="relative z-10">
@@ -1263,19 +1275,7 @@
                 </td>
             </tr>
 
-            
-
-            <tr class="hover:bg-blue-50/40 transition-colors bg-gray-50/30 group/row">
-                <td class="p-3 md:p-5 text-gray-800 border-r border-blue-50 leading-snug">文樂里</td>
-                <td class="p-3 md:p-5">
-                    <div class="flex flex-col gap-y-2">
-                        <div class="flex items-center">
-                            <span>樂善國小、文青國中小</span>
-                            <span class="ml-2 text-[9px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">自由學區</span>
-                        </div>
-                    </div>
-                </td>
-            </tr>
+        
 
             <tr class="hover:bg-blue-50/40 transition-colors group/row">
                 <td class="p-3 md:p-5 text-gray-800 border-r border-blue-50 leading-snug">
@@ -1307,21 +1307,34 @@
                 <td class="p-3 md:p-5">
                     <div class="flex flex-col gap-y-2">
                         <div class="flex items-center">
-                            <span>文青國小</span>
+                            <span>樂善國小、文青國小</span>
                             <span class="ml-2 text-[9px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">自由學區</span>
                         </div>
                         <div class="flex items-center">
-                            <span>樂善國小</span>
+                            <span>樂善國小、長庚國小</span>
                             <span class="ml-2 text-[9px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">自由學區</span>
                         </div>
                     </div>
                 </td>
             </tr>
+
+                        <tr class="hover:bg-blue-50/40 transition-colors bg-gray-50/30 group/row">
+                <td class="p-3 md:p-5 text-gray-800 border-r border-blue-50 leading-snug">文樂里</td>
+                <td class="p-3 md:p-5">
+                    <div class="flex flex-col gap-y-2">
+                        <div class="flex items-center">
+                            <span>樂善國小、文青國小</span>
+                            <span class="ml-2 text-[9px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">自由學區</span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
             <tr class="hover:bg-blue-50/40 transition-colors group/row">
                 <td class="p-3 md:p-5 text-gray-800 border-r border-blue-50 leading-snug">文桃里</td>
                 <td class="p-3 md:p-5">
                     <div class="flex items-center">
-                        <span>文青國中小</span>
+                        <span>文青國小</span>
                     </div>
                 </td>
             </tr>
@@ -2914,14 +2927,14 @@
             } else if (newVillage === '文桃里') {
                 schoolResult = "文青國中小";
             } else if (newVillage === '樂善里' || newVillage === '文樂里') {
-                schoolResult = "樂善國小、文青國中小";
+                schoolResult = "樂善國小、文青國小";
                 isFree = true;
             } else if (newVillage === '長樂里') {
                 if (neighborhood !== null && neighborhood >= 10 && neighborhood <= 21) {
                     schoolResult = "樂善國小、長庚國小";
                     isFree = true;
                 } else if (neighborhood !== null && neighborhood >= 1 && neighborhood <= 9) {
-                    schoolResult = "樂善國小、文青國中小";
+                    schoolResult = "樂善國小、文青國小";
                     isFree = true;
                 } else {
                     schoolResult = "需確認確切鄰別 (1-9鄰為樂善/文青；10-21鄰為樂善/長庚)";
@@ -3211,21 +3224,40 @@
             const descEls = document.querySelectorAll('.weather-desc');
             const hlEls = document.querySelectorAll('.weather-hl');
             const iconEls = document.querySelectorAll('.weather-icon');
+            const humidityBadge = document.getElementById('humidity-badge');
+            const humidityVal = document.querySelector('.humidity-value');
+            const fogAlert = document.getElementById('fog-alert');
 
-            const renderWeather = (temp, desc, hl, iconHtml) => {
+            const renderWeather = (temp, desc, hl, iconHtml, humidity, isFoggy) => {
                 tempEls.forEach(el => el.textContent = `${temp}°C`);
                 descEls.forEach(el => el.textContent = desc);
                 hlEls.forEach(el => el.textContent = hl);
                 iconEls.forEach(el => el.innerHTML = iconHtml);
+
+                // 更新濕氣與起霧標籤
+                if (humidityBadge && humidityVal) {
+                    humidityBadge.style.display = 'flex';
+                    humidityVal.textContent = humidity;
+                }
+                if (fogAlert) {
+                    if (isFoggy) {
+                        fogAlert.style.display = 'flex';
+                    } else {
+                        fogAlert.style.display = 'none';
+                    }
+                }
             };
 
             try {
-                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.040&longitude=121.391&current_weather=true&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FTaipei');
+                // 更新 API 網址，加入濕度 (relative_humidity_2m) 與天氣狀態碼 (weather_code) 的獲取
+                const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=25.040&longitude=121.391&current=temperature_2m,relative_humidity_2m,weather_code,is_day&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FTaipei');
                 if (!res.ok) throw new Error('天氣資料連線失敗');
                 const data = await res.json();
-                const temp = Math.round(data.current_weather.temperature);
-                const code = data.current_weather.weathercode;
-                const isDay = data.current_weather.is_day; 
+                
+                const temp = Math.round(data.current.temperature_2m);
+                const humidity = Math.round(data.current.relative_humidity_2m);
+                const code = data.current.weather_code;
+                const isDay = data.current.is_day; 
                 
                 const minTemp = Math.round(data.daily.temperature_2m_min[0]);
                 const maxTemp = Math.round(data.daily.temperature_2m_max[0]);
@@ -3233,7 +3265,9 @@
 
                 let desc = '晴時多雲';
                 let icon = '<i class="fa-solid fa-cloud-sun text-yellow-300"></i>';
+                let isFoggy = false;
 
+                // 判斷天氣圖示與描述
                 if (code === 0) { 
                     desc = '晴朗無雲'; 
                     icon = isDay ? '<i class="fa-solid fa-sun text-yellow-300"></i>' : '<i class="fa-solid fa-moon text-yellow-100"></i>'; 
@@ -3243,6 +3277,7 @@
                 } else if (code >= 45 && code <= 48) { 
                     desc = '起霧'; 
                     icon = '<i class="fa-solid fa-smog text-gray-200"></i>'; 
+                    isFoggy = true;
                 } else if (code >= 51 && code <= 67) { 
                     desc = '陣雨'; 
                     icon = '<i class="fa-solid fa-cloud-rain text-blue-100"></i>'; 
@@ -3254,10 +3289,15 @@
                     icon = '<i class="fa-solid fa-cloud-bolt text-purple-200"></i>'; 
                 }
 
-                renderWeather(temp, desc, hlText, icon);
+                // A7 專屬邏輯：如果濕度 >= 95% 且沒有下大雨，有極高機率起霧
+                if (humidity >= 95 && code < 71) {
+                    isFoggy = true;
+                }
+
+                renderWeather(temp, desc, hlText, icon, humidity, isFoggy);
             } catch (e) {
                 console.info('天氣 API 無法讀取，自動使用備用呈現。');
-                renderWeather(22, '多雲時晴', '最高 24° / 最低 18°', '<i class="fa-solid fa-cloud-sun text-yellow-300"></i>');
+                renderWeather(22, '多雲時晴', '最高 24° / 最低 18°', '<i class="fa-solid fa-cloud-sun text-yellow-300"></i>', 85, false);
             }
         }
 
