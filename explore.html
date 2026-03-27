@@ -57,9 +57,12 @@
     <style>
         body {
             background-color: #FDFBF7;
-            /* 可愛的圓點背景 */
-            background-image: radial-gradient(#FF9EBB 1.5px, transparent 1.5px);
-            background-size: 40px 40px;
+            /* 融入機捷紫與可愛粉的雙色波卡圓點，加大間距與點點大小，溫和不密集 */
+            background-image:
+                radial-gradient(rgba(193, 151, 255, 0.35) 4px, transparent 4px),
+                radial-gradient(rgba(255, 158, 187, 0.25) 4px, transparent 4px);
+            background-size: 120px 120px;
+            background-position: 0 0, 60px 60px;
         }
 
         /* 自訂可愛滾動條 */
@@ -232,7 +235,8 @@
                 <div class="flex items-center min-w-0">
                     <div
                         class="w-12 h-12 bg-themePurple text-white rounded-2xl flex items-center justify-center text-2xl mr-4 transform -rotate-3 shadow-md shrink-0">
-                        <i class="fa-solid fa-ticket"></i></div>
+                        <i class="fa-solid fa-ticket"></i>
+                    </div>
                     <h2 class="text-2xl font-black text-purple-400 truncate">探索在地A7 <span id="main-title-desc"
                             class="text-sm md:text-lg text-gray-400 font-bold ml-2">了解在地生活</span></h2>
                 </div>
@@ -405,13 +409,15 @@
                         class="bg-gradient-to-br from-teal-50 to-emerald-100 rounded-[1.5rem] border-4 border-white p-3 md:p-4 shadow-cute flex flex-col justify-between relative overflow-hidden group/air hover:shadow-lg transition-all flex-1 min-w-0 min-h-[130px]">
                         <div
                             class="absolute -right-4 -bottom-4 text-emerald-200/40 text-6xl md:text-7xl z-0 pointer-events-none group-hover/air:scale-110 transition-transform">
-                            <i class="fa-solid fa-wind"></i></div>
+                            <i class="fa-solid fa-wind"></i>
+                        </div>
 
                         <div class="flex items-center justify-between w-full relative z-10 mb-1.5">
                             <div class="flex items-center gap-2">
                                 <div
                                     class="aqi-icon-container w-6 h-6 md:w-7 md:h-7 rounded-full bg-white/80 text-emerald-500 flex items-center justify-center text-[10px] md:text-xs shrink-0 shadow-sm transition-colors">
-                                    <i class="fa-solid fa-leaf"></i></div>
+                                    <i class="fa-solid fa-leaf"></i>
+                                </div>
                                 <div class="text-[10px] md:text-xs text-emerald-800/70 font-black tracking-wide">環境空氣品質
                                 </div>
                             </div>
@@ -462,12 +468,14 @@
                         class="bg-gradient-to-br from-sky-400 to-blue-400 rounded-[1.5rem] border-4 border-white/40 p-3 md:p-4 shadow-cute flex flex-col justify-between relative overflow-hidden text-white flex-1 min-w-0 min-h-[130px]">
                         <div
                             class="absolute -right-2 -bottom-2 text-sky-200/30 text-6xl md:text-7xl z-0 pointer-events-none hover:scale-110 transition-transform">
-                            <i class="fa-solid fa-cloud"></i></div>
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
 
                         <div class="flex flex-col items-start gap-1 relative z-10 w-full mb-1">
                             <div
                                 class="text-[9px] md:text-[10px] font-bold text-sky-50 flex items-center bg-black/10 px-2 py-0.5 rounded backdrop-blur-sm shadow-sm border border-white/10 w-max">
-                                <i class="fa-solid fa-location-dot mr-1"></i>桃園龜山</div>
+                                <i class="fa-solid fa-location-dot mr-1"></i>桃園龜山
+                            </div>
                             <div
                                 class="text-[9px] md:text-[10px] font-bold text-sky-50 bg-black/10 px-2 py-0.5 rounded shadow-sm border border-white/10 weather-hl whitespace-nowrap w-max">
                                 -- / --</div>
@@ -492,13 +500,15 @@
                         class="bg-gradient-to-br from-amber-50 to-yellow-100 rounded-[1.5rem] border-4 border-white p-3 md:p-4 shadow-cute flex flex-col justify-between relative overflow-hidden group/fuel hover:shadow-lg transition-all flex-1 min-w-0 min-h-[130px]">
                         <div
                             class="absolute -right-4 -bottom-4 text-yellow-200/50 text-6xl md:text-7xl z-0 pointer-events-none group-hover/fuel:scale-110 transition-transform">
-                            <i class="fa-solid fa-gas-pump"></i></div>
+                            <i class="fa-solid fa-gas-pump"></i>
+                        </div>
 
                         <div class="flex items-center justify-between w-full relative z-10 mb-1.5">
                             <div class="flex items-center gap-2">
                                 <div
                                     class="w-6 h-6 md:w-7 md:h-7 rounded-full bg-white/80 text-amber-500 flex items-center justify-center text-[10px] md:text-xs shrink-0 shadow-sm transition-colors">
-                                    <i class="fa-solid fa-gas-pump"></i></div>
+                                    <i class="fa-solid fa-gas-pump"></i>
+                                </div>
                                 <div class="text-[10px] md:text-xs text-amber-800/70 font-black tracking-wide">中油即時油價
                                 </div>
                             </div>
@@ -605,7 +615,8 @@
                 <div
                     class="bg-white rounded-[2.5rem] shadow-cute p-6 md:p-10 border-4 border-emerald-50 relative overflow-hidden">
                     <div class="absolute -right-6 -bottom-6 text-emerald-50 text-8xl floating pointer-events-none z-0">
-                        <i class="fa-solid fa-timeline"></i></div>
+                        <i class="fa-solid fa-timeline"></i>
+                    </div>
 
                     <div class="flex flex-row items-center justify-between mb-8 md:mb-10 relative z-10 gap-2">
                         <h3
@@ -762,7 +773,8 @@
                                 class="text-lg font-black text-gray-800 flex items-center border-b border-purple-100 pb-3 mb-4 shrink-0">
                                 <div
                                     class="w-8 h-8 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mr-3 shrink-0">
-                                    <i class="fa-solid fa-train-subway text-sm"></i></div>
+                                    <i class="fa-solid fa-train-subway text-sm"></i>
+                                </div>
                                 桃園機場捷運 <span class="text-purple-600 text-sm ml-2">A7 站</span>
                             </h3>
                             <!-- 手機版及電腦版皆固定為左右排列 -->
@@ -866,7 +878,8 @@
                                 class="text-lg font-black text-gray-800 flex items-center border-b border-emerald-100 pb-3 mb-4 shrink-0">
                                 <div
                                     class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mr-3 shrink-0">
-                                    <i class="fa-solid fa-stopwatch text-sm"></i></div>
+                                    <i class="fa-solid fa-stopwatch text-sm"></i>
+                                </div>
                                 即時公車到站資訊
                             </h3>
                             <div id="bus-overview-fastest-container"
@@ -889,7 +902,8 @@
                     class="bg-gradient-to-br from-rose-50 to-pink-100 rounded-[2.5rem] shadow-cute p-8 border-4 border-white relative overflow-hidden mb-8 group">
                     <div
                         class="absolute -right-6 -bottom-6 text-rose-200 text-9xl floating pointer-events-none z-0 opacity-40 group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-map-location-dot"></i></div>
+                        <i class="fa-solid fa-map-location-dot"></i>
+                    </div>
                     <h2 class="text-2xl md:text-3xl font-black text-rose-600 mb-4 relative z-10 flex items-center">
                         <i class="fa-solid fa-route mr-3 text-rose-400"></i>機捷 A7 轉乘全攻略
                     </h2>
@@ -922,7 +936,8 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-12 h-12 bg-purple-100 text-purple-500 rounded-2xl flex items-center justify-center text-2xl mr-4 shrink-0 shadow-inner">
-                                    <i class="fa-solid fa-train-subway"></i></div>
+                                    <i class="fa-solid fa-train-subway"></i>
+                                </div>
                                 <div>
                                     <h3 class="text-lg md:text-xl font-black text-gray-800">桃園機場捷運 <span
                                             class="text-purple-600 text-sm md:text-base ml-1">A7 體育大學站</span></h3>
@@ -931,7 +946,8 @@
                             </div>
                             <div
                                 class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 group-open:rotate-180 transition-transform duration-300 shrink-0 border border-gray-100">
-                                <i class="fa-solid fa-chevron-down"></i></div>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </summary>
                         <div class="px-5 pb-5 pt-2 border-t-2 border-purple-50/80">
                             <!-- 機捷動態看板 (含動畫版) -->
@@ -1067,7 +1083,8 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-12 h-12 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center text-2xl mr-4 shrink-0 shadow-inner">
-                                    <i class="fa-solid fa-building-user"></i></div>
+                                    <i class="fa-solid fa-building-user"></i>
+                                </div>
                                 <div>
                                     <h3 class="text-lg md:text-xl font-black text-gray-800">往 台北市區 / 內湖</h3>
                                     <p class="text-xs text-gray-400 font-bold mt-0.5">946、967 通勤快速公車 (A8轉乘/體大發車)</p>
@@ -1075,7 +1092,8 @@
                             </div>
                             <div
                                 class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 group-open:rotate-180 transition-transform duration-300 shrink-0 border border-gray-100">
-                                <i class="fa-solid fa-chevron-down"></i></div>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </summary>
                         <div class="px-5 pb-5 pt-2 border-t-2 border-gray-50/80">
                             <div id="bus-taipei-container" class="flex flex-col gap-3 mt-3">
@@ -1092,7 +1110,8 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-12 h-12 bg-emerald-100 text-emerald-500 rounded-2xl flex items-center justify-center text-2xl mr-4 shrink-0 shadow-inner">
-                                    <i class="fa-solid fa-bus"></i></div>
+                                    <i class="fa-solid fa-bus"></i>
+                                </div>
                                 <div>
                                     <h3 class="text-lg md:text-xl font-black text-gray-800">往 長庚醫院 / 三井</h3>
                                     <p class="text-xs text-gray-400 font-bold mt-0.5">202、603、606、607 等實用路線</p>
@@ -1100,7 +1119,8 @@
                             </div>
                             <div
                                 class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 group-open:rotate-180 transition-transform duration-300 shrink-0 border border-gray-100">
-                                <i class="fa-solid fa-chevron-down"></i></div>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </summary>
                         <div class="px-5 pb-5 pt-2 border-t-2 border-gray-50/80">
                             <div id="bus-hospital-container" class="flex flex-col gap-3 mt-3">
@@ -1117,7 +1137,8 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-12 h-12 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-2xl mr-4 shrink-0 shadow-inner">
-                                    <i class="fa-solid fa-city"></i></div>
+                                    <i class="fa-solid fa-city"></i>
+                                </div>
                                 <div>
                                     <h3 class="text-lg md:text-xl font-black text-gray-800">往 下新莊 / 迴龍站</h3>
                                     <p class="text-xs text-gray-400 font-bold mt-0.5">青山路、壽山路主要幹道</p>
@@ -1125,7 +1146,8 @@
                             </div>
                             <div
                                 class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 group-open:rotate-180 transition-transform duration-300 shrink-0 border border-gray-100">
-                                <i class="fa-solid fa-chevron-down"></i></div>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </summary>
                         <div class="px-5 pb-5 pt-2 border-t-2 border-gray-50/80">
                             <div id="bus-xinzhuang-container" class="flex flex-col gap-3 mt-3">
@@ -1142,7 +1164,8 @@
                             <div class="flex items-center">
                                 <div
                                     class="w-12 h-12 bg-pink-100 text-themePink rounded-2xl flex items-center justify-center text-2xl mr-4 shrink-0 shadow-inner">
-                                    <i class="fa-solid fa-van-shuttle"></i></div>
+                                    <i class="fa-solid fa-van-shuttle"></i>
+                                </div>
                                 <div>
                                     <h3 class="text-lg md:text-xl font-black text-gray-800">區域循環 / 社區接駁</h3>
                                     <p class="text-xs text-gray-400 font-bold mt-0.5">文青路、樂善二路生活圈</p>
@@ -1150,7 +1173,8 @@
                             </div>
                             <div
                                 class="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 group-open:rotate-180 transition-transform duration-300 shrink-0 border border-gray-100">
-                                <i class="fa-solid fa-chevron-down"></i></div>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </summary>
                         <div class="px-5 pb-5 pt-2 border-t-2 border-gray-50/80">
                             <div id="bus-local-container" class="flex flex-col gap-3 mt-3">
@@ -1162,7 +1186,8 @@
                                 class="mt-4 p-4 bg-pink-50/50 rounded-2xl border border-pink-100 flex items-start gap-3">
                                 <div
                                     class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-themePink shrink-0 shadow-sm">
-                                    <i class="fa-solid fa-bicycle"></i></div>
+                                    <i class="fa-solid fa-bicycle"></i>
+                                </div>
                                 <div>
                                     <h4 class="font-black text-gray-800 text-sm mb-1">YouBike 2.0 租借站點</h4>
                                     <p class="text-xs text-gray-600 font-bold leading-relaxed">A7站 1號出口與
@@ -1178,7 +1203,8 @@
                     <div class="flex items-center mb-6">
                         <h2
                             class="text-2xl font-black text-themeYellow flex items-center border-b-4 border-yellow-100 pb-2">
-                            <i class="fa-solid fa-lightbulb mr-3 text-3xl"></i>A7 站周邊實用資訊</h2>
+                            <i class="fa-solid fa-lightbulb mr-3 text-3xl"></i>A7 站周邊實用資訊
+                        </h2>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
@@ -1186,7 +1212,8 @@
                             class="bg-white rounded-[2rem] p-5 shadow-sm border-2 border-gray-100 flex items-start gap-4 hover:border-yellow-200 transition-colors">
                             <div
                                 class="w-10 h-10 bg-gray-100 text-gray-500 rounded-xl flex items-center justify-center text-lg shrink-0">
-                                <i class="fa-solid fa-motorcycle"></i></div>
+                                <i class="fa-solid fa-motorcycle"></i>
+                            </div>
                             <div>
                                 <h4 class="font-black text-gray-800 mb-1">機車與汽車停車資訊</h4>
                                 <p class="text-sm text-gray-600 font-bold leading-relaxed">捷運站周邊設有多處收費停車場。A7
@@ -1197,7 +1224,8 @@
                             class="bg-white rounded-[2rem] p-5 shadow-sm border-2 border-gray-100 flex items-start gap-4 hover:border-yellow-200 transition-colors">
                             <div
                                 class="w-10 h-10 bg-gray-100 text-gray-500 rounded-xl flex items-center justify-center text-lg shrink-0">
-                                <i class="fa-regular fa-clock"></i></div>
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
                             <div>
                                 <h4 class="font-black text-gray-800 mb-1">首末班車時間表</h4>
                                 <ul class="text-sm text-gray-600 font-bold space-y-1 mt-2">
@@ -1377,7 +1405,8 @@
                     class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-cute mb-8 relative overflow-hidden border-4 border-blue-50">
                     <div
                         class="absolute -right-4 -top-4 text-blue-100 text-8xl floating opacity-50 z-0 pointer-events-none">
-                        <i class="fa-solid fa-building-columns"></i></div>
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
                     <h3 class="text-2xl font-black mb-2 relative z-10 flex items-center text-themeBlue"><i
                             class="fa-solid fa-landmark-flag mr-3"></i> 公共事業與政府單位</h3>
                     <p class="text-sm font-bold text-gray-500 mb-6 relative z-10 border-b-2 border-blue-50 pb-4">
@@ -1425,12 +1454,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市龜山區中山街26號</span></div>
+                                                    class="line-clamp-1">桃園市龜山區中山街26號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1465,12 +1496,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市龜山區自強南路105號1樓</span></div>
+                                                    class="line-clamp-1">桃園市龜山區自強南路105號1樓</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1505,12 +1538,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市龜山區自強南路105號</span></div>
+                                                    class="line-clamp-1">桃園市龜山區自強南路105號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1545,12 +1580,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市龜山區自強南路105號</span></div>
+                                                    class="line-clamp-1">桃園市龜山區自強南路105號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1585,12 +1622,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區法治路1號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區法治路1號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1638,12 +1677,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區縣府路1號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區縣府路1號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1678,12 +1719,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區復興路192號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區復興路192號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–17:30</span></div>
+                                                    class="line-clamp-1">平日 08:30–17:30</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1718,12 +1761,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區縣府路59號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區縣府路59號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–17:30</span></div>
+                                                    class="line-clamp-1">平日 08:30–17:30</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1758,12 +1803,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區三元街156號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區三元街156號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–12:30, 13:30–17:30</span></div>
+                                                    class="line-clamp-1">平日 08:30–12:30, 13:30–17:30</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1798,12 +1845,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區介壽路416號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區介壽路416號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1838,12 +1887,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區縣府路1號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區縣府路1號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1878,12 +1929,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區南平路303號</span></div>
+                                                    class="line-clamp-1">桃園市桃園區南平路303號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">週二至六 08:30–21:00</span></div>
+                                                    class="line-clamp-1">週二至六 08:30–21:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1918,12 +1971,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市桃園區縣府路1號8樓</span></div>
+                                                    class="line-clamp-1">桃園市桃園區縣府路1號8樓</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1971,12 +2026,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市龜山區樂善一路6號</span></div>
+                                                    class="line-clamp-1">桃園市龜山區樂善一路6號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:30–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2011,12 +2068,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">龜山區復興街5號(長庚內)</span></div>
+                                                    class="line-clamp-1">龜山區復興街5號(長庚內)</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:30–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2051,12 +2110,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">龜山區文化一路259號</span></div>
+                                                    class="line-clamp-1">龜山區文化一路259號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:30–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2091,12 +2152,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">桃園市龜山區文昌一街102號</span></div>
+                                                    class="line-clamp-1">桃園市龜山區文昌一街102號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:30–17:30</span></div>
+                                                    class="line-clamp-1">平日 08:30–17:30</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2131,12 +2194,14 @@
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-location-dot mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">新北市林口區文化一路一段29號</span></div>
+                                                    class="line-clamp-1">新北市林口區文化一路一段29號</span>
+                                            </div>
                                             <div
                                                 class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start">
                                                 <i
                                                     class="fa-solid fa-clock mr-1.5 text-gray-400 w-3 text-center mt-0.5"></i><span
-                                                    class="line-clamp-1">平日 08:00–17:00</span></div>
+                                                    class="line-clamp-1">平日 08:00–17:00</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -2268,12 +2333,14 @@
                                     class="bg-white rounded-xl border-2 border-gray-100 p-4 shadow-sm flex flex-col relative overflow-hidden group/air hover:border-teal-200 transition-colors mt-2">
                                     <div
                                         class="absolute -right-4 -bottom-4 text-teal-50 text-7xl z-0 pointer-events-none group-hover/air:scale-110 transition-transform">
-                                        <i class="fa-solid fa-wind"></i></div>
+                                        <i class="fa-solid fa-wind"></i>
+                                    </div>
 
                                     <div class="flex items-start gap-3 relative z-10 w-full flex-1">
                                         <div
                                             class="aqi-icon-container w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center text-xl sm:text-2xl shrink-0 transition-colors mt-0.5">
-                                            <i class="fa-solid fa-leaf"></i></div>
+                                            <i class="fa-solid fa-leaf"></i>
+                                        </div>
                                         <div class="flex flex-col flex-1 min-w-0">
                                             <div
                                                 class="text-sm sm:text-base text-gray-700 font-black mb-1 leading-tight">
@@ -2480,7 +2547,8 @@
                     <h3 class="text-xl md:text-2xl font-black text-orange-500 flex items-center">
                         <div
                             class="w-12 h-12 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center mr-4 shadow-sm transform -rotate-3">
-                            <i class="fa-solid fa-school"></i></div>
+                            <i class="fa-solid fa-school"></i>
+                        </div>
                         就學與設籍指南
                     </h3>
                 </div>
@@ -2491,7 +2559,8 @@
                     class="bg-white rounded-[2rem] p-6 md:p-8 shadow-cute border-4 border-blue-50 relative overflow-hidden group hover:-translate-y-1 transition-transform">
                     <div
                         class="absolute -right-4 -bottom-4 text-8xl text-blue-100 opacity-40 group-hover:scale-110 transition-transform pointer-events-none">
-                        <i class="fa-solid fa-graduation-cap"></i></div>
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
 
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 relative z-10 gap-3">
                         <h3 class="text-xl md:text-2xl font-black text-themeBlue flex items-center">
@@ -2688,7 +2757,8 @@
                         class="bg-white rounded-[2rem] p-6 md:p-8 shadow-cute border-4 border-orange-50 relative overflow-hidden group hover:-translate-y-1 transition-transform">
                         <div
                             class="absolute -right-4 -bottom-4 text-8xl text-orange-100 opacity-40 group-hover:scale-110 transition-transform pointer-events-none">
-                            <i class="fa-solid fa-id-card-clip"></i></div>
+                            <i class="fa-solid fa-id-card-clip"></i>
+                        </div>
 
                         <h4 class="text-lg md:text-xl font-black text-orange-600 mb-5 flex items-center relative z-10">
                             <i class="fa-solid fa-house-user mr-3 text-orange-400"></i>戶籍遷入須知
@@ -2728,7 +2798,8 @@
                             class="mt-6 pt-5 border-t-2 border-dashed border-orange-100 flex items-start gap-3 relative z-10">
                             <div
                                 class="w-8 h-8 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center shrink-0 shadow-sm">
-                                <i class="fa-solid fa-lightbulb"></i></div>
+                                <i class="fa-solid fa-lightbulb"></i>
+                            </div>
                             <p class="text-sm md:text-base text-gray-600 font-bold leading-relaxed pt-1">
                                 線上申辦更方便！符合條件者可利用 <a href="https://www.ris.gov.tw/app/portal/834" target="_blank"
                                     rel="noopener noreferrer"
@@ -2745,7 +2816,8 @@
                         class="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-cute mt-8 relative overflow-hidden border-4 border-green-50 scroll-mt-24">
                         <div
                             class="absolute -right-4 -top-4 text-green-100 text-8xl floating opacity-50 z-0 pointer-events-none">
-                            <i class="fa-solid fa-school"></i></div>
+                            <i class="fa-solid fa-school"></i>
+                        </div>
                         <h3 class="text-2xl font-black mb-6 relative z-10 flex items-center text-themeGreen"><i
                                 class="fa-solid fa-book-open mr-3"></i> 在地教育單位</h3>
 
@@ -2765,7 +2837,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-themeGreen text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-star mr-1"></i>雙語教學</div>
+                                        <i class="fa-solid fa-star mr-1"></i>雙語教學
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="https://www.wcjps.tyc.edu.tw/" target="_blank"
@@ -2777,11 +2850,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 40 班 / 總量管制校</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 40 班 / 總量管制校
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區文青路</span></div>
+                                                class="line-clamp-2">桃園市龜山區文青路</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -2827,7 +2902,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-themeGreen text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-star mr-1"></i>雙語教學</div>
+                                        <i class="fa-solid fa-star mr-1"></i>雙語教學
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="http://www2.leses.tyc.edu.tw/school/web/index.php" target="_blank"
@@ -2839,11 +2915,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 35 班 / 附設幼兒園</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 35 班 / 附設幼兒園
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區樂善街200巷71號</span></div>
+                                                class="line-clamp-2">桃園市龜山區樂善街200巷71號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -2892,7 +2970,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-themeGreen text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-star mr-1"></i>雙語教學</div>
+                                        <i class="fa-solid fa-star mr-1"></i>雙語教學
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="http://www.sshes.tyc.edu.tw/" target="_blank"
@@ -2904,11 +2983,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 60 班 / 大型學校</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 60 班 / 大型學校
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區文化七路116號</span></div>
+                                                class="line-clamp-2">桃園市龜山區文化七路116號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -2947,7 +3028,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-orange-400 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-leaf mr-1"></i>生態校園</div>
+                                        <i class="fa-solid fa-leaf mr-1"></i>生態校園
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="https://www.dges.tyc.edu.tw/" target="_blank"
@@ -2959,11 +3041,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 50 班 / 歷史悠久</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 50 班 / 歷史悠久
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區大湖路175號</span></div>
+                                                class="line-clamp-2">桃園市龜山區大湖路175號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -3006,7 +3090,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-blue-400 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-book-open-reader mr-1"></i>閱讀教育</div>
+                                        <i class="fa-solid fa-book-open-reader mr-1"></i>閱讀教育
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="https://www.weses.tyc.edu.tw/" target="_blank"
@@ -3018,11 +3103,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 30 班 / 美感校園</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 30 班 / 美感校園
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區文德路81號</span></div>
+                                                class="line-clamp-2">桃園市龜山區文德路81號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -3062,7 +3149,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-yellow-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-tree mr-1"></i>森林校園</div>
+                                        <i class="fa-solid fa-tree mr-1"></i>森林校園
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="https://www.cgps.tyc.edu.tw/" target="_blank"
@@ -3074,11 +3162,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 24 班 / 醫護社區</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 24 班 / 醫護社區
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區長庚醫護新村425號</span></div>
+                                                class="line-clamp-2">桃園市龜山區長庚醫護新村425號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -3115,7 +3205,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-yellow-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-seedling mr-1"></i>田園教學</div>
+                                        <i class="fa-solid fa-seedling mr-1"></i>田園教學
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="https://www.dpps.tyc.edu.tw/index.php/zh/" target="_blank"
@@ -3127,11 +3218,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 15 班 / 特色小學</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 15 班 / 特色小學
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區振興路1169號</span></div>
+                                                class="line-clamp-2">桃園市龜山區振興路1169號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -3171,7 +3264,8 @@
                                     </div>
                                     <div
                                         class="absolute bottom-3 left-3 bg-purple-500 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-sm tracking-widest">
-                                        <i class="fa-solid fa-basketball mr-1"></i>多元社團</div>
+                                        <i class="fa-solid fa-basketball mr-1"></i>多元社團
+                                    </div>
                                 </div>
                                 <div class="p-3 sm:p-4 flex flex-col flex-1 bg-gradient-to-b from-white to-green-50/20">
                                     <a href="https://www.dgjh.tyc.edu.tw/" target="_blank"
@@ -3183,11 +3277,13 @@
                                     <div class="space-y-1.5 mt-auto">
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-600 font-bold flex items-center bg-green-50 px-2 py-1 rounded-md w-fit">
-                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 40 班 / 體育班</div>
+                                            <i class="fa-solid fa-users mr-1.5 text-green-500"></i>約 40 班 / 體育班
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-2">
                                             <i class="fa-solid fa-location-dot mr-1.5 text-gray-400 mt-0.5"></i><span
-                                                class="line-clamp-2">桃園市龜山區文化二路168號</span></div>
+                                                class="line-clamp-2">桃園市龜山區文化二路168號</span>
+                                        </div>
                                         <div
                                             class="text-[10px] sm:text-xs text-gray-500 font-bold flex items-start px-1 mt-0.5">
                                             <i class="fa-solid fa-map-location-dot mr-1.5 text-gray-400 mt-1"></i>
@@ -4211,7 +4307,7 @@
             { "village": "文藝里", "neighborhoods": [19], "streets": ["（同調整前）"], "tag": "由原文青里16鄰調整" },
             { "village": "文藝里", "neighborhoods": [20], "streets": ["（同調整前）"], "tag": "由原文青里17鄰調整" },
             { "village": "長庚里", "neighborhoods": [1], "streets": ["文德路108號"], "tag": "由原樂善里28鄰調整" },
-            { "village": "長庚里", "neighborhoods": [2], "streets": ["文化二路386-406（雙）", "長庚路1號（長庚醫院）"], "tag": "（同調整前）" },
+            { "village": "長庚里", "neighborhoods": [2], "streets": ["文化二路386-406（雙）", "長庚路1號（長庚醫院）", "長庚一街"], "tag": "（同調整前）" },
             { "village": "長庚里", "neighborhoods": [3], "streets": ["長庚路2號、3號", "文化二路408-430（雙）"], "tag": "（同調整前）" },
             { "village": "長庚里", "neighborhoods": [4], "streets": ["文化二路432-460（雙）", "復興街1-50號"], "tag": "（同調整前）" },
             { "village": "長庚里", "neighborhoods": [5], "streets": ["文化二路462-490（雙）", "長庚醫護新村1-100號"], "tag": "（同調整前）" },
@@ -4430,7 +4526,7 @@
             // 去除重複的 strongMatches (同里同鄰的多重條件命中的結果合併)
             const uniqueStrong = [];
             const seen = new Set();
-            
+
             // 【優化】如果有 condition 命中，就過濾掉 street_only 的命中（因為 condition 更精確）
             const hasConditionMatch = strongMatches.some(m => m.matchType === 'condition' || m.matchType === 'tag' || m.matchType === 'village');
             const filteredStrong = hasConditionMatch ? strongMatches.filter(m => m.matchType !== 'street_only') : strongMatches;
