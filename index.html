@@ -1173,7 +1173,6 @@
 
             </div>
 
-            
 
             <!-- 樂園廣播 (最新消息) -->
             <div
@@ -1653,6 +1652,16 @@
                         // 加上短暫的高亮提示框讓使用者知道定位成功
                         schoolEl.classList.add('ring-4', 'ring-themeGreen', 'ring-offset-4', 'transition-shadow', 'duration-500');
                         setTimeout(() => schoolEl.classList.remove('ring-4', 'ring-themeGreen', 'ring-offset-4'), 2500);
+                    }
+                }, 350);
+            } else if (hash === 'food-gacha') {
+                renderPage('home');
+                setTimeout(() => {
+                    const gachaEl = document.getElementById('food-gacha');
+                    if (gachaEl) {
+                        gachaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        gachaEl.classList.add('ring-4', 'ring-themePink', 'ring-offset-4', 'transition-shadow', 'duration-500');
+                        setTimeout(() => gachaEl.classList.remove('ring-4', 'ring-themePink', 'ring-offset-4'), 2500);
                     }
                 }, 350);
             } else {
