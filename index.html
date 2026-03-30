@@ -2284,6 +2284,9 @@
         // --- 清理便利商店品牌前綴 ---
         function getCleanStoreName(name, category) {
             if (!name) return name;
+            if (name.includes('蝦皮')) {
+                return name.replace(/^(蝦皮店到店|蝦皮)\s*[-－]?\s*/i, '').trim();
+            }
             if (category && category.includes('便利')) {
                 return name.replace(/^(7-ELEVEN|7-11|全家便利商店|全家|萊爾富便利商店|萊爾富|OK便利商店|OK MART)\s*[-－]?\s*/i, '').trim();
             }
@@ -4025,6 +4028,7 @@
 
             let mrtCat = null;
             let convenienceCat = null;
+            let shoppingCenterCat = null;
             let photoCats = [];
             let normalCats = [];
 
@@ -4033,8 +4037,10 @@
                     mrtCat = { name: catName, items: items };
                 } else if (catName.includes('便利')) {
                     convenienceCat = { name: catName, items: items, isPhoto: false, isLargeText: true };
+                } else if (catName.includes('購物中心') || catName.includes('百貨') || catName.includes('商場')) {
+                    shoppingCenterCat = { name: catName, items: items, isPhoto: true, isLargeText: false };
                 } else {
-                    const isPhoto = catName.includes('購物中心') || catName.includes('觀光景點') || catName.includes('百貨') || catName.includes('商場') || catName.includes('公園');
+                    const isPhoto = catName.includes('觀光景點') || catName.includes('公園');
                     const isLargeText = catName.includes('生鮮') || catName.includes('超市');
 
                     if (isPhoto) {
@@ -4325,9 +4331,9 @@
                 `;
             }
 
-            if (convenienceCat) {
+            if (shoppingCenterCat) {
                 finalOutput += `<div class="w-full mb-6">`;
-                finalOutput += renderBlock(convenienceCat, 'w-full');
+                finalOutput += renderBlock(shoppingCenterCat, 'w-full');
                 finalOutput += `</div>`;
             }
 
@@ -4345,6 +4351,12 @@
                         </div>
                     </div>
                 `;
+            }
+
+            if (convenienceCat) {
+                finalOutput += `<div class="w-full mt-6">`;
+                finalOutput += renderBlock(convenienceCat, 'w-full');
+                finalOutput += `</div>`;
             }
 
             container.innerHTML = finalOutput;
