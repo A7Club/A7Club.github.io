@@ -2635,7 +2635,7 @@
             const navTarget = encodeURIComponent((item.address && item.address.trim() !== '') ? item.address : item.name);
 
             resultView.innerHTML = `
-                <div class="w-[90%] max-w-[240px] sm:max-w-[200px] aspect-square shrink-0 bg-white rounded-3xl flex flex-col items-center justify-center shadow-md mb-3 sm:mb-4 border-4 border-themePink overflow-hidden animate-bounce">
+                <div id="gacha-result-img-box" class="w-[90%] max-w-[240px] sm:max-w-[200px] aspect-square shrink-0 bg-white rounded-3xl flex flex-col items-center justify-center shadow-md mb-3 sm:mb-4 border-4 border-themePink overflow-hidden animate-bounce">
                     ${item.img
                     ? `<img src="${item.img}" class="w-full h-full object-cover" onerror="this.outerHTML='<i class=&quot;fa-solid ${style.iconClass} text-6xl ${style.textColor}&quot;></i>'">`
                     : `<i class="fa-solid ${style.iconClass} text-6xl ${style.textColor}"></i>`}
@@ -2658,6 +2658,12 @@
             isSlotSpinning = false;
 
             confettiEffect(btn);
+
+            // 照片跳動 8 秒後自動停止
+            setTimeout(() => {
+                const imgBox = document.getElementById('gacha-result-img-box');
+                if (imgBox) imgBox.classList.remove('animate-bounce');
+            }, 4500);
         }
 
         function confettiEffect(el) {
