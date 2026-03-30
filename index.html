@@ -22,6 +22,7 @@
       gtag('config', 'G-YJ9RJC2DRS');
     </script>
 
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for Icons -->
@@ -582,7 +583,8 @@
 
                 <div class="absolute -right-10 -top-10 text-white/40 text-9xl z-0"><i
                         class="fa-solid fa-dharmachakra"></i></div>
-                <div class="absolute -left-5 -bottom-5 text-white/40 text-8xl z-0"><i class="fa-solid fa-mountain-city"></i>
+                <div class="absolute -left-5 -bottom-5 text-white/40 text-8xl z-0"><i
+                        class="fa-solid fa-mountain-city"></i>
                 </div>
 
                 <h1 class="text-4xl md:text-5xl font-black text-white mb-4 relative z-10 drop-shadow-lg">探索 A7 在地生活 ✨
@@ -1434,22 +1436,7 @@
 
     <!-- 🩺 5. 生活通模板 (Lifehub) -->
     <template id="tpl-lifehub">
-        <div class="bg-green-50/50 p-6 rounded-3xl border-2 border-dashed border-green-200 mb-8 relative z-10">
-            <h4 class="font-black text-themeGreen mb-3 flex items-center">
-                <i class="fa-solid fa-magnifying-glass-location mr-2"></i> 學區查詢助理
-            </h4>
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input id="address-checker-input" type="text" placeholder="請輸入路名（例如：文青路、樂善二路）"
-                    class="flex-1 px-5 py-3 rounded-2xl border-2 border-white shadow-sm focus:ring-4 focus:ring-green-200 outline-none font-bold text-gray-700">
-                <button onclick="checkSchoolDistrict()"
-                    class="bg-themeGreen text-white font-black px-8 py-3 rounded-2xl shadow-md hover:bg-green-600 transition-all shrink-0">
-                    查詢學區
-                </button>
-            </div>
-            <div id="district-result-msg"
-                class="hidden mt-4 p-4 rounded-2xl bg-white border border-green-100 animate-fadeIn">
-            </div>
-        </div>
+
         <div class="fade-in">
             <div class="flex items-center mb-8">
                 <div
@@ -4037,26 +4024,58 @@
             }
 
             let mrtCat = null;
-            let mainCats = [];
-            let sideCats = [];
+            let convenienceCat = null;
+            let photoCats = [];
+            let normalCats = [];
 
             for (const [catName, items] of Object.entries(groupedCategories)) {
                 if (catName.includes('捷運') || catName.includes('機捷') || catName.includes('交通')) {
                     mrtCat = { name: catName, items: items };
+                } else if (catName.includes('便利')) {
+                    convenienceCat = { name: catName, items: items, isPhoto: false, isLargeText: true };
                 } else {
                     const isPhoto = catName.includes('購物中心') || catName.includes('觀光景點') || catName.includes('百貨') || catName.includes('商場') || catName.includes('公園');
-                    const isLargeText = catName.includes('生鮮') || catName.includes('超市') || catName.includes('便利');
+                    const isLargeText = catName.includes('生鮮') || catName.includes('超市');
 
-                    if (isPhoto || isLargeText) {
-                        mainCats.push({ name: catName, items: items, isPhoto: isPhoto, isLargeText: isLargeText });
+                    if (isPhoto) {
+                        photoCats.push({ name: catName, items: items, isPhoto: true, isLargeText: false });
                     } else {
-                        sideCats.push({ name: catName, items: items, isPhoto: false, isLargeText: false });
+                        normalCats.push({ name: catName, items: items, isPhoto: false, isLargeText: isLargeText });
                     }
                 }
             }
 
-            mainCats.sort((a, b) => catLikes[b.name] - catLikes[a.name]);
-            sideCats.sort((a, b) => catLikes[b.name] - catLikes[a.name]);
+            photoCats.sort((a, b) => catLikes[b.name] - catLikes[a.name]);
+            normalCats.sort((a, b) => catLikes[b.name] - catLikes[a.name]);
+
+            let col1 = [];
+            let col2 = [];
+            let photoIndex = 0;
+            let normalIndex = 0;
+            let usePhotoForCol1 = true;
+            let usePhotoForCol2 = false;
+
+            while (photoIndex < photoCats.length || normalIndex < normalCats.length) {
+                if (usePhotoForCol1 && photoIndex < photoCats.length) {
+                    col1.push(photoCats[photoIndex++]);
+                    usePhotoForCol1 = false;
+                } else if (normalIndex < normalCats.length) {
+                    col1.push(normalCats[normalIndex++]);
+                    usePhotoForCol1 = true;
+                } else if (photoIndex < photoCats.length) {
+                    col1.push(photoCats[photoIndex++]);
+                }
+
+                if (usePhotoForCol2 && photoIndex < photoCats.length) {
+                    col2.push(photoCats[photoIndex++]);
+                    usePhotoForCol2 = false;
+                } else if (normalIndex < normalCats.length) {
+                    col2.push(normalCats[normalIndex++]);
+                    usePhotoForCol2 = true;
+                } else if (photoIndex < photoCats.length) {
+                    col2.push(photoCats[photoIndex++]);
+                }
+            }
 
             const stylePool = [
                 { border: 'border-yellow-50', textBig: 'text-yellow-100', textTitle: 'text-themeYellow', icon: 'fa-cart-shopping', emoji: '🛒' },
@@ -4217,10 +4236,8 @@
                 let listClass = isPhotoCategory
                     ? "grid grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 relative z-10 flex-1 content-start"
                     : isConvenience
-                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 font-bold text-gray-600 relative z-10 flex-1 content-start"
-                        : isSupermarket
-                            ? "grid grid-cols-1 sm:grid-cols-2 gap-3 font-bold text-gray-600 relative z-10 flex-1 content-start"
-                            : "grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3 font-bold text-gray-600 relative z-10 flex-1 content-start";
+                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 font-bold text-gray-600 relative z-10 flex-1 content-start"
+                        : "grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-3 font-bold text-gray-600 relative z-10 flex-1 content-start";
 
                 return `
                     <div class="w-full ${widthClass} flex flex-col">
@@ -4308,28 +4325,26 @@
                 `;
             }
 
-            const maxLen = Math.max(mainCats.length, sideCats.length);
+            if (convenienceCat) {
+                finalOutput += `<div class="w-full mb-6">`;
+                finalOutput += renderBlock(convenienceCat, 'w-full');
+                finalOutput += `</div>`;
+            }
 
-            for (let i = 0; i < maxLen; i++) {
-                const mainCat = mainCats[i];
-                const sideCat = sideCats[i];
+            let col1Html = col1.map(cat => renderBlock(cat, 'w-full')).join('');
+            let col2Html = col2.map(cat => renderBlock(cat, 'w-full')).join('');
 
-                let rowHtml = `<div class="flex flex-col lg:flex-row gap-6 w-full mb-6 items-stretch">`;
-
-                if (mainCat) {
-                    let widthClass = mainCat.isLargeText ? 'lg:w-2/3' : 'lg:w-1/2';
-                    if (!sideCat) widthClass = 'w-full';
-                    rowHtml += renderBlock(mainCat, widthClass);
-                }
-
-                if (sideCat) {
-                    let widthClass = (mainCat && mainCat.isLargeText) ? 'lg:w-1/3' : 'lg:w-1/3';
-                    if (!mainCat) widthClass = 'lg:w-1/3';
-                    rowHtml += renderBlock(sideCat, widthClass);
-                }
-
-                rowHtml += `</div>`;
-                finalOutput += rowHtml;
+            if (col1Html || col2Html) {
+                finalOutput += `
+                    <div class="flex flex-col lg:flex-row gap-6 w-full items-start">
+                        <div class="flex-1 flex flex-col gap-6 w-full lg:w-1/2">
+                            ${col1Html}
+                        </div>
+                        <div class="flex-1 flex flex-col gap-6 w-full lg:w-1/2">
+                            ${col2Html}
+                        </div>
+                    </div>
+                `;
             }
 
             container.innerHTML = finalOutput;
