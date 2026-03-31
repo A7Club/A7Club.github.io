@@ -703,7 +703,7 @@
                     <div class="relative z-10 flex flex-col gap-6 w-full h-full">
                         <!-- 標題與參考資料 -->
                         <div class="flex items-center pb-1">
-                            <h2 class="text-xl md:text-2xl font-black text-purple-500 flex items-center">
+                            <h2 class="text-xl md:text-2xl font-black text-themePurple flex items-center">
                                 <i class="fa-solid fa-train-tram mr-2 md:mr-3 text-2xl md:text-3xl"></i> 機捷到站通知
                             </h2>
                             <a href="https://tdx.transportdata.tw/" target="_blank"
@@ -750,7 +750,7 @@
                         <div
                             class="w-full bg-white rounded-[1.5rem] p-4 sm:p-6 border border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] flex flex-col justify-center mt-1 flex-1">
                             <div class="flex justify-between items-center mb-6">
-                                <span class="text-xs sm:text-sm text-gray-400 font-black flex items-center"><i
+                                <span class="text-xs sm:text-sm text-gray-600 font-black flex items-center"><i
                                         class="fa-solid fa-location-crosshairs mr-1.5 md:mr-2"></i>列車即時位置</span>
                                 <span id="mrt-status-badge"
                                     class="text-[10px] sm:text-xs font-black transition-colors text-gray-400 bg-transparent"><i
@@ -1420,7 +1420,7 @@
 
             <!-- 可愛免責聲明 -->
             <div
-                class="bg-yellow-50/80 text-yellow-400 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl mb-6 flex items-center justify-center shadow-sm border border-yellow-100 text-center w-full">
+                class="bg-yellow-50/80 text-yellow-600 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl mb-6 flex items-center justify-center shadow-sm border border-yellow-100 text-center w-full">
                 <i class="fa-solid fa-comment-dots mr-2 text-yellow-500"></i>店家資訊皆由社群網友熱心分享，提供大家參考交流。
             </div>
 
@@ -2377,7 +2377,7 @@
             if (!tdxData || (northTimes.length === 0 && southTimes.length === 0)) {
                 northTimes = generateStaticMrtTimes([2, 17, 32, 47]);
                 southTimes = generateStaticMrtTimes([0, 15, 30, 45]);
-
+                statusHtml = `<i class="fa-solid fa-calendar-days mr-1.5"></i>依A7時刻表推算 (無連線)`;
                 badgeStyle = 'text-gray-400 bg-transparent';
             } else {
                 if (fetchFailed) {
@@ -2547,15 +2547,46 @@
             const reel = document.getElementById('slot-reel');
             if (!reel) return;
 
+            const now = new Date();
+            const h = now.getHours();
+            let pool = [];
+
+            const isBreakfast = (cat) => ['早', '早餐', '早午餐'].some(k => cat.includes(k));
+            const isDrink = (cat) => ['飲', '飲料', '手搖', '茶'].some(k => cat.includes(k));
+            const isDessert = (cat) => ['甜點', '冰', '蛋糕', '麵包', '甜甜圈'].some(k => cat.includes(k));
+
+            globalFoodData.forEach(item => {
+                const cat = item.category || '';
+                const isBr = isBreakfast(cat);
+                const isDr = isDrink(cat);
+                const isDe = isDessert(cat);
+
+                if (isBr && (h < 5 || h >= 12)) return;
+                if ((isDr || isDe) && h < 11) return;
+
+                let weight = 1;
+                if (isBr && h < 11) {
+                    weight = 3;
+                }
+
+                for (let w = 0; w < weight; w++) {
+                    pool.push(item);
+                }
+            });
+
+            if (pool.length === 0) {
+                pool = globalFoodData;
+            }
+
             const totalItems = 35; // 增加滾動數量感
             const stopIndex = totalItems - 5; // 停在倒數第 5 個
-            const finalItem = globalFoodData[Math.floor(Math.random() * globalFoodData.length)];
+            const finalItem = pool[Math.floor(Math.random() * pool.length)];
 
             let itemsHtml = '';
 
             // 產生滾動清單，並在目標位置插入真正的結果
             for (let i = 0; i < totalItems; i++) {
-                const item = (i === stopIndex) ? finalItem : globalFoodData[Math.floor(Math.random() * globalFoodData.length)];
+                const item = (i === stopIndex) ? finalItem : pool[Math.floor(Math.random() * pool.length)];
                 const style = getCategoryStyle(item.category, item.name);
                 const isTarget = (i === stopIndex);
 
@@ -3348,7 +3379,7 @@
             { keywords: ['甜點', '冰', '蛋糕', '麵包', '甜甜圈'], iconClass: 'fa-bread-slice', bgColor: 'bg-pink-400', textColor: 'text-pink-600', emoji: '🍩' },
             { keywords: ['咖啡'], iconClass: 'fa-mug-hot', bgColor: 'bg-themeBlue', textColor: 'text-blue-500', emoji: '☕' },
             { keywords: ['西餐', '美式', '漢堡', '義式', '披薩'], iconClass: 'fa-burger', bgColor: 'bg-orange-500', textColor: 'text-orange-700', emoji: '🍔' },
-            { keywords: ['麵', '麵食', '拉麵'], iconClass: 'fa-bacon', bgColor: 'bg-amber-500', textColor: 'text-amber-700', emoji: '🍜' },
+            { keywords: ['麵', '麵食', '拉麵'], iconClass: 'fa-bowl-food', bgColor: 'bg-amber-500', textColor: 'text-amber-700', emoji: '🍜' },
             { keywords: ['飯', '正餐', '主食', '便當', '水餃'], iconClass: 'fa-bowl-rice', bgColor: 'bg-orange-400', textColor: 'text-orange-600', emoji: '🍱' },
             { keywords: ['小吃', '宵夜', '炸', '烤', '滷味'], iconClass: 'fa-drumstick-bite', bgColor: 'bg-amber-400', textColor: 'text-amber-600', emoji: '🍗' },
             { keywords: ['鍋', '火鍋', '鐵板'], iconClass: 'fa-fire-burner', bgColor: 'bg-red-400', textColor: 'text-red-500', emoji: '🍲' },
