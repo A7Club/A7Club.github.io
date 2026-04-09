@@ -384,7 +384,7 @@
                     <div class="flex flex-col items-center w-full relative z-10">
                         <h3
                             class="font-black text-base lg:text-lg text-gray-800 leading-tight whitespace-nowrap tracking-wide group-hover:text-amber-700 transition-colors">
-                            路燈維護</h3>
+                            路燈報修</h3>
                         <p
                             class="text-gray-400 text-[9px] sm:text-[10px] md:text-xs font-bold truncate w-full mt-0.5 sm:mt-1">
                             快速申報</p>
@@ -405,10 +405,10 @@
                     <div class="flex flex-col items-center w-full relative z-10">
                         <h3
                             class="font-black text-base lg:text-lg text-gray-800 leading-tight whitespace-nowrap tracking-wide group-hover:text-orange-700 transition-colors">
-                            隨手報</h3>
+                            環境檢舉</h3>
                         <p
                             class="text-gray-400 text-[9px] sm:text-[10px] md:text-xs font-bold truncate w-full mt-0.5 sm:mt-1">
-                            環境清潔</p>
+                            環境維護</p>
                     </div>
                 </button>
 
@@ -544,8 +544,7 @@
                                         class="aqi-icon-container w-8 h-8 md:w-9 md:h-9 rounded-2xl bg-white/80 text-emerald-500 flex items-center justify-center text-xs md:text-sm shrink-0 shadow-sm transition-colors">
                                         <i class="fa-solid fa-leaf"></i>
                                     </div>
-                                    <div class="text-lg text-emerald-800/70 font-black tracking-widest"><span
-                                            class="hidden md:inline">環境</span>空氣品質</div>
+                                    <div class="text-lg text-emerald-800/70 font-black tracking-widest"><span class="hidden md:inline">環境</span>空氣品質</div>
                                 </div>
                                 <div
                                     class="air-update-time hidden md:block text-[10px] md:text-xs text-emerald-700/50 font-bold bg-white/60 px-2 py-1 rounded-lg backdrop-blur-sm border border-white/40">
@@ -595,8 +594,7 @@
                                 <i class="fa-solid fa-cloud"></i>
                             </div>
 
-                            <div
-                                class="flex flex-col items-start md:flex-row md:items-center justify-between w-full relative z-10 mb-4 md:h-9 gap-2 md:gap-0">
+                            <div class="flex flex-col items-start md:flex-row md:items-center justify-between w-full relative z-10 mb-4 md:h-9 gap-2 md:gap-0">
                                 <div
                                     class="text-lg font-black text-sky-50 flex items-center bg-black/15 px-3 py-1 rounded-lg backdrop-blur-md shadow-sm border border-white/15 w-max">
                                     <i class="fa-solid fa-location-dot mr-1.5 text-sky-100"></i>桃園龜山
@@ -2482,10 +2480,10 @@
                                 具體學區劃分依照桃園市政府教育局公告「鄰里別」為準，建議設籍前先向區公所確認。
                             </div>
 
-                            <a href="lifehub.html#section-education-hall"
+                            <button onclick="window.switchTab('school'); window.scrollTo({top: 0, behavior: 'smooth'});"
                                 class="w-full sm:w-auto inline-flex items-center justify-center text-sm font-black text-themePurple bg-purple-50 hover:bg-purple-100 border border-purple-200 px-4 py-2.5 rounded-xl transition-colors shadow-sm active:scale-95">
                                 <i class="fa-solid fa-school mr-2"></i> 了解更多各里「就學與設籍指南」
-                            </a>
+                            </button>
 
 
                         </div>
@@ -5465,14 +5463,15 @@
             `;
         }
 
-        // ==========================================
+// ==========================================
         // 🚌 交通轉乘：改用 GAS 雲端 API，並精準鎖定站牌
         // ==========================================
         async function fetchRealtimeTransitData() {
             const refreshIcon = document.getElementById('transit-refresh-icon');
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbw0t0lUbxn6MV30sK75uGCNz6y_paQzQHtTvyFBpVd-uuPIAJ3op--wkv9TI6EjuGUxWw/exec";
+            // 💡 替換為新的 GAS URL
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbyfG-5P1uureyDnwT9XvWg_49smheYnEkZ8Bca9SJWERUyPnpwWIvBxi0WRCEZcjtC3IA/exec";
 
             // 💡 備援推算函式：依照官方時刻表推算
             const generateStaticMrtTimes = (schedule) => {
@@ -5487,10 +5486,11 @@
             };
 
             try {
-                if (!GAS_URL || GAS_URL.includes("YOUR_GAS_URL_HERE")) {
+                if (!GAS_URL) {
                     throw new Error("尚未設定 GAS_URL");
                 }
 
+                // 💡 發送一次 fetch 請求，就能同時拿到捷運、公車的所有資料
                 const response = await fetch(GAS_URL, { redirect: "follow" });
                 const res = await response.json();
 
@@ -5584,7 +5584,10 @@
                         n: parseMrtTime(window.gasTransitCache.mrtA7.north),
                         s: parseMrtTime(window.gasTransitCache.mrtA7.south)
                     };
-                    renderAllTransit();
+                    // 呼叫下方的 renderAllTransit 更新畫面
+                    if (typeof renderAllTransit === 'function') {
+                        renderAllTransit();
+                    }
                 }
                 if (refreshIcon) refreshIcon.classList.remove('fa-spin');
             }
