@@ -1698,6 +1698,79 @@
 
     <!-- JavaScript 路由與注入邏輯 -->
     <script>
+
+        // 請替換成你 GAS 部署後的 Web App URL
+const TRANSPORT_API_URL = "https://script.google.com/macros/s/AKfycbyfG-5P1uureyDnwT9XvWg_49smheYnEkZ8Bca9SJWERUyPnpwWIvBxi0WRCEZcjtC3IA/exec";
+async function updateAllTransportData() {
+    const statusMsg = document.getElementById('tdx-status-msg');
+    
+    try {
+        if (statusMsg) statusMsg.innerText = "正在連線中繼站...";
+
+        const response = await fetch(TRANSPORT_API_URL);
+        const data = await response.json();
+
+        if (data.error) throw new Error(data.error);
+
+        // 1. 更新捷運資訊 (A7 站)
+        renderMRTData(data.mrt_A7);
+
+        // 2. 合併並更新公車資訊
+        const allBusData = [...data.bus_Taoyuan, ...data.bus_NewTaipei];
+        renderBusData(allBusData);
+
+        // 3. 更新環境與油價 (選用)
+        if (data.aqi_data) renderAQIData(data.aqi_data);
+        if (data.fuel_data) renderFuelData(data.fuel_data);
+
+        if (statusMsg) {
+            statusMsg.innerText = data.is_offline ? "🌙 夜間離線模式" : `✅ 最後更新：${data.updateTime}`;
+        }
+
+    } catch (error) {
+        console.error("資料抓取失敗:", error);
+        if (statusMsg) statusMsg.innerText = "❌ 無法取得即時資訊，請稍後再試";
+        // 失敗時呼叫你原本準備好的靜態時刻表備援
+        if (typeof useStaticFallback === "function") useStaticFallback();
+    }
+}
+
+function renderBusData(busList) {
+    const container = document.getElementById('bus-list-container');
+    if (!container) return;
+
+    if (busList.length === 0) {
+        container.innerHTML = "<p class='text-gray-500'>目前無公車班次資訊</p>";
+        return;
+    }
+
+    // 範例：依照預估時間排序
+    busList.sort((a, b) => (a.EstimateTime || 9999) - (b.EstimateTime || 9999));
+
+    container.innerHTML = busList.map(bus => `
+        <div class="flex justify-between items-center p-2 border-b">
+            <div>
+                <span class="font-bold text-blue-600">${bus.RouteName}</span>
+                <span class="text-sm text-gray-500 ml-2">往 ${bus.StopName}</span>
+            </div>
+            <div class="${bus.EstimateTime < 180 ? 'text-red-500 animate-pulse' : 'text-green-600'}">
+                ${formatBusTime(bus.EstimateTime, bus.StopStatus)}
+            </div>
+        </div>
+    `).join('');
+}
+
+function formatBusTime(seconds, status) {
+    if (status === 1) return "尚未發車";
+    if (status === 3) return "末班車已過";
+    if (seconds === undefined || seconds === null) return "查詢中";
+    const mins = Math.floor(seconds / 60);
+    if (mins <= 1) return "即將到站";
+    return `${mins} 分鐘`;
+}
+
+
+
         // ==========================================
         // 1. 核心邏輯、路由與資料載入
         // ==========================================
@@ -2830,12 +2903,12 @@
             `;
         }
 
-        // --- 交通轉乘：改用 GAS 雲端 API ---
+// --- 交通轉乘：改用 GAS 雲端 API ---
         async function fetchRealtimeTransitData() {
             const refreshIcon = document.getElementById('transit-refresh-icon');
             if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
-            const GAS_URL = "https://script.google.com/macros/s/AKfycbw0t0lUbxn6MV30sK75uGCNz6y_paQzQHtTvyFBpVd-uuPIAJ3op--wkv9TI6EjuGUxWw/exec";
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbyfG-5P1uureyDnwT9XvWg_49smheYnEkZ8Bca9SJWERUyPnpwWIvBxi0WRCEZcjtC3IA/exec";
 
             const generateStaticMrtTimes = (schedule) => {
                 const now = new Date();
@@ -2847,10 +2920,22 @@
             };
 
             try {
-                const response = await fetch(GAS_URL, { redirect: "follow" });
-                const res = await response.json();
-                const now = new Date();
+                // 發送請求
+                const response = await fetch(GAS_URL);
+                if (!response.ok) throw new Error(`連線失敗狀態碼: ${response.status}`);
+                
+                // 先將回應轉成純文字，防護 GAS 權限沒開導致回傳 HTML 登入頁面的問題
+                const text = await response.text();
+                let res;
+                try {
+                    res = JSON.parse(text);
+                } catch (e) {
+                    console.error("GAS 回傳非 JSON 格式 (可能權限未設為所有人):", text.substring(0, 100));
+                    throw new Error("GAS權限錯誤");
+                }
+
                 const rawData = res.data || res;
+                if (rawData.error) throw new Error(rawData.error);
 
                 const parseSafeArray = (key) => {
                     let val = rawData[key];
@@ -2899,13 +2984,14 @@
 
                 window.gasTransitCache = {
                     isFallback: false,
-                    timestamp: now.getTime(),
-                    updateTime: rawData.updateTime ? new Date(rawData.updateTime).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }) : now.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }),
+                    timestamp: new Date().getTime(),
+                    updateTime: rawData.updateTime || new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }),
                     mrtA7: { north: northMrt, south: southMrt },
                     buses: allBuses
                 };
+
             } catch (err) {
-                console.warn("※ GAS 連線或格式錯誤:", err.message);
+                console.warn("※ GAS 交通資料解析失敗:", err.message);
                 window.gasTransitCache = {
                     isFallback: true,
                     timestamp: Date.now(),
@@ -2921,15 +3007,16 @@
                 if (window.gasTransitCache) {
                     const parseMrtTime = (val) => {
                         const m = parseFloat(val);
-                        if (!isNaN(m)) return m;
-                        return null;
+                        return !isNaN(m) ? m : null;
                     };
                     window.mrtBaseData = {
                         timestamp: window.gasTransitCache.timestamp,
                         n: parseMrtTime(window.gasTransitCache.mrtA7.north),
                         s: parseMrtTime(window.gasTransitCache.mrtA7.south)
                     };
-                    renderAllTransit();
+                    if (typeof renderAllTransit === 'function') {
+                        renderAllTransit();
+                    }
                 }
                 if (refreshIcon) refreshIcon.classList.remove('fa-spin');
             }
@@ -2941,7 +3028,8 @@
             const elapsedMins = Math.floor((Date.now() - cache.timestamp) / 60000);
 
             const getGasBusTime = (routeKeyword, targetStopName) => {
-                if (cache.isFallback) return cache.errorMsg?.includes('GAS') ? '請更新GAS' : '連線異常';
+                // 將「連線異常」改為溫和的「暫無資料」，避免版面醜掉
+                if (cache.isFallback) return '暫無資料';
                 if (!cache.buses || cache.buses.length === 0) return '未發車';
 
                 const matchingBuses = cache.buses.filter(b => {
@@ -2972,14 +3060,13 @@
 
             const allResolvedBuses = busConfigs.map(conf => {
                 const time = getGasBusTime(conf.route, '捷運體育大學');
-                const isActive = (time !== '未發車' && time !== '尚未發車' && time !== '末班已過' && time !== '今日未營運' && time !== '交管不停靠' && time !== '連線異常' && time !== '請更新GAS');
+                const isActive = (time !== '未發車' && time !== '尚未發車' && time !== '末班已過' && time !== '今日未營運' && time !== '交管不停靠' && time !== '暫無資料');
                 return { ...conf, time, isActive };
             });
 
             const activeBuses = allResolvedBuses.filter(b => b.isActive);
             let displayBuses = activeBuses;
 
-            // 如果活耀路線不足 3 條，則補足至 3 條 (從非活耀中取)
             if (displayBuses.length < 3) {
                 const inactiveBuses = allResolvedBuses.filter(b => !b.isActive);
                 const needed = 3 - displayBuses.length;
@@ -3007,7 +3094,8 @@
 
             const statusMsgs = document.querySelectorAll('.tdx-status-msg');
             if (cache.isFallback) {
-                statusMsgs.forEach(el => el.innerHTML = `<div class="bg-orange-50 text-orange-700 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg border border-orange-200 font-bold inline-flex items-center shadow-sm w-full sm:w-max"><i class="fa-solid fa-triangle-exclamation mr-1.5 shrink-0"></i>異常：${cache.errorMsg}</div>`);
+                let errorTxt = cache.errorMsg === "GAS權限錯誤" ? "請確認GAS權限設為所有人" : cache.errorMsg;
+                statusMsgs.forEach(el => el.innerHTML = `<div class="bg-orange-50 text-orange-700 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg border border-orange-200 font-bold inline-flex items-center shadow-sm w-full sm:w-max"><i class="fa-solid fa-triangle-exclamation mr-1.5 shrink-0"></i>切換為備援時刻表 (${errorTxt})</div>`);
             } else {
                 statusMsgs.forEach(el => el.innerHTML = `<div class="bg-purple-50 text-purple-700 text-[11px] sm:text-xs px-3 py-1.5 rounded-lg border border-purple-200 font-bold inline-flex items-center shadow-sm w-full sm:w-max"><i class="fa-solid fa-server mr-1.5 shrink-0"></i>已連線雲端資料，每分鐘自動同步最新動態</div>`);
             }
