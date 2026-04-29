@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>柒樂部遊樂園 - 集點護照</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入日系圓體字型 -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- 引入 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'rounded': ['"M PLUS Rounded 1c"', 'sans-serif'],
+                    },
+                    colors: {
+                        macaron: {
+                            pink: '#FFD1DC',
+                            blue: '#B5EAD7',
+                            yellow: '#FFF5BA',
+                            purple: '#E2D1F9',
+                            mint: '#C7CEEA',
+                            text: '#5D5D5D' // 深灰字體，文青感不刺眼
+                        }
+                    },
+                    animation: {
+                        'bounce-pop': 'pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        pop: {
+                            '0%': { transform: 'scale(0.5)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: linear-gradient(135deg, #fff0f5 0%, #e0f7fa 100%);
+            color: #5d5d5d;
+            /* 隱藏卷軸但可滾動 */
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
+        }
+        body::-webkit-scrollbar { 
+            display: none; 
+        }
+        /* 玻璃擬態卡片 */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(255, 209, 220, 0.8);
+        }
+        /* 按鈕點擊效果 */
+        .active-scale:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center bg-gray-100">
+
+    <!-- 模擬手機邊框的容器 (在電腦上看較美觀，手機上會全螢幕) -->
+    <div class="w-full max-w-[400px] bg-gradient-to-br from-[#FFD1DC]/30 via-[#FFF5BA]/30 to-[#B5EAD7]/30 min-h-screen relative shadow-2xl overflow-hidden flex flex-col">
+        
+        <!-- 頂部裝飾與使用者資訊 -->
+        <header class="pt-8 pb-4 px-6 relative z-10">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-sm font-bold text-[#6B5B95] flex items-center gap-1">
+                        <i data-lucide="ticket" class="w-4 h-4"></i> 柒樂部 LINE 社群專屬
+                    </h2>
+                    <h1 class="text-2xl font-extrabold text-[#4A4A4A] tracking-wide mt-1 animate-float">
+                        遊樂園集點護照 🎡
+                    </h1>
+                </div>
+                <!-- 模擬使用者頭像 -->
+                <div class="w-12 h-12 rounded-full border-4 border-white shadow-sm bg-macaron-yellow overflow-hidden flex items-center justify-center">
+                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Lucky&backgroundColor=transparent" alt="User" class="w-10 h-10">
+                </div>
+            </div>
+        </header>
+
+        <!-- 主要內容區 -->
+        <main class="flex-1 px-5 pb-24 overflow-y-auto relative z-10">
+            
+            <!-- 狀態提示框 -->
+            <div class="bg-white/90 rounded-2xl p-4 shadow-sm mb-6 flex items-center gap-4 border-l-4 border-macaron-blue">
+                <div class="w-10 h-10 rounded-full bg-macaron-blue/30 flex items-center justify-center text-xl">
+                    🎈
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 font-medium">目前的進度</p>
+                    <p class="text-sm font-bold text-[#4A4A4A]">再集 <span id="points-needed" class="text-[#FF8C94] text-lg">7</span> 點，即可兌換 LINE POINTS！</p>
+                </div>
+            </div>
+
+            <!-- 集點卡本體 -->
+            <div class="glass-card rounded-3xl p-6 shadow-md relative">
+                <!-- 裝飾小彩旗 -->
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4/5 h-6 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSIyMCI+PHBvbHlnb24gcG9pbnRzPSIwLDExIDIwLDAgNDAsMTEgMjAsMjIiIGZpbGw9IiNGRkQxREMiLz48L3N2Zz4=')] bg-repeat-x opacity-80"></div>
+                
+                <div class="text-center mb-6 mt-2">
+                    <span class="inline-block bg-[#E2D1F9]/70 text-[#6B5B95] text-xs font-bold px-3 py-1 rounded-full mb-2">
+                        目標獎勵
+                    </span>
+                    <h3 class="text-xl font-bold text-[#4A4A4A]">
+                        🎁 LINE POINTS 50點
+                    </h3>
+                </div>
+
+                <!-- 10格集點區 (動態產生) -->
+                <div id="stamp-grid" class="grid grid-cols-5 gap-y-5 gap-x-2 justify-items-center">
+                    <!-- JavaScript 將在這裡插入集點圈圈 -->
+                </div>
+
+                <!-- 裝飾文字 -->
+                <p class="text-center text-xs text-gray-400 mt-6 font-medium">
+                    -- 柒樂部 遊樂園守則：開心地玩吧！ --
+                </p>
+            </div>
+
+            <!-- 互動按鈕區 -->
+            <div class="mt-8 flex flex-col gap-3">
+                <button id="btn-stamp" class="active-scale w-full bg-gradient-to-r from-[#FFD1DC] to-[#E2D1F9] text-[#4A4A4A] font-bold text-lg py-4 rounded-2xl shadow-[0_4px_15px_rgba(255,209,220,0.5)] flex justify-center items-center gap-2">
+                    <i data-lucide="scan-line"></i> 模擬掃碼集點
+                </button>
+                
+                <button id="btn-redeem" disabled class="active-scale w-full bg-gray-200 text-gray-400 font-bold text-lg py-4 rounded-2xl flex justify-center items-center gap-2 transition-all duration-300">
+                    <i data-lucide="gift"></i> 兌換獎品
+                </button>
+            </div>
+        </main>
+
+        <!-- 底部導覽列 -->
+        <nav class="absolute bottom-0 w-full bg-white/90 backdrop-blur-md border-t border-gray-100 px-6 py-3 pb-6 flex justify-between z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
+            <button class="flex flex-col items-center gap-1 text-[#FF8C94] transition-colors">
+                <i data-lucide="home" class="w-6 h-6 text-[#FF8C94]"></i>
+                <span class="text-[10px] font-bold text-[#FF8C94]">首頁</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-[#FF8C94] transition-colors">
+                <i data-lucide="map" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold">園區導覽</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-[#FF8C94] transition-colors">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+                <span class="text-[10px] font-bold">紀錄</span>
+            </button>
+        </nav>
+
+        <!-- 自訂彈跳視窗 (Modal) -->
+        <div id="modal" class="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center px-4">
+            <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="modal-content">
+                <div class="text-center">
+                    <div class="text-6xl mb-4 animate-bounce">🎉</div>
+                    <h3 class="text-xl font-bold text-[#4A4A4A] mb-2">兌換成功！</h3>
+                    <p class="text-sm text-gray-600 mb-4">恭喜您獲得 <span class="font-bold text-[#FF8C94]">LINE POINTS 50點</span>！<br>請複製下方序號至 LINE 兌換。</p>
+                    
+                    <div class="bg-gray-100 p-3 rounded-xl border border-gray-200 mb-5 flex justify-between items-center">
+                        <span class="font-mono font-bold text-lg tracking-widest text-[#4A4A4A]" id="coupon-code">Q7B9-X2K4-M1LP</span>
+                        <button onclick="copyCode()" class="text-macaron-blue hover:text-teal-500 p-2">
+                            <i data-lucide="copy"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="closeModal()" class="w-full bg-[#B5EAD7] text-[#4A4A4A] font-bold py-3 rounded-xl shadow-sm hover:brightness-95">
+                        太棒了，繼續玩！
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 初始化 Lucide 圖示
+        lucide.createIcons();
+
+        // 系統變數
+        const MAX_POINTS = 10;
+        let currentPoints = 3; // 預設已有3點，方便預覽效果
+        
+        // 童趣遊樂園圖示庫 (馬卡龍色系的表情符號)
+        const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫', '🍿', '🎈', '🍦', '🪄', '🦄'];
+
+        // DOM 元素
+        const grid = document.getElementById('stamp-grid');
+        const pointsNeededEl = document.getElementById('points-needed');
+        const btnStamp = document.getElementById('btn-stamp');
+        const btnRedeem = document.getElementById('btn-redeem');
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modal-content');
+
+        // 渲染集點卡
+        function renderStamps(isAnimatingNewPoint = false) {
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < MAX_POINTS; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center relative transition-all duration-300';
+                
+                if (i < currentPoints) {
+                    // 已集點的樣式
+                    slot.classList.add('bg-white', 'shadow-[inset_0_-3px_6px_rgba(0,0,0,0.05),0_3px_6px_rgba(0,0,0,0.05)]', 'border', 'border-gray-100');
+                    
+                    const icon = document.createElement('span');
+                    icon.className = 'text-2xl drop-shadow-sm';
+                    icon.innerText = stampIcons[i % stampIcons.length]; // 依序給予不同的遊樂園圖示
+                    
+                    // 如果是剛加入的新點數，加入彈出動畫
+                    if (isAnimatingNewPoint && i === currentPoints - 1) {
+                        icon.classList.add('animate-bounce-pop');
+                    }
+                    
+                    slot.appendChild(icon);
+                } else {
+                    // 未集點的樣式 (虛線框)
+                    slot.classList.add('border-2', 'border-dashed', 'border-gray-300', 'bg-gray-50/50');
+                    
+                    // 顯示數字
+                    const num = document.createElement('span');
+                    num.className = 'text-gray-400 font-bold text-sm';
+                    num.innerText = i + 1;
+                    slot.appendChild(num);
+                }
+                
+                grid.appendChild(slot);
+            }
+
+            // 更新文字與按鈕狀態
+            const needed = MAX_POINTS - currentPoints;
+            if (needed > 0) {
+                pointsNeededEl.innerText = needed;
+                btnRedeem.disabled = true;
+                btnRedeem.className = "active-scale w-full bg-gray-200 text-gray-400 font-bold text-lg py-4 rounded-2xl flex justify-center items-center gap-2 transition-all duration-300";
+            } else {
+                pointsNeededEl.parentElement.innerHTML = '太厲害了！您已集滿 <span class="text-[#FF8C94] text-lg">10</span> 點，快去兌換吧！';
+                
+                // 改變兌換按鈕樣式為可點擊 (高亮黃色)
+                btnRedeem.disabled = false;
+                btnRedeem.className = "active-scale w-full bg-gradient-to-r from-[#FFF5BA] to-[#FFD1DC] text-[#4A4A4A] font-bold text-lg py-4 rounded-2xl shadow-[0_4px_15px_rgba(255,245,186,0.8)] flex justify-center items-center gap-2 animate-bounce mt-4";
+                
+                // 停用集點按鈕
+                btnStamp.disabled = true;
+                btnStamp.classList.add('opacity-50');
+            }
+        }
+
+        // 模擬集點動作
+        btnStamp.addEventListener('click', () => {
+            if (currentPoints < MAX_POINTS) {
+                currentPoints++;
+                renderStamps(true);
+                
+                // 震動回饋 (如果手機支援)
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            }
+        });
+
+        // 打開兌換彈窗
+        btnRedeem.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            // 延遲一點點加入動畫類別，讓瀏覽器渲染
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        });
+
+        // 關閉兌換彈窗 & 重置點數 (重新開始玩)
+        function closeModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                // 重置遊戲
+                currentPoints = 0;
+                pointsNeededEl.parentElement.innerHTML = '再集 <span id="points-needed" class="text-[#FF8C94] text-lg">10</span> 點，即可兌換 LINE POINTS！';
+                btnStamp.disabled = false;
+                btnStamp.classList.remove('opacity-50');
+                renderStamps();
+            }, 300);
+        }
+
+        // 複製序號功能
+        function copyCode() {
+            const code = document.getElementById('coupon-code').innerText;
+            
+            // 使用剪貼簿 API 或回退方案
+            try {
+                document.execCommand('copy'); // 在這裡做個相容性處理，但實務上建議建構隱藏 input 複製
+                // 這裡我們用一個簡單的提示模擬
+                const btn = event.currentTarget;
+                const icon = btn.innerHTML;
+                btn.innerHTML = '<span class="text-xs font-bold text-teal-500">已複製!</span>';
+                setTimeout(() => {
+                    btn.innerHTML = icon;
+                }, 2000);
+            } catch (err) {
+                console.error('複製失敗');
+            }
+        }
+
+        // 初始化畫面
+        renderStamps();
+
+    </script>
+</body>
+</html>
