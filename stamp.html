@@ -48,7 +48,7 @@
         .corner-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
         .corner-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
 
-        /* 強制隱藏 html5-qrcode 預設的白色醜醜邊框 */
+        /* 強制隱藏 html5-qrcode 預設的白色邊框 */
         #qr-shaded-region > div {
             display: none !important;
         }
@@ -119,7 +119,7 @@
             <!-- 操作按鈕 -->
             <div class="mt-4">
                 <button id="start-scan" class="active-scale w-full bg-gradient-to-r from-[#FFD1DC] to-[#E2D1F9] text-[#4A4A4A] font-extrabold text-lg py-4 rounded-2xl shadow-[0_4px_15px_rgba(255,209,220,0.5)] flex justify-center items-center gap-2">
-                    <i data-lucide="maximize" class="w-5 h-5"></i> 開啟相機集點
+                    <i data-lucide="maximize" class="w-5 h-5"></i> 開啟相機 (集點 / 核銷)
                 </button>
             </div>
         </main>
@@ -140,13 +140,13 @@
             </button>
         </nav>
 
-        <!-- 掃描窗 -->
+        <!-- 掃描窗 (集點與店家核銷共用) -->
         <div id="scanner-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] hidden flex flex-col items-center justify-center p-6 text-white">
             <div class="w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl relative">
                 <div class="bg-macaron-pink/50 p-4 flex justify-between items-center text-[#6B5B95] font-bold">
                     <div class="flex items-center gap-2">
                         <i data-lucide="qr-code" class="w-5 h-5"></i>
-                        <span>正在搜尋集點 QR Code</span>
+                        <span>正在搜尋 QR Code</span>
                     </div>
                     <button onclick="stopScanning()" class="bg-white/80 rounded-full p-1"><i data-lucide="x" class="w-5 h-5 text-gray-500"></i></button>
                 </div>
@@ -170,12 +170,33 @@
                 </div>
                 
                 <div class="p-5 bg-white text-center">
-                    <p class="text-xs text-gray-500 font-medium leading-relaxed">請將相機對準柒樂部店家的<br><span class="text-[#FF8C94] font-bold">專屬 QR Code</span></p>
+                    <p class="text-xs text-gray-500 font-medium leading-relaxed">
+                        👉 <b>集點</b>：請掃描店家正方形 QR Code<br>
+                        👉 <b>店家核銷</b>：請掃描用戶兌換畫面
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- 兌換成功彈窗 -->
+        <!-- 實體獎品出示 QR Code 彈窗 (用戶端) -->
+        <div id="physical-qr-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center px-4">
+            <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="physical-qr-content">
+                <div class="text-center">
+                    <div class="text-5xl mb-4">🧸</div>
+                    <h3 class="text-xl font-bold text-[#4A4A4A] mb-2">兌換 <span id="physical-qr-prize" class="text-[#FF8C94]"></span></h3>
+                    <p class="text-xs text-gray-500 mb-6 font-medium">請將此畫面出示給店家掃描<br>掃描成功後即完成扣點與領取</p>
+                    
+                    <!-- QR Code 圖片容器 -->
+                    <div class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-[#FFD1DC] mb-6 flex justify-center items-center aspect-square mx-auto w-[220px]">
+                        <img id="physical-qr-img" src="" alt="Redeem QR Code" class="w-[180px] h-[180px] object-contain">
+                    </div>
+                    
+                    <button onclick="closePhysicalQrModal()" class="w-full bg-[#B5EAD7] text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale">完成並關閉</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 電子兌換成功彈窗 (用戶端) -->
         <div id="redeem-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center px-4">
             <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="redeem-modal-content">
                 <div class="text-center">
@@ -186,7 +207,7 @@
                         <span class="font-mono font-bold text-lg tracking-widest text-[#4A4A4A]" id="redemption-code"></span>
                         <button onclick="copyCode()" class="text-macaron-blue p-2 active-scale"><i data-lucide="copy"></i></button>
                     </div>
-                    <button onclick="closeModal()" class="w-full bg-[#B5EAD7] text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm">太棒了，繼續玩！</button>
+                    <button onclick="closeModal()" class="w-full bg-[#B5EAD7] text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale">太棒了，繼續玩！</button>
                 </div>
             </div>
         </div>
@@ -197,7 +218,7 @@
 
         // 核心設定
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzC8FV-VwFLwjv7N9jyn4xy8IrCMjZy24-xdCT9rVgpRP5bXSudababRhaAkQloVmU2LA/exec";
-        const LIFF_ID = "2009930258-GNJpigEk"; // 請填寫您的 LIFF ID
+        const LIFF_ID = "2009930258-GNJpigEk"; // 替換為您的 LIFF ID
         const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026";
         const MAX_STAMPS = 10;
         
@@ -250,6 +271,7 @@
             }
         }
 
+        // 發送 API 請求給 GAS
         async function callGAS(payload) {
             try {
                 const response = await fetch(GAS_URL, {
@@ -266,6 +288,7 @@
             }
         }
 
+        // 同步畫面與點數
         async function syncData() {
             if (!userData.userId) return;
             
@@ -279,7 +302,6 @@
             if (result.status === 'success') {
                 currentPoints = result.points;
                 
-                // 如果是新用戶，跳出歡迎訊息 (配合 GAS isNewUser 參數)
                 if(result.isNewUser) {
                     setTimeout(() => alert("歡迎加入柒樂部！已贈送您入園禮 1 點！"), 500);
                 }
@@ -293,6 +315,7 @@
             }
         }
 
+        // 渲染畫面
         function renderUI(prizes = []) {
             const grid = document.getElementById('stamp-grid');
             const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫', '🍿', '🎈', '🍦', '🪄', '🦄'];
@@ -326,6 +349,7 @@
                 const canRedeem = currentPoints >= prize.points;
                 const item = document.createElement('div');
                 item.className = `flex justify-between items-center p-4 rounded-2xl border transition-all ${canRedeem ? 'bg-white border-[#B5EAD7] shadow-sm' : 'bg-gray-100/30 border-gray-100 opacity-60'}`;
+                // 修改 onclick 傳入兩個參數：名稱與類型
                 item.innerHTML = `
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-macaron-yellow/20 flex items-center justify-center text-xl">${prize.type === '電子' ? '🎟️' : '🎁'}</div>
@@ -334,7 +358,7 @@
                             <p class="text-[10px] text-gray-400 font-medium">${prize.points} 點 • ${prize.type}獎勵</p>
                         </div>
                     </div>
-                    <button onclick="handleRedeem('${prize.name}')" ${!canRedeem ? 'disabled' : ''} 
+                    <button onclick="handleRedeem('${prize.name}', '${prize.type}')" ${!canRedeem ? 'disabled' : ''} 
                         class="px-5 py-2 rounded-xl font-bold text-xs transition-colors ${canRedeem ? 'bg-[#B5EAD7] text-[#4A4A4A] active-scale' : 'bg-gray-200 text-gray-400'}">
                         兌換
                     </button>
@@ -343,31 +367,33 @@
             });
         }
 
-        async function handleScanSuccess() {
-            if (html5QrCode) {
-                await html5QrCode.stop().catch(e => console.log(e));
-                document.getElementById('scanner-modal').classList.add('hidden');
-                document.getElementById('loading').style.display = 'flex';
-                document.getElementById('loading').style.opacity = '1';
-                
-                const result = await callGAS({ 
-                    action: 'addStamp', 
-                    userId: userData.userId, 
-                    displayName: userData.displayName, 
-                    shopCode: SHOP_QR_CODE 
-                });
-                
-                if (result.status === 'success') {
-                    await syncData();
-                    if (navigator.vibrate) navigator.vibrate(200);
-                } else {
-                    alert(result.message);
-                    document.getElementById('loading').style.display = 'none';
-                }
-            }
-        }
+        // ==========================================
+        // 兌換與核銷核心邏輯
+        // ==========================================
 
-        async function handleRedeem(prizeName) {
+        // [用戶端] 點擊兌換按鈕
+        async function handleRedeem(prizeName, prizeType) {
+            // 實體獎品：產生 QR Code 讓店家掃描 (此時不扣點)
+            if (prizeType === '實體') {
+                // 將核銷所需資訊打包成字串
+                const qrData = `REDEEM:::${userData.userId}:::${userData.displayName}:::${prizeName}`;
+                // 呼叫免費 API 產生 QR Code 圖片
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=6B5B95&data=${encodeURIComponent(qrData)}`;
+                
+                document.getElementById('physical-qr-img').src = qrUrl;
+                document.getElementById('physical-qr-prize').innerText = prizeName;
+                
+                const modal = document.getElementById('physical-qr-modal');
+                const content = document.getElementById('physical-qr-content');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.replace('scale-95', 'scale-100');
+                    content.classList.replace('opacity-0', 'opacity-100');
+                }, 10);
+                return;
+            }
+
+            // 電子獎品：直接扣點並給予序號 (維持原樣)
             if (!confirm(`確定要兌換「${prizeName}」嗎？`)) return;
             document.getElementById('loading').style.display = 'flex';
             document.getElementById('loading').style.opacity = '1';
@@ -388,20 +414,93 @@
                     content.classList.replace('opacity-0', 'opacity-100');
                 }, 10);
                 
-                if (result.type === '電子') {
-                    document.getElementById('redeem-msg').innerText = `恭喜獲得電子序號！您可以直接複製：`;
-                    document.getElementById('redeem-code-box').classList.remove('hidden');
-                    document.getElementById('redemption-code').innerText = result.code;
-                } else {
-                    document.getElementById('redeem-msg').innerText = `兌換成功！實體領取碼為：\n${result.code}\n請向社群管理員出示此畫面領取。`;
-                    document.getElementById('redeem-code-box').classList.add('hidden');
-                }
+                document.getElementById('redeem-msg').innerText = `恭喜獲得電子序號！您可以直接複製：`;
+                document.getElementById('redeem-code-box').classList.remove('hidden');
+                document.getElementById('redemption-code').innerText = result.code;
                 await syncData();
             } else {
                 document.getElementById('loading').style.display = 'none';
                 alert(result.message);
             }
         }
+
+        // [用戶端] 關閉實體 QR Code 彈窗
+        async function closePhysicalQrModal() {
+            const content = document.getElementById('physical-qr-content');
+            content.classList.replace('scale-100', 'scale-95');
+            content.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => document.getElementById('physical-qr-modal').classList.add('hidden'), 300);
+            
+            // 關閉後重新拉取點數 (因為店家可能剛才已經掃描扣點了)
+            await syncData();
+        }
+
+        // [店家端] 處理掃描到「使用者兌換 QR Code」的邏輯
+        async function handleAdminRedeem(text) {
+            if (html5QrCode) {
+                await html5QrCode.stop().catch(e => console.log(e));
+            }
+            document.getElementById('scanner-modal').classList.add('hidden');
+            
+            // 解析 QR Code 內的資料 (REDEEM:::UserID:::DisplayName:::PrizeName)
+            const parts = text.split(":::");
+            if (parts.length !== 4) return;
+            const [prefix, targetUserId, targetDisplayName, targetPrizeName] = parts;
+
+            // 二次確認防呆
+            if (!confirm(`【店家核銷確認】\n確定要為「${targetDisplayName}」核銷實體獎品「${targetPrizeName}」嗎？\n\n確認後將扣除該用戶點數。`)) {
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').style.opacity = '1';
+            
+            // 發送核銷請求給 GAS (注意：傳送的是 target 的 ID)
+            const result = await callGAS({ 
+                action: 'redeem', 
+                userId: targetUserId, 
+                displayName: targetDisplayName, 
+                prizeName: targetPrizeName 
+            });
+
+            document.getElementById('loading').style.display = 'none';
+
+            if (result.status === 'success') {
+                alert(`✅ 核銷成功！\n\n用戶：${targetDisplayName}\n獎品：${targetPrizeName}\n系統紀錄碼：${result.code}\n\n請將實體獎品交給用戶。`);
+                await syncData(); // 更新店家自己的畫面
+            } else {
+                alert(`❌ 核銷失敗：${result.message}`);
+            }
+        }
+
+        // [用戶端] 掃描店家 QR Code 集點成功
+        async function handleScanSuccess() {
+            if (html5QrCode) {
+                await html5QrCode.stop().catch(e => console.log(e));
+            }
+            document.getElementById('scanner-modal').classList.add('hidden');
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').style.opacity = '1';
+            
+            const result = await callGAS({ 
+                action: 'addStamp', 
+                userId: userData.userId, 
+                displayName: userData.displayName, 
+                shopCode: SHOP_QR_CODE 
+            });
+            
+            if (result.status === 'success') {
+                await syncData();
+                if (navigator.vibrate) navigator.vibrate(200);
+            } else {
+                alert(result.message);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // ==========================================
+        // UI 與相機控制
+        // ==========================================
 
         function closeModal() {
             const content = document.getElementById('redeem-modal-content');
@@ -422,15 +521,26 @@
             document.getElementById('scanner-modal').classList.remove('hidden');
             html5QrCode = new Html5Qrcode("reader");
             try {
-                // 強制 qrbox 必須為單一數值 (會自動產生完美的正方形遮罩)
                 await html5QrCode.start(
                     { facingMode: "environment" }, 
                     { 
-                        fps: 15, 
-                        qrbox: 260, // 設為整數 260，套件才會強制繪製 260x260 的正方形透明區
+                        fps: 20, 
+                        qrbox: 260, 
                         aspectRatio: 1.0 
                     }, 
-                    (text) => { if (text === SHOP_QR_CODE) handleScanSuccess(); }
+                    (text) => { 
+                        // 判斷掃描到的是哪種 QR Code
+                        if (text === SHOP_QR_CODE) {
+                            // 掃到集點 QR
+                            handleScanSuccess(); 
+                        } else if (text.startsWith("REDEEM:::")) {
+                            // 掃到用戶核銷 QR (店家專用)
+                            handleAdminRedeem(text);
+                        } else {
+                            // 掃到不相干的 QR Code
+                            console.log("Ignored unrecognised QR code.");
+                        }
+                    }
                 );
             } catch (err) {
                 alert("相機開啟失敗，請確認是否已允許相機存取權限。");
