@@ -461,7 +461,8 @@
                 action: 'redeem', 
                 userId: targetUserId, 
                 displayName: targetDisplayName, 
-                prizeName: targetPrizeName 
+                prizeName: targetPrizeName,
+                shopCode: SHOP_QR_CODE // 新增這行：記錄是哪個店家進行的核銷
             });
 
             document.getElementById('loading').style.display = 'none';
