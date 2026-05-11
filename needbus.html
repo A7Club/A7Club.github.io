@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <title>A7 柒樂部🎡｜通勤公車增班投訴教學</title>
+    <meta name="description" content="桃園龜山A7至雙北通勤公車增班爭取！提供桃園市政信箱投訴教學與一鍵複製範本，讓我們一起發聲爭取通勤權益。">
+    <meta name="keywords" content="A7重劃區, 公車增班, 桃園市政信箱, 967, 946, 龜山通勤">
+    <meta property="og:image" content="https://raw.githubusercontent.com/A7Club/life/main/website.jpg">
+
+    <!-- 📊 Google Analytics (GA4)追蹤代碼放置區 -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJ9RJC2DRS"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-YJ9RJC2DRS');
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts (可愛圓潤字體) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        themePink: '#FF9EBB',
+                        themeBlue: '#80CFFF',
+                        themeYellow: '#FFD166',
+                        themeGreen: '#06D6A0',
+                        themePurple: '#C197FF',
+                        bgPastel: '#FDFBF7'
+                    },
+                    boxShadow: {
+                        'cute': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+                        'sticker': '0 0 0 4px white, 0 8px 20px rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FDFBF7;
+            background-image:
+                radial-gradient(rgba(193, 151, 255, 0.35) 4px, transparent 4px),
+                radial-gradient(rgba(255, 158, 187, 0.25) 4px, transparent 4px);
+            background-size: 120px 120px;
+            background-position: 0 0, 60px 60px;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #FF9EBB;
+            border-radius: 10px;
+            border: 2px solid #FDFBF7;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff7eb3;
+        }
+    </style>
+</head>
+
+<body class="text-gray-700 antialiased min-h-screen flex flex-col relative">
+
+    <!-- 🎪 導航列 (雲朵造型) -->
+    <nav class="sticky top-4 z-40 mx-4 sm:mx-8 lg:mx-auto max-w-6xl">
+        <div
+            class="bg-white/90 backdrop-blur-md rounded-full shadow-cute px-6 py-3 flex justify-between items-center border-2 border-white">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center cursor-pointer gap-2">
+                <div
+                    class="w-10 h-10 bg-themeYellow rounded-full flex items-center justify-center text-white text-xl shadow-inner">
+                    <i class="fa-solid fa-mountain-city"></i>
+                </div>
+                <span class="font-black text-2xl tracking-wide text-themePink">A7<span
+                        class="text-themePurple">柒</span><span class="text-themeBlue">樂部　</span></span>
+            </a>
+
+            <!-- 電腦版選單 -->
+            <div class="hidden md:flex space-x-2">
+                <a href="index.html#food"
+                    class="nav-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-themePink hover:text-white transition-all">🍿
+                    找美食</a>
+                <a href="index.html#shopping"
+                    class="nav-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-themeYellow hover:text-white transition-all">🛍️
+                    買東西</a>
+                <a href="lifehub.html"
+                    class="nav-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-themeGreen hover:text-white transition-all">🩺
+                    生活通</a>
+                <a href="explore.html"
+                    class="nav-btn px-4 py-2 rounded-full font-black transition-all transform scale-105 bg-themePurple text-white shadow-md">🎠
+                    探索柒</a>
+            </div>
+
+            <!-- 手機版選單按鈕 -->
+            <div class="md:hidden">
+                <button onclick="toggleMobileMenu()"
+                    class="text-themePink text-2xl focus:outline-none w-10 h-10 bg-pink-50 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 手機版展開選單 -->
+        <div id="mobile-menu"
+            class="hidden absolute top-full right-0 mt-2 bg-white rounded-3xl shadow-cute p-5 border-2 border-pink-100 flex-col space-y-3 text-center z-50 w-max min-w-[200px]">
+            <a href="index.html#food" onclick="toggleMobileMenu()"
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-themePink bg-pink-50 shadow-sm active:scale-95 transition-transform flex items-center justify-center">🍿
+                美食販賣部</a>
+            <a href="index.html#shopping" onclick="toggleMobileMenu()"
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-themeYellow bg-yellow-50 shadow-sm active:scale-95 transition-transform flex items-center justify-center">🛍️
+                生活補給站</a>
+            <a href="lifehub.html" onclick="toggleMobileMenu()"
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-themeGreen bg-green-50 shadow-sm active:scale-95 transition-transform flex items-center justify-center">🩺
+                安心支援所</a>
+            <a href="explore.html" onclick="toggleMobileMenu()"
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-white bg-themePurple shadow-sm active:scale-95 transition-transform flex items-center justify-center">🎠
+                探索在地A7</a>
+        </div>
+    </nav>
+
+    <!-- 🎈 動態內容容器 -->
+    <main id="app-root" class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 relative">
+
+        <div class="fade-in">
+            <!-- 頁面標題 -->
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center flex-wrap gap-y-2">
+                    <div
+                        class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center text-2xl mr-4 transform -rotate-3 shadow-md shrink-0">
+                        <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                    <h2 class="text-xl md:text-2xl font-black text-rose-600 truncate">桃園龜山A7至雙北通勤公車增班 <span id="main-title-desc"
+                            class="text-sm md:text-lg text-rose-400 font-bold ml-1 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100 shadow-sm inline-block">市政信箱投訴教學</span></h2>
+                </div>
+            </div>
+
+            <!-- 投訴教學主要內容區塊 -->
+            <div class="bg-white rounded-[2.5rem] shadow-cute border-4 border-rose-100 p-6 md:p-10 relative overflow-hidden">
+                <div class="absolute -right-8 -top-8 text-rose-50 text-9xl pointer-events-none z-0 opacity-60">
+                    <i class="fa-solid fa-bullhorn"></i>
+                </div>
+
+                <div class="relative z-10">
+                    <h3 class="text-xl md:text-2xl font-black text-gray-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-500 mr-3"></i> 爭取我們的通勤權益！
+                    </h3>
+                    <p class="text-gray-600 font-bold mb-8 leading-relaxed md:text-lg">
+                        A7 重劃區人口不斷移入，但前往雙北的通勤公車班次（如 967、946 路線）在上下班尖峰時段已無法負荷，許多居民面臨<span class="text-rose-500 bg-rose-50 px-1 rounded">「看著車來卻擠不上」</span>的窘境。請大家動動手指，一人一信向桃園市政府反映，強烈要求增加班次！
+                    </p>
+
+                    <div class="space-y-6">
+                        <!-- STEP 1 -->
+                        <div class="bg-rose-50/50 rounded-2xl p-5 md:p-6 border-2 border-rose-100 shadow-sm transition-colors hover:bg-rose-50">
+                            <div class="flex items-center mb-3">
+                                <span class="bg-rose-500 text-white font-black px-3 py-1 rounded-xl mr-3 shadow-sm text-sm">STEP 1</span>
+                                <h4 class="font-black text-gray-800 text-lg">前往桃園市政信箱</h4>
+                            </div>
+                            <p class="text-gray-600 font-bold mb-4">點擊下方按鈕，開啟桃園市政府「市政信箱」陳情網頁填寫基本資料。</p>
+                            <a href="https://taotalk.tycg.gov.tw/main/PageCtrl?p=p_2&sc_Id=CC204" target="_blank" class="inline-flex items-center justify-center font-black text-white bg-rose-500 hover:bg-rose-600 px-6 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 w-full sm:w-auto text-center group">
+                                <i class="fa-solid fa-envelope-open-text mr-2 group-hover:scale-110 transition-transform"></i> 前往市政信箱填寫
+                                <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-xs opacity-70"></i>
+                            </a>
+                            
+                            <!-- 新增：截圖示意與引導區塊 -->
+                            <div class="mt-6 border-t-2 border-dashed border-rose-200 pt-5">
+                                <p class="text-rose-600 font-black text-sm mb-3 flex items-center">
+                                    <i class="fa-solid fa-hand-pointer mr-2 animate-bounce"></i> 進入網頁後，請點選下方第二排的「公車問題」分類：
+                                </p>
+                                <div class="rounded-xl overflow-hidden border-2 border-rose-200 shadow-sm bg-white">
+                                    <img src="https://i.meee.com.tw/yb0ChZ4.png" alt="點選公車問題指示圖" class="w-full h-auto object-cover" onerror="this.src='https://placehold.co/800x400/ffe4e6/e11d48?text=請點選下方【公車問題】'">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2 -->
+                        <div class="bg-blue-50/50 rounded-2xl p-5 md:p-6 border-2 border-blue-100 shadow-sm transition-colors hover:bg-blue-50">
+                            <div class="flex items-center mb-3">
+                                <span class="bg-blue-500 text-white font-black px-3 py-1 rounded-xl mr-3 shadow-sm text-sm">STEP 2</span>
+                                <h4 class="font-black text-gray-800 text-lg">複製建議內容範本</h4>
+                            </div>
+                            <p class="text-gray-600 font-bold mb-4">您可以直接複製以下範本，並貼到市政信箱的「陳情內容」欄位中，也建議加上您個人的實際站牌與通勤狀況，讓市府更了解實情！</p>
+                            
+                            <div class="relative bg-white border-2 border-blue-200 rounded-xl p-4 md:p-5 shadow-inner">
+                                <button onclick="copyTemplate()" id="copy-btn" class="absolute top-3 right-3 bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition-all px-3 py-1.5 rounded-lg text-sm font-black flex items-center shadow-sm active:scale-95">
+                                    <i class="fa-regular fa-copy mr-1.5"></i> 點我複製
+                                </button>
+                                <textarea id="petition-template" readonly class="w-full h-48 md:h-40 resize-none outline-none text-gray-700 font-bold leading-relaxed bg-transparent text-sm md:text-base mt-8 md:mt-0 pt-2 md:pt-0 md:pr-24"
+>市長您好，我是桃園市龜山區A7重劃區的居民。
+
+目前A7地區人口快速增長，但前往雙北（台北、新北）的通勤公車（如967、946等通勤路線）班次嚴重不足。導致上下班尖峰時刻，許多居民面臨滿載無法上車的窘境，嚴重影響通勤權益與生活品質。
+
+懇請市府相關單位體恤通勤族辛勞，協調客運業者於上下班尖峰時段「增加發車班次」，或「新闢直達雙北的通勤路線」。
+
+感謝市府團隊的協助與重視，期盼能盡快改善。</textarea>
+                            </div>
+                            <p id="copy-success" class="text-green-600 font-black text-sm mt-3 hidden bg-green-50 px-3 py-2 rounded-lg border border-green-200 w-max"><i class="fa-solid fa-check-circle mr-1"></i> 複製成功！請前往市政信箱貼上。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-white border-t-4 border-dashed border-pink-200 py-8 text-center mt-auto rounded-t-[3rem]">
+        <h2 class="text-xl font-black text-themePink mb-2">🎈林口、龜山美食機能生活地圖指南 </h2>
+        <p class="text-gray-400 text-sm font-bold">讓每天的生活都像在遊樂園一樣精彩！© 2026</p>
+    </footer>
+
+    <script>
+        // 手機版選單切換
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) {
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    menu.classList.add('flex');
+                } else {
+                    menu.classList.remove('flex');
+                    menu.classList.add('hidden');
+                }
+            }
+        }
+
+        // 複製範本文字功能
+        function copyTemplate() {
+            const textArea = document.getElementById('petition-template');
+            const text = textArea.value;
+            const copyBtn = document.getElementById('copy-btn');
+            
+            // 使用剪貼簿 API
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showSuccessMessage(copyBtn);
+                }).catch(err => {
+                    fallbackCopyTextToClipboard(text, copyBtn);
+                });
+            } else {
+                fallbackCopyTextToClipboard(text, copyBtn);
+            }
+        }
+
+        // 備用複製方法 (針對舊版瀏覽器或非 HTTPS)
+        function fallbackCopyTextToClipboard(text, btn) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) {
+                    showSuccessMessage(btn);
+                }
+            } catch (err) {
+                console.error('複製失敗', err);
+                alert("無法複製，請手動選取文字複製。");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // 顯示複製成功提示
+        function showSuccessMessage(btn) {
+            const msg = document.getElementById('copy-success');
+            const originalBtnHtml = btn.innerHTML;
+            
+            msg.classList.remove('hidden');
+            btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i> 已複製';
+            btn.classList.add('bg-green-500', 'text-white');
+            btn.classList.remove('bg-blue-100', 'text-blue-700');
+            
+            setTimeout(() => {
+                msg.classList.add('hidden');
+                btn.innerHTML = originalBtnHtml;
+                btn.classList.remove('bg-green-500', 'text-white');
+                btn.classList.add('bg-blue-100', 'text-blue-700');
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>
