@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
-    <title>A7 柒樂部🎡｜桃園龜山 A7 通勤公車增班需求</title>
-    <meta name="description" content="桃園龜山A7至雙北通勤公車增班爭取！提供桃園市政信箱投訴教學與一鍵複製範本，讓我們一起發聲爭取通勤權益。">
-    <meta name="keywords" content="A7重劃區, 公車增班, 桃園市政信箱, 967, 946, 龜山通勤">
+    <title>A7 柒樂部｜桃園龜山 A7 通勤公車增班需求</title>
+    <meta name="description" content="桃園龜山A7至雙北通勤公車增班爭取！提供各級政府機關申訴教學與一鍵複製範本，讓我們一起發聲爭取通勤權益。">
+    <meta name="keywords" content="A7重劃區, 公車增班, 桃園市政信箱, 公路局, 交通部, 消保會, 監察院, 967, 946, 龜山通勤">
     <meta property="og:image" content="https://raw.githubusercontent.com/A7Club/life/main/website.jpg">
 
     <!-- 📊 Google Analytics (GA4)追蹤代碼放置區 -->
@@ -78,6 +78,15 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: #ff7eb3;
+        }
+
+        /* 隱藏橫向滾動條 */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
@@ -152,40 +161,66 @@
                         class="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center text-2xl mr-4 transform -rotate-3 shadow-md shrink-0">
                         <i class="fa-solid fa-bullhorn"></i>
                     </div>
-                    <h2 class="text-xl md:text-2xl font-black text-rose-600 truncate">桃園龜山A7至雙北通勤公車增班 <span id="main-title-desc"
-                            class="text-sm md:text-lg text-rose-400 font-bold ml-1 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100 shadow-sm inline-block">市政信箱投訴教學</span></h2>
+                    <h2 class="text-xl md:text-2xl font-black text-rose-600 truncate">桃園龜山(A7) 至 雙北通勤公車增班 <span
+                            class="text-sm md:text-lg text-rose-400 font-bold ml-1 bg-rose-50 px-2 py-0.5 rounded-lg border border-rose-100 shadow-sm inline-block">投訴與建議教學</span></h2>
                 </div>
             </div>
 
             <!-- 投訴教學主要內容區塊 -->
-            <div class="bg-white rounded-[2.5rem] shadow-cute border-4 border-rose-100 p-6 md:p-10 relative overflow-hidden">
+            <div class="bg-white rounded-[2.5rem] shadow-cute border-4 border-rose-100 p-5 md:p-8 relative overflow-hidden">
                 <div class="absolute -right-8 -top-8 text-rose-50 text-9xl pointer-events-none z-0 opacity-60">
                     <i class="fa-solid fa-bullhorn"></i>
                 </div>
 
                 <div class="relative z-10">
-                    <h3 class="text-xl md:text-2xl font-black text-gray-800 mb-4 flex items-center">
-                        <i class="fa-solid fa-triangle-exclamation text-rose-500 mr-3"></i> 爭取我們的通勤權益！
+                    <h3 class="text-xl md:text-2xl font-black text-gray-800 mb-6 flex items-center border-b-2 border-gray-100 pb-4">
+                        <i class="fa-solid fa-scale-unbalanced text-rose-500 mr-3"></i> 爭取我們的通勤權益
                     </h3>
-                    <p class="text-gray-600 font-bold mb-8 leading-relaxed md:text-lg">
-                        A7 重劃區人口不斷移入，但前往雙北的通勤公車班次（如 967、946、945 路線）在上下班尖峰時段已無法負荷，許多居民面臨<span class="text-rose-500 bg-rose-50 px-1 rounded">「看著車來卻擠不上」</span>的窘境。請大家動動手指，一人一信向桃園市政府反映，強烈要求增加班次！
-                    </p>
+                    
+                    <!-- 申訴管道網格切換區 -->
+                    <div class="mb-8">
+                        <p class="text-sm font-black text-gray-600 mb-3"><i class="fa-solid fa-check-to-slot mr-1.5 text-gray-400"></i> 請點選您欲申訴 / 建議的機關：</p>
+                        <!-- 使用 Grid 佈局，手機版一排2個，平板一排3個，電腦版一排5個 -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="channel-tabs">
+                            <!-- JS將動態產生按鈕 -->
+                        </div>
+                    </div>
+
+                    <!-- 正式且專業的說明區 (Information Card Style + 生動顏色標籤) -->
+                    <div id="desc-container" class="bg-white rounded-xl p-5 md:p-6 border border-gray-200 shadow-sm mb-8 flex flex-col gap-3 relative overflow-hidden transition-all duration-300">
+                        <!-- 裝飾用側邊條 (動態變色) -->
+                        <div id="desc-sidebar" class="absolute left-0 top-0 bottom-0 w-1.5 bg-gray-400 transition-colors duration-300"></div>
+                        
+                        <div class="flex items-center gap-2 mb-1 pl-2">
+                            <h4 class="font-black text-gray-800 text-lg flex items-center tracking-wide">
+                                <i class="fa-solid fa-circle-info mr-2 text-gray-400 transition-colors duration-300" id="desc-icon"></i> 
+                                <span id="desc-title">申訴管道說明</span>
+                            </h4>
+                        </div>
+                        <p id="channel-desc" class="text-gray-600 font-bold leading-loose text-sm md:text-base pl-2 text-justify"></p>
+                        
+                        <div id="channel-phone-container" class="mt-3 pl-2 hidden">
+                            <div class="inline-flex items-center bg-gray-50 px-4 py-2 rounded-lg border border-gray-200 text-sm font-black text-gray-700 shadow-sm">
+                                <i class="fa-solid fa-phone mr-2 text-gray-500"></i> 聯絡專線：<span id="channel-phone" class="ml-1 text-gray-800 tracking-wide"></span>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="space-y-6">
                         <!-- STEP 1 -->
                         <div class="bg-rose-50/50 rounded-2xl p-5 md:p-6 border-2 border-rose-100 shadow-sm transition-colors hover:bg-rose-50">
                             <div class="flex items-center mb-3">
                                 <span class="bg-rose-500 text-white font-black px-3 py-1 rounded-xl mr-3 shadow-sm text-sm">STEP 1</span>
-                                <h4 class="font-black text-gray-800 text-lg">前往桃園市政信箱</h4>
+                                <h4 class="font-black text-gray-800 text-lg" id="step1-title">前往市政信箱</h4>
                             </div>
-                            <p class="text-gray-600 font-bold mb-4">點擊下方按鈕，開啟桃園市政府「市政信箱」陳情網頁填寫基本資料。</p>
-                            <a href="https://taotalk.tycg.gov.tw/main/PageCtrl?p=p_2&sc_Id=CC204" target="_blank" class="inline-flex items-center justify-center font-black text-white bg-rose-500 hover:bg-rose-600 px-6 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 w-full sm:w-auto text-center group">
-                                <i class="fa-solid fa-envelope-open-text mr-2 group-hover:scale-110 transition-transform"></i> 前往市政信箱填寫
+                            <p class="text-gray-600 font-bold mb-4">點擊下方按鈕，開啟相關單位的陳情網頁填寫基本資料。</p>
+                            <a id="channel-url" href="#" target="_blank" class="inline-flex items-center justify-center font-black text-white bg-rose-500 hover:bg-rose-600 px-6 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 w-full sm:w-auto text-center group">
+                                <i class="fa-solid fa-envelope-open-text mr-2 group-hover:scale-110 transition-transform"></i> <span id="channel-btn-text">前往市政信箱填寫</span>
                                 <i class="fa-solid fa-arrow-up-right-from-square ml-2 text-xs opacity-70"></i>
                             </a>
                             
-                            <!-- 新增：截圖示意與引導區塊 -->
-                            <div class="mt-6 border-t-2 border-dashed border-rose-200 pt-5">
+                            <!-- 截圖示意與引導區塊 (僅桃園市政信箱顯示) -->
+                            <div id="taoyuan-image-guide" class="mt-6 border-t-2 border-dashed border-rose-200 pt-5">
                                 <p class="text-rose-600 font-black text-sm mb-3 flex items-center">
                                     <i class="fa-solid fa-hand-pointer mr-2 animate-bounce"></i> 進入網頁後，請點選下方第二排的「公車問題」分類：
                                 </p>
@@ -201,22 +236,15 @@
                                 <span class="bg-blue-500 text-white font-black px-3 py-1 rounded-xl mr-3 shadow-sm text-sm">STEP 2</span>
                                 <h4 class="font-black text-gray-800 text-lg">複製建議內容範本</h4>
                             </div>
-                            <p class="text-gray-600 font-bold mb-4">您可以直接複製以下範本，並貼到市政信箱的「陳情內容」欄位中，也建議加上您個人的實際站牌與通勤狀況，讓市府更了解實情！</p>
+                            <p class="text-gray-600 font-bold mb-4">您可以直接複製以下專屬範本並貼到陳情欄位中，也強烈建議您附上個人的「實際搭乘站牌」與「等車時間」狀況，讓機關更了解實情！</p>
                             
                             <div class="relative bg-white border-2 border-blue-200 rounded-xl p-4 md:p-5 shadow-inner">
-                                <button onclick="copyTemplate()" id="copy-btn" class="absolute top-3 right-3 bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition-all px-3 py-1.5 rounded-lg text-sm font-black flex items-center shadow-sm active:scale-95">
+                                <button onclick="copyTemplate()" id="copy-btn" class="absolute top-3 right-3 bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white transition-all px-3 py-1.5 rounded-lg text-sm font-black flex items-center shadow-sm active:scale-95 z-10">
                                     <i class="fa-regular fa-copy mr-1.5"></i> 點我複製
                                 </button>
-                                <textarea id="petition-template" readonly class="w-full h-72 md:h-64 resize-none outline-none text-gray-700 font-bold leading-relaxed bg-transparent text-sm md:text-base mt-8 md:mt-0 pt-2 md:pt-0 md:pr-24"
->市長您好，我是桃園市龜山區A7重劃區的居民。
-
-目前A7地區人口快速增長，但前往雙北（台北、新北）的通勤公車（如967、946等通勤路線）班次嚴重不足。導致上下班尖峰時刻，許多居民面臨滿載無法上車的窘境，嚴重影響通勤權益與生活品質。
-
-懇請市府相關單位體恤通勤族辛勞，協調客運業者於上下班尖峰時段「增加發車班次」，或「新闢直達雙北的通勤路線」。
-
-感謝市府團隊的協助與重視，期盼能盡快改善。</textarea>
+                                <textarea id="petition-template" readonly class="w-full h-72 md:h-64 resize-none outline-none text-gray-700 font-bold leading-relaxed bg-transparent text-sm md:text-base mt-8 md:mt-0 pt-2 md:pt-0 md:pr-24"></textarea>
                             </div>
-                            <p id="copy-success" class="text-green-600 font-black text-sm mt-3 hidden bg-green-50 px-3 py-2 rounded-lg border border-green-200 w-max"><i class="fa-solid fa-check-circle mr-1"></i> 複製成功！請前往市政信箱貼上。</p>
+                            <p id="copy-success" class="text-green-600 font-black text-sm mt-3 hidden bg-green-50 px-3 py-2 rounded-lg border border-green-200 w-max"><i class="fa-solid fa-check-circle mr-1"></i> 複製成功！請前往網頁貼上。</p>
                         </div>
                     </div>
                 </div>
@@ -231,6 +259,142 @@
     </footer>
 
     <script>
+        // --- 申訴管道資料 (結合正式說明與生動顏色標籤) ---
+        const channels = [
+            {
+                name: "桃園市政信箱",
+                icon: "fa-city",
+                title: "前往桃園市政信箱",
+                desc: "A7 重劃區人口不斷移入，但前往雙北的通勤公車班次（如 <span class='text-rose-600 font-black bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100'>967、946</span> 路線）在上下班尖峰時段已無法負荷，許多居民面臨<span class='text-rose-600 font-black bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100'>「看著車來卻擠不上」</span>的窘境。請大家動動手指，<strong class='text-rose-600 border-b-2 border-rose-300 pb-0.5'>一人一信</strong>向桃園市政府反映，強烈要求增加班次！",
+                phone: "",
+                url: "https://taotalk.tycg.gov.tw/main/PageCtrl?p=p_2&sc_Id=CC204",
+                urlText: "前往市政信箱填寫",
+                template: "市長您好，我是桃園市龜山區A7重劃區的居民______。\n\n目前A7地區人口快速增長，但前往雙北（台北、新北）的通勤公車（如967、946等通勤路線）班次嚴重不足。導致上下班尖峰時刻，許多居民面臨滿載無法上車的窘境，嚴重影響通勤權益與生活品質。\n\n懇請市府相關單位體恤通勤族辛勞，協調客運業者於上下班尖峰時段「增加發車班次」，或「新闢直達雙北的通勤路線」。\n\n感謝市府團隊的協助與重視，期盼能盡快改善。",
+                showImage: true,
+                activeClass: "bg-rose-50 text-rose-700 border-rose-500 shadow-md",
+                borderColor: "bg-rose-500",
+                iconColor: "text-rose-500"
+            },
+            {
+                name: "公路局",
+                icon: "fa-road",
+                title: "前往公路局民意信箱",
+                desc: "由於 A7 往返台北市或內科的公車多屬<span class='text-blue-600 font-black bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100'>「公路客運」</span>或<span class='text-blue-600 font-black bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100'>「國道客運」</span>（如 1211、9002 等），這些路線的主管機關是交通部公路局而非地方政府。當地方政府以「需求不足」或「無車」推託時，直接向<strong class='text-blue-600 border-b-2 border-blue-300 pb-0.5'>中央監理機關</strong>反映班次不足、上不了車的實況最為直接。",
+                phone: "0800-231-035 (用路人專線)",
+                url: "https://www.thb.gov.tw/MessageConfirmPage.aspx?n=37&sms=13619&pgn=1D95B2A4C316480B449D2B265F812515",
+                urlText: "前往公路局局長信箱",
+                template: "局長您好，我是桃園A7重劃區居民______。\n\n本區往返雙北的公路客運及國道客運(如1211、9002等)在上下班尖峰時刻班次嚴重不足，導致居民經常望車興嘆、無法上車，嚴重影響通勤權益。而地方政府往往以跨縣市路線或客運業者無車為由推託。\n\n懇請貴局正視A7地區龐大的通勤需求，主動協調客運業者增班，或盡速開放新路權，保障民眾基本通勤權益。",
+                showImage: false,
+                activeClass: "bg-blue-50 text-blue-700 border-blue-500 shadow-md",
+                borderColor: "bg-blue-500",
+                iconColor: "text-blue-500"
+            },
+            {
+                name: "交通部公運司",
+                icon: "fa-sitemap",
+                title: "前往交通部部長信箱",
+                desc: "跨縣市的交通整合平台通常由交通部主持（如 <span class='text-purple-600 font-black bg-purple-50 px-1.5 py-0.5 rounded border border-purple-100'>北北基桃交通平台</span>）。若地方政府層級無法達成共識，直接向交通部反映<strong class='text-purple-600 border-b-2 border-purple-300 pb-0.5'>「跨縣市通勤正義」</strong>問題，有助於推動政策面的專案補貼或新路線闢建。",
+                phone: "",
+                url: "https://poms.motc.gov.tw/message/tw",
+                urlText: "前往交通部民意信箱",
+                template: "部長/司長您好，我是桃園A7重劃區的通勤族______。\n\n目前A7往返雙北的跨縣市通勤交通面臨嚴重瓶頸，公車班次稀少且經常客滿拒載。由於跨縣市公車涉及北北桃三市協調，地方政府間常互推責任，導致問題長期無解。\n\n懇請交通部出面整合「北北基桃交通平台」，針對A7通勤專案給予政策補貼，或協助闢建跨市新路線，落實跨縣市通勤正義，解決重劃區交通困境。",
+                showImage: false,
+                activeClass: "bg-purple-50 text-purple-700 border-purple-500 shadow-md",
+                borderColor: "bg-purple-500",
+                iconColor: "text-purple-500"
+            },
+            {
+                name: "消保會",
+                icon: "fa-scale-balanced",
+                title: "前往行政院消保會申訴",
+                desc: "公共運輸服務品質（如看得到吃不到、班次過少導致權益受損）亦屬於<span class='text-orange-600 font-black bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100'>消費爭議</span>的一環。透過行政院消保處申訴，可以強迫業者與主管機關針對<strong class='text-orange-600 border-b-2 border-orange-300 pb-0.5'>「服務供給失衡」</strong>提出說明，尤其當您<span class='text-orange-600 font-black'>已經支付票款（或使用 TPASS）</span>卻無法獲得應有服務時。",
+                phone: "1950 (全國消費者專線)",
+                url: "https://appeal.cpc.ey.gov.tw/WWW/Default.aspx",
+                urlText: "前往線上申訴系統",
+                template: "您好，本人______為TPASS通勤月票/客運常客。\n\n桃園A7地區往返雙北之客運公車（如967、946、1211等）在上下班尖峰時刻班次極度匱乏。消費者雖已預先支付票款購買月票，卻因業者「服務供給嚴重失衡」，導致長期無法順利搭乘，權益嚴重受損。\n\n此舉已構成公共運輸消費爭議，懇請消保會介入調查客運業者與相關主管機關是否怠於提供應有之服務品質，並要求限期改善。",
+                showImage: false,
+                activeClass: "bg-orange-50 text-orange-700 border-orange-500 shadow-md",
+                borderColor: "bg-orange-500",
+                iconColor: "text-orange-500"
+            },
+            {
+                name: "監察院陳情",
+                icon: "fa-building-columns",
+                title: "前往監察院陳情平台",
+                desc: "若桃園市與雙北市政府對於跨市公車需求長期<span class='text-teal-600 font-black bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100'>互推責任</span>，導致人民基本通勤權利受損，這可能涉及<strong class='text-teal-600 border-b-2 border-teal-300 pb-0.5'>行政效率不彰</strong>或怠忽職守。您可以向監察院陳情，要求監察委員調查政府在重劃區交通規劃上的缺失。",
+                phone: "",
+                url: "https://www.cy.gov.tw/iFrame.aspx?n=521",
+                urlText: "前往監察院線上陳情",
+                template: "監察委員您好，陳情人______為桃園市A7重劃區居民。\n\n本區人口近年急速成長，然往返雙北之大眾運輸極度缺乏。桃園市政府與雙北市政府針對跨市公車之增班及新路線闢建，長期互推責任、行政效率低落，導致數萬居民基本通勤權利嚴重受損。\n\n懇請鈞院立案調查相關主管機關（桃園市交通局、雙北市交通局、交通部公路局）是否涉有怠忽職守、未及早因應重劃區發展規劃交通配套之行政違失，以維護人民基本權益。",
+                showImage: false,
+                activeClass: "bg-teal-50 text-teal-700 border-teal-500 shadow-md",
+                borderColor: "bg-teal-500",
+                iconColor: "text-teal-500"
+            }
+        ];
+
+        // 初始化渲染 Tabs
+        const tabsContainer = document.getElementById('channel-tabs');
+        
+        function initTabs() {
+            let html = '';
+            channels.forEach((ch, index) => {
+                html += `
+                    <button onclick="switchChannel(${index})" id="tab-btn-${index}" 
+                        class="flex items-center justify-center px-1 sm:px-3 py-3 rounded-xl font-black text-[13px] md:text-base transition-all border-2 bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm leading-tight text-center">
+                        <i class="fa-solid ${ch.icon} mr-1.5 md:mr-2"></i>${ch.name}
+                    </button>
+                `;
+            });
+            tabsContainer.innerHTML = html;
+            switchChannel(0); // 預設顯示第一個
+        }
+
+        // 切換頻道邏輯
+        function switchChannel(index) {
+            const ch = channels[index];
+            
+            // 1. 切換按鈕狀態
+            channels.forEach((channelData, i) => {
+                const btn = document.getElementById(`tab-btn-${i}`);
+                if (i === index) {
+                    btn.className = `flex items-center justify-center px-1 sm:px-3 py-3 rounded-xl font-black text-[13px] md:text-base transition-all border-2 ${channelData.activeClass} leading-tight text-center transform scale-105 sm:scale-100`;
+                } else {
+                    btn.className = `flex items-center justify-center px-1 sm:px-3 py-3 rounded-xl font-black text-[13px] md:text-base transition-all border-2 bg-white text-gray-500 border-gray-200 hover:bg-gray-50 hover:border-gray-300 shadow-sm leading-tight text-center`;
+                }
+            });
+
+            // 2. 更新說明區塊內容 (使用 innerHTML 以便渲染 HTML 顏色標籤)
+            document.getElementById('desc-title').textContent = ch.name;
+            document.getElementById('channel-desc').innerHTML = ch.desc;
+            
+            // 更新裝飾用側邊條及 Icon 顏色
+            document.getElementById('desc-sidebar').className = `absolute left-0 top-0 bottom-0 w-1.5 transition-colors duration-300 ${ch.borderColor}`;
+            document.getElementById('desc-icon').className = `fa-solid fa-circle-info mr-2 transition-colors duration-300 ${ch.iconColor}`;
+
+            const phoneContainer = document.getElementById('channel-phone-container');
+            const phoneText = document.getElementById('channel-phone');
+            if (ch.phone) {
+                phoneText.textContent = ch.phone;
+                phoneContainer.classList.remove('hidden');
+            } else {
+                phoneContainer.classList.add('hidden');
+            }
+
+            document.getElementById('step1-title').textContent = ch.title;
+            document.getElementById('channel-url').href = ch.url;
+            document.getElementById('channel-btn-text').textContent = ch.urlText;
+            document.getElementById('petition-template').value = ch.template;
+            
+            // 3. 圖片顯示邏輯 (僅桃園市顯示)
+            const imgGuide = document.getElementById('taoyuan-image-guide');
+            if (ch.showImage) {
+                imgGuide.classList.remove('hidden');
+            } else {
+                imgGuide.classList.add('hidden');
+            }
+        }
+
         // 手機版選單切換
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
@@ -251,7 +415,6 @@
             const text = textArea.value;
             const copyBtn = document.getElementById('copy-btn');
             
-            // 使用剪貼簿 API
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
                     showSuccessMessage(copyBtn);
@@ -263,7 +426,7 @@
             }
         }
 
-        // 備用複製方法 (針對舊版瀏覽器或非 HTTPS)
+        // 備用複製方法
         function fallbackCopyTextToClipboard(text, btn) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -289,7 +452,7 @@
         // 顯示複製成功提示
         function showSuccessMessage(btn) {
             const msg = document.getElementById('copy-success');
-            const originalBtnHtml = btn.innerHTML;
+            const originalBtnHtml = '<i class="fa-regular fa-copy mr-1.5"></i> 點我複製';
             
             msg.classList.remove('hidden');
             btn.innerHTML = '<i class="fa-solid fa-check mr-1.5"></i> 已複製';
@@ -303,6 +466,10 @@
                 btn.classList.add('bg-blue-100', 'text-blue-700');
             }, 3000);
         }
+
+        // 執行初始化
+        document.addEventListener('DOMContentLoaded', initTabs);
+
     </script>
 </body>
 
