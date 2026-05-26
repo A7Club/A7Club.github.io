@@ -21,7 +21,7 @@
                         macaron: { 
                             pink: '#FFD1DC', 
                             blue: '#B5EAD7', 
-                            sky: '#AEDFF7', // 新增寶貝藍
+                            sky: '#AEDFF7', // 寶貝藍/天空藍
                             yellow: '#FFF5BA', 
                             purple: '#E2D1F9', 
                             mint: '#C7CEEA', 
@@ -76,6 +76,20 @@
         <button id="retry-btn" class="mt-4 px-6 py-2 bg-macaron-sky rounded-full text-[#4A4A4A] font-bold text-xs hidden" onclick="location.reload()">重新連線</button>
     </div>
 
+    <!-- 自訂對話框/確認框 (完全替代原生 alert 與 confirm，避免 iframe 崩潰問題) -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden flex items-center justify-center px-4">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="custom-alert-content">
+            <div class="text-center">
+                <div id="custom-alert-icon" class="text-4xl mb-3">🔔</div>
+                <h3 id="custom-alert-title" class="text-lg font-bold text-[#4A4A4A] mb-2">提示</h3>
+                <p id="custom-alert-message" class="text-sm text-gray-600 mb-6 whitespace-pre-line leading-relaxed"></p>
+                <div class="flex gap-3 justify-center" id="custom-alert-buttons">
+                    <!-- JS 動態插入按鈕 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="w-full max-w-[400px] bg-gradient-to-br from-[#FFD1DC]/30 via-[#FFF5BA]/30 to-[#AEDFF7]/30 min-h-screen relative shadow-2xl overflow-hidden flex flex-col">
         
         <!-- 頂部導航 -->
@@ -96,7 +110,7 @@
         </header>
 
         <main class="flex-1 px-5 pb-24 overflow-y-auto relative z-10">
-            <!-- 進度卡片 -->
+            <!-- 進度卡片 (已改為寶貝藍) -->
             <div class="bg-white/90 rounded-2xl p-4 shadow-sm mb-6 flex items-center gap-4 border-l-4 border-macaron-sky">
                 <div class="w-10 h-10 rounded-full bg-macaron-sky/30 flex items-center justify-center text-xl">🎈</div>
                 <div>
@@ -105,7 +119,7 @@
                 </div>
             </div>
 
-            <!-- 集點卡本體 -->
+            <!-- 集點卡本體 (改為 5 格一排) -->
             <div class="glass-card rounded-3xl p-6 shadow-md relative mb-6 overflow-hidden">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4/5 h-6 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSIyMCI+PHBvbHlnb24gcG9pbnRzPSIwLDExIDIwLDAgNDAsMTEgMjAsMjIiIGZpbGw9IiNGRkQxREMiLz48L3N2Zz4=')] bg-repeat-x opacity-60"></div>
                 
@@ -138,15 +152,34 @@
                 <i data-lucide="home" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-[#FF8C94]">首頁</span>
             </button>
-            <button class="flex flex-col items-center gap-1 text-gray-400 opacity-50">
+            <button class="flex flex-col items-center gap-1 text-gray-400 active-scale transition-all" onclick="openMapModal()">
                 <i data-lucide="map-pinned" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-gray-400">地圖</span>
             </button>
-            <button class="flex flex-col items-center gap-1 text-gray-400 opacity-50">
+            <button class="flex flex-col items-center gap-1 text-gray-400 opacity-50" onclick="showCustomAlert('請在社群中向管理員查詢兌換紀錄哦！', '兌換紀錄', '📝')">
                 <i data-lucide="scroll-text" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-gray-400">紀錄</span>
             </button>
         </nav>
+
+        <!-- 合作店家地圖彈窗 (順暢滑出式選單) -->
+        <div id="map-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden flex flex-col items-center justify-end sm:justify-center p-0 sm:p-6 transition-all duration-300">
+            <div class="w-full max-w-[400px] bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] transform translate-y-full transition-transform duration-300" id="map-modal-content">
+                <div class="bg-macaron-sky/60 p-5 flex justify-between items-center text-[#6B5B95] font-bold shadow-sm z-10">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="map-pinned" class="w-5 h-5 text-[#4A4A4A]"></i>
+                        <span class="text-[#4A4A4A]">合作店家一覽</span>
+                    </div>
+                    <button onclick="closeMapModal()" class="bg-white/80 rounded-full p-1.5 active-scale"><i data-lucide="x" class="w-5 h-5 text-gray-600"></i></button>
+                </div>
+                <!-- 商店列表容器 -->
+                <div class="p-5 overflow-y-auto flex-1 bg-gray-50/50 flex flex-col gap-3" id="shop-list-container">
+                    <div class="flex items-center justify-center py-10">
+                        <div class="animate-spin text-2xl">⏳</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 掃描窗 (集點與店家核銷共用) -->
         <div id="scanner-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] hidden flex flex-col items-center justify-center p-6 text-white">
@@ -158,28 +191,21 @@
                     </div>
                     <button onclick="stopScanning()" class="bg-white/80 rounded-full p-1"><i data-lucide="x" class="w-5 h-5 text-gray-500"></i></button>
                 </div>
-                
-                <!-- 掃描顯示區域 -->
                 <div class="relative aspect-square w-full bg-black overflow-hidden">
                     <div id="reader" class="w-full h-full"></div>
-                    
-                    <!-- 自訂正方形掃描框裝飾 -->
                     <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div class="w-[260px] h-[260px] relative">
-                            <!-- 四個角落 -->
                             <div class="scan-corner corner-tl"></div>
                             <div class="scan-corner corner-tr"></div>
                             <div class="scan-corner corner-bl"></div>
                             <div class="scan-corner corner-br"></div>
-                            <!-- 掃描雷射線 -->
                             <div class="scanner-laser"></div>
                         </div>
                     </div>
                 </div>
-                
                 <div class="p-5 bg-white text-center">
                     <p class="text-xs text-gray-500 font-medium leading-relaxed">
-                        👉 <b>集點</b>：請掃描各店家的專屬 QR Code<br>
+                        👉 <b>集點</b>：請掃描店家正方形 QR Code<br>
                         👉 <b>店家核銷</b>：請掃描用戶兌換畫面
                     </p>
                 </div>
@@ -193,12 +219,9 @@
                     <div class="text-5xl mb-4">🧸</div>
                     <h3 class="text-xl font-bold text-[#4A4A4A] mb-2">兌換 <span id="physical-qr-prize" class="text-[#FF8C94]"></span></h3>
                     <p class="text-xs text-gray-500 mb-6 font-medium">請將此畫面出示給店家掃描<br>掃描成功後即完成扣點與領取</p>
-                    
-                    <!-- QR Code 圖片容器 -->
                     <div class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-[#FFD1DC] mb-6 flex justify-center items-center aspect-square mx-auto w-[220px]">
                         <img id="physical-qr-img" src="" alt="Redeem QR Code" class="w-[180px] h-[180px] object-contain">
                     </div>
-                    
                     <button onclick="closePhysicalQrModal()" class="w-full bg-macaron-sky text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale">完成並關閉</button>
                 </div>
             </div>
@@ -224,14 +247,92 @@
     <script>
         lucide.createIcons();
 
-        // 核心設定
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzC8FV-VwFLwjv7N9jyn4xy8IrCMjZy24-xdCT9rVgpRP5bXSudababRhaAkQloVmU2LA/exec";
         const LIFF_ID = "2009930258-GNJpigEk"; 
-        const MAX_STAMPS = 5; // ★ 從 10 改為 5
+        const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026";
+        const MAX_STAMPS = 5; // 修改為 5 點
         
         let currentPoints = 0;
         let userData = { userId: null, displayName: '遊客' };
         let html5QrCode;
+        let globalShopList = []; // 儲存店家名單
+
+        // --- 自訂精美對話視窗系統 (取代原生 alert & confirm) ---
+        function showCustomAlert(message, title = "提示", icon = "🎡") {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-alert-modal');
+                const content = document.getElementById('custom-alert-content');
+                
+                document.getElementById('custom-alert-title').innerText = title;
+                document.getElementById('custom-alert-message').innerText = message;
+                document.getElementById('custom-alert-icon').innerText = icon;
+                
+                const btnContainer = document.getElementById('custom-alert-buttons');
+                btnContainer.innerHTML = '';
+                
+                const okBtn = document.createElement('button');
+                okBtn.className = 'w-full bg-macaron-sky text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale';
+                okBtn.innerText = '好的';
+                okBtn.onclick = () => {
+                    closeCustomAlert();
+                    resolve(true);
+                };
+                btnContainer.appendChild(okBtn);
+                
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.replace('scale-95', 'scale-100');
+                    content.classList.replace('opacity-0', 'opacity-100');
+                }, 10);
+            });
+        }
+
+        function showCustomConfirm(message, title = "確認動作", icon = "❓") {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('custom-alert-modal');
+                const content = document.getElementById('custom-alert-content');
+                
+                document.getElementById('custom-alert-title').innerText = title;
+                document.getElementById('custom-alert-message').innerText = message;
+                document.getElementById('custom-alert-icon').innerText = icon;
+                
+                const btnContainer = document.getElementById('custom-alert-buttons');
+                btnContainer.innerHTML = '';
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'w-1/2 bg-gray-100 text-gray-500 font-bold py-3 rounded-2xl active-scale';
+                cancelBtn.innerText = '取消';
+                cancelBtn.onclick = () => {
+                    closeCustomAlert();
+                    resolve(false);
+                };
+                
+                const confirmBtn = document.createElement('button');
+                confirmBtn.className = 'w-1/2 bg-macaron-sky text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale';
+                confirmBtn.innerText = '確定';
+                confirmBtn.onclick = () => {
+                    closeCustomAlert();
+                    resolve(true);
+                };
+                
+                btnContainer.appendChild(cancelBtn);
+                btnContainer.appendChild(confirmBtn);
+                
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.replace('scale-95', 'scale-100');
+                    content.classList.replace('opacity-0', 'opacity-100');
+                }, 10);
+            });
+        }
+
+        function closeCustomAlert() {
+            const modal = document.getElementById('custom-alert-modal');
+            const content = document.getElementById('custom-alert-content');
+            content.classList.replace('scale-100', 'scale-95');
+            content.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
 
         function showError(msg) {
             document.getElementById('loading-spinner').classList.add('hidden');
@@ -240,7 +341,6 @@
             document.getElementById('retry-btn').classList.remove('hidden');
         }
 
-        // 初始化 LIFF 流程
         async function init() {
             try {
                 if (LIFF_ID === "您的_LIFF_ID" || LIFF_ID === "") {
@@ -248,34 +348,28 @@
                     document.getElementById('setup-hint').classList.remove('hidden');
                     return;
                 }
-
                 await liff.init({ liffId: LIFF_ID });
-                
                 if (!liff.isLoggedIn()) {
                     document.getElementById('loading-text').innerText = "引導至 LINE 登入中...";
                     liff.login(); 
                     return;
                 }
-
                 const profile = await liff.getProfile();
                 userData.userId = profile.userId;
                 userData.displayName = profile.displayName;
                 document.getElementById('user-avatar').src = profile.pictureUrl || document.getElementById('user-avatar').src;
 
                 await syncData();
-
             } catch (err) {
                 console.error("LIFF/Init Error:", err);
-                document.getElementById('loading-text').innerText = "驗證失敗";
                 let errorMsg = "請從 LINE App 內開啟此網址。";
                 if (err.message.includes("channel not found")) {
                     errorMsg = "LIFF ID 無效（Channel Not Found）。請確認 LINE Developers 後台設定是否正確。";
                 }
-                showError(errorMsg + "\n錯誤細節：" + err.message);
+                showError(errorMsg);
             }
         }
 
-        // 發送 API 請求給 GAS
         async function callGAS(payload) {
             try {
                 const response = await fetch(GAS_URL, {
@@ -287,16 +381,14 @@
                 if (!response.ok) throw new Error("網路請求失敗");
                 return await response.json();
             } catch (e) {
-                console.error("Fetch Error:", e);
                 return { status: "error", message: "無法連線至雲端資料庫" };
             }
         }
 
-        // 同步畫面與點數
         async function syncData() {
             if (!userData.userId) return;
-            
             document.getElementById('loading').style.display = 'flex';
+            
             const result = await callGAS({ 
                 action: 'getPoints', 
                 userId: userData.userId, 
@@ -305,22 +397,26 @@
             
             if (result.status === 'success') {
                 currentPoints = result.points;
+                globalShopList = result.shops || []; 
+
                 if(result.isNewUser) {
-                    setTimeout(() => alert("歡迎加入柒樂部！已贈送您入園禮 1 點！"), 500);
+                    setTimeout(() => showCustomAlert("歡迎加入柒樂部！已贈送您入園禮 1 點！", "新朋友加入", "🎉"), 500);
                 }
+
                 renderUI(result.prizes || []);
+                renderMapShops(); 
+                
                 document.getElementById('loading').style.opacity = '0';
                 setTimeout(() => document.getElementById('loading').style.display = 'none', 300);
             } else {
-                alert(result.message);
+                showCustomAlert(result.message, "同步失敗", "❌");
                 document.getElementById('retry-btn').classList.remove('hidden');
             }
         }
 
-        // 渲染畫面
         function renderUI(prizes = []) {
             const grid = document.getElementById('stamp-grid');
-            const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫', '🍿', '🎈', '🍦', '🪄', '🦄'];
+            const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫'];
             grid.innerHTML = '';
             
             const displayPoints = currentPoints % MAX_STAMPS === 0 && currentPoints > 0 ? MAX_STAMPS : currentPoints % MAX_STAMPS;
@@ -371,19 +467,68 @@
             });
         }
 
+        function renderMapShops() {
+            const listContainer = document.getElementById('shop-list-container');
+            listContainer.innerHTML = '';
+
+            if (globalShopList.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 opacity-50">
+                        <i data-lucide="map-x" class="w-12 h-12 text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500 font-bold">目前尚無店家地圖資訊</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            globalShopList.forEach(shop => {
+                const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(shop.address)}`;
+                const item = document.createElement('div');
+                item.className = 'bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex justify-between items-center';
+                item.innerHTML = `
+                    <div class="flex-1 pr-3">
+                        <h4 class="font-bold text-[#4A4A4A] text-sm">${shop.name}</h4>
+                        <p class="text-[11px] text-gray-500 mt-1.5 flex items-start gap-1">
+                            <i data-lucide="map-pin" class="w-3.5 h-3.5 mt-0.5 shrink-0 text-macaron-sky"></i>
+                            <span class="leading-relaxed text-left">${shop.address}</span>
+                        </p>
+                    </div>
+                    <a href="${mapLink}" target="_blank" class="w-10 h-10 bg-macaron-sky/20 text-[#6B5B95] rounded-full flex items-center justify-center shrink-0 active-scale transition-all">
+                        <i data-lucide="navigation" class="w-4 h-4"></i>
+                    </a>
+                `;
+                listContainer.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        function openMapModal() {
+            const modal = document.getElementById('map-modal');
+            const content = document.getElementById('map-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeMapModal() {
+            const modal = document.getElementById('map-modal');
+            const content = document.getElementById('map-modal-content');
+            content.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
         // ==========================================
         // 兌換與核銷核心邏輯
         // ==========================================
-
-        // [用戶端] 點擊兌換按鈕
         async function handleRedeem(prizeName, prizeType) {
             if (prizeType === '實體') {
                 const qrData = `REDEEM:::${userData.userId}:::${userData.displayName}:::${prizeName}`;
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=6B5B95&data=${encodeURIComponent(qrData)}`;
-                
                 document.getElementById('physical-qr-img').src = qrUrl;
                 document.getElementById('physical-qr-prize').innerText = prizeName;
-                
                 const modal = document.getElementById('physical-qr-modal');
                 const content = document.getElementById('physical-qr-content');
                 modal.classList.remove('hidden');
@@ -394,7 +539,9 @@
                 return;
             }
 
-            if (!confirm(`確定要兌換「${prizeName}」嗎？`)) return;
+            const confirmed = await showCustomConfirm(`確定要兌換「${prizeName}」嗎？`, "兌換確認", "🎁");
+            if (!confirmed) return;
+
             document.getElementById('loading').style.display = 'flex';
             document.getElementById('loading').style.opacity = '1';
             
@@ -413,14 +560,13 @@
                     content.classList.replace('scale-95', 'scale-100');
                     content.classList.replace('opacity-0', 'opacity-100');
                 }, 10);
-                
                 document.getElementById('redeem-msg').innerText = `恭喜獲得電子序號！您可以直接複製：`;
                 document.getElementById('redeem-code-box').classList.remove('hidden');
                 document.getElementById('redemption-code').innerText = result.code;
                 await syncData();
             } else {
                 document.getElementById('loading').style.display = 'none';
-                alert(result.message);
+                showCustomAlert(result.message, "兌換失敗", "❌");
             }
         }
 
@@ -432,20 +578,20 @@
             await syncData();
         }
 
-        // [店家端] 掃描用戶的出示條碼
         async function handleAdminRedeem(text) {
-            if (html5QrCode) {
-                await html5QrCode.stop().catch(e => console.log(e));
-            }
+            if (html5QrCode) await html5QrCode.stop().catch(e => console.log(e));
             document.getElementById('scanner-modal').classList.add('hidden');
             
             const parts = text.split(":::");
             if (parts.length !== 4) return;
             const [prefix, targetUserId, targetDisplayName, targetPrizeName] = parts;
 
-            if (!confirm(`【店家核銷確認】\n確定要為「${targetDisplayName}」核銷實體獎品「${targetPrizeName}」嗎？\n\n確認後將扣除該用戶點數。`)) {
-                return;
-            }
+            const confirmed = await showCustomConfirm(
+                `【店家核銷確認】\n確定要為「${targetDisplayName}」核銷實體獎品「${targetPrizeName}」嗎？\n\n確認後將自動扣除該用戶之集點點數。`, 
+                "店家核銷確認", 
+                "🧸"
+            );
+            if (!confirmed) return;
 
             document.getElementById('loading').style.display = 'flex';
             document.getElementById('loading').style.opacity = '1';
@@ -454,25 +600,24 @@
                 action: 'redeem', 
                 userId: targetUserId, 
                 displayName: targetDisplayName, 
-                prizeName: targetPrizeName,
-                adminId: userData.userId // 傳遞掃描者(店家)的 LINE ID，交由後端驗證權限
+                prizeName: targetPrizeName 
             });
 
             document.getElementById('loading').style.display = 'none';
-
             if (result.status === 'success') {
-                alert(`✅ 核銷成功！\n\n用戶：${targetDisplayName}\n獎品：${targetPrizeName}\n系統紀錄碼：${result.code}\n\n請將實體獎品交給用戶。`);
+                await showCustomAlert(
+                    `✅ 核銷成功！\n\n用戶：${targetDisplayName}\n獎品：${targetPrizeName}\n系統紀錄碼：${result.code}\n\n請現場發放實體禮品。`, 
+                    "核銷成功", 
+                    "🎉"
+                );
                 await syncData(); 
             } else {
-                alert(`❌ 核銷失敗：${result.message}`);
+                showCustomAlert(`❌ 核銷失敗：${result.message}`, "核銷失敗", "⚠️");
             }
         }
 
-        // [用戶端] 掃描任一店家 QR Code
-        async function handleScanSuccess(scannedShopCode) {
-            if (html5QrCode) {
-                await html5QrCode.stop().catch(e => console.log(e));
-            }
+        async function handleScanSuccess() {
+            if (html5QrCode) await html5QrCode.stop().catch(e => console.log(e));
             document.getElementById('scanner-modal').classList.add('hidden');
             document.getElementById('loading').style.display = 'flex';
             document.getElementById('loading').style.opacity = '1';
@@ -481,15 +626,15 @@
                 action: 'addStamp', 
                 userId: userData.userId, 
                 displayName: userData.displayName, 
-                shopCode: scannedShopCode // 傳入動態掃描到的店家代碼
+                shopCode: SHOP_QR_CODE 
             });
             
             if (result.status === 'success') {
                 await syncData();
                 if (navigator.vibrate) navigator.vibrate(200);
             } else {
-                alert(result.message);
                 document.getElementById('loading').style.display = 'none';
+                showCustomAlert(result.message, "集點失敗", "⚠️");
             }
         }
 
@@ -505,7 +650,7 @@
             const el = document.createElement('textarea');
             el.value = code; document.body.appendChild(el); el.select();
             document.execCommand('copy'); document.body.removeChild(el);
-            alert("已複製序號！");
+            showCustomAlert("序號已成功複製到剪貼簿！", "複製成功", "📋");
         }
 
         async function startScanning() {
@@ -514,41 +659,27 @@
             try {
                 await html5QrCode.start(
                     { facingMode: "environment" }, 
-                    { 
-                        fps: 20, 
-                        qrbox: 260, 
-                        aspectRatio: 1.0 
-                    }, 
+                    { fps: 20, qrbox: 260, aspectRatio: 1.0 }, 
                     (text) => { 
-                        if (text.startsWith("REDEEM:::")) {
-                            // 若開頭是 REDEEM，代表店家正在掃描用戶
-                            handleAdminRedeem(text);
-                        } else {
-                            // 若不是 REDEEM 開頭，一律視為用戶正在掃描店家的集點 QR Code
-                            handleScanSuccess(text);
-                        }
+                        if (text === SHOP_QR_CODE) handleScanSuccess(); 
+                        else if (text.startsWith("REDEEM:::")) handleAdminRedeem(text);
                     }
                 );
             } catch (err) {
-                alert("相機開啟失敗，請確認是否已允許相機存取權限。");
+                showCustomAlert("相機開啟失敗，請確認手機設定中是否已授予 LINE / 網頁瀏覽器的相機使用權限。", "相機權限錯誤", "📷");
                 stopScanning();
             }
         }
 
         function stopScanning() {
             if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    document.getElementById('scanner-modal').classList.add('hidden');
-                }).catch(() => {
-                    document.getElementById('scanner-modal').classList.add('hidden');
-                });
+                html5QrCode.stop().then(() => document.getElementById('scanner-modal').classList.add('hidden')).catch(() => document.getElementById('scanner-modal').classList.add('hidden'));
             } else {
                 document.getElementById('scanner-modal').classList.add('hidden');
             }
         }
 
         document.getElementById('start-scan').addEventListener('click', startScanning);
-        
         window.onload = init;
     </script>
 </body>
