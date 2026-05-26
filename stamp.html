@@ -76,7 +76,7 @@
         <button id="retry-btn" class="mt-4 px-6 py-2 bg-macaron-sky rounded-full text-[#4A4A4A] font-bold text-xs hidden" onclick="location.reload()">重新連線</button>
     </div>
 
-    <!-- 自訂對話框/確認框 (完全替代原生 alert 與 confirm，避免 iframe 崩潰問題) -->
+    <!-- 自訂對話框/確認框 -->
     <div id="custom-alert-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] hidden flex items-center justify-center px-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="custom-alert-content">
             <div class="text-center">
@@ -110,7 +110,7 @@
         </header>
 
         <main class="flex-1 px-5 pb-24 overflow-y-auto relative z-10">
-            <!-- 進度卡片 (已改為寶貝藍) -->
+            <!-- 進度卡片 -->
             <div class="bg-white/90 rounded-2xl p-4 shadow-sm mb-6 flex items-center gap-4 border-l-4 border-macaron-sky">
                 <div class="w-10 h-10 rounded-full bg-macaron-sky/30 flex items-center justify-center text-xl">🎈</div>
                 <div>
@@ -119,11 +119,11 @@
                 </div>
             </div>
 
-            <!-- 集點卡本體 (改為 5 格一排) -->
+            <!-- 集點卡本體 (改為 7 格置中排列) -->
             <div class="glass-card rounded-3xl p-6 shadow-md relative mb-6 overflow-hidden">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4/5 h-6 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSIyMCI+PHBvbHlnb24gcG9pbnRzPSIwLDExIDIwLDAgNDAsMTEgMjAsMjIiIGZpbGw9IiNGRkQxREMiLz48L3N2Zz4=')] bg-repeat-x opacity-60"></div>
                 
-                <div id="stamp-grid" class="grid grid-cols-5 gap-y-5 gap-x-2 justify-items-center mt-4">
+                <div id="stamp-grid" class="flex flex-wrap justify-center gap-y-4 gap-x-3 mt-4 px-2">
                     <!-- JavaScript 動態渲染集點章 -->
                 </div>
             </div>
@@ -163,7 +163,7 @@
             </button>
         </nav>
 
-        <!-- ⭐ 歷史紀錄彈窗 (順暢滑出式選單) -->
+        <!-- 歷史紀錄彈窗 -->
         <div id="history-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden flex flex-col items-center justify-end sm:justify-center p-0 sm:p-6 transition-all duration-300">
             <div class="w-full max-w-[400px] bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] transform translate-y-full transition-transform duration-300" id="history-modal-content">
                 <div class="bg-macaron-yellow/60 p-5 flex justify-between items-center text-[#6B5B95] font-bold shadow-sm z-10">
@@ -173,7 +173,6 @@
                     </div>
                     <button onclick="closeHistoryModal()" class="bg-white/80 rounded-full p-1.5 active-scale"><i data-lucide="x" class="w-5 h-5 text-gray-600"></i></button>
                 </div>
-                <!-- 紀錄列表容器 -->
                 <div class="p-5 overflow-y-auto flex-1 bg-gray-50/50 flex flex-col gap-3" id="history-list-container">
                     <div class="flex items-center justify-center py-10">
                         <div class="animate-spin text-2xl">⏳</div>
@@ -182,7 +181,7 @@
             </div>
         </div>
 
-        <!-- 合作店家地圖彈窗 (順暢滑出式選單) -->
+        <!-- 合作店家地圖彈窗 -->
         <div id="map-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden flex flex-col items-center justify-end sm:justify-center p-0 sm:p-6 transition-all duration-300">
             <div class="w-full max-w-[400px] bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] transform translate-y-full transition-transform duration-300" id="map-modal-content">
                 <div class="bg-macaron-sky/60 p-5 flex justify-between items-center text-[#6B5B95] font-bold shadow-sm z-10">
@@ -192,7 +191,6 @@
                     </div>
                     <button onclick="closeMapModal()" class="bg-white/80 rounded-full p-1.5 active-scale"><i data-lucide="x" class="w-5 h-5 text-gray-600"></i></button>
                 </div>
-                <!-- 商店列表容器 -->
                 <div class="p-5 overflow-y-auto flex-1 bg-gray-50/50 flex flex-col gap-3" id="shop-list-container">
                     <div class="flex items-center justify-center py-10">
                         <div class="animate-spin text-2xl">⏳</div>
@@ -201,7 +199,7 @@
             </div>
         </div>
 
-        <!-- 掃描窗 (集點與店家核銷共用) -->
+        <!-- 掃描窗 -->
         <div id="scanner-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[60] hidden flex flex-col items-center justify-center p-6 text-white">
             <div class="w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl relative">
                 <div class="bg-macaron-pink/50 p-4 flex justify-between items-center text-[#6B5B95] font-bold">
@@ -236,7 +234,7 @@
         <div id="physical-qr-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center px-4">
             <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="physical-qr-content">
                 <div class="text-center">
-                    <div class="text-5xl mb-4">🧸</div>
+                    <div class="text-5xl mb-4" id="physical-qr-icon">🍠</div>
                     <h3 class="text-xl font-bold text-[#4A4A4A] mb-2">兌換 <span id="physical-qr-prize" class="text-[#FF8C94]"></span></h3>
                     <p class="text-xs text-gray-500 mb-6 font-medium">請將此畫面出示給店家掃描<br>掃描成功後即完成扣點與領取</p>
                     <div class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-[#FFD1DC] mb-6 flex justify-center items-center aspect-square mx-auto w-[220px]">
@@ -251,7 +249,7 @@
         <div id="redeem-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center px-4">
             <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="redeem-modal-content">
                 <div class="text-center">
-                    <div class="text-6xl mb-4 animate-bounce">🎁</div>
+                    <div class="text-6xl mb-4 animate-bounce" id="redeem-modal-icon">🎁</div>
                     <h3 class="text-xl font-bold text-[#4A4A4A] mb-2">兌換成功！</h3>
                     <p id="redeem-msg" class="text-sm text-gray-600 mb-6 leading-relaxed"></p>
                     <div id="redeem-code-box" class="bg-gray-50 p-4 rounded-2xl border-2 border-dashed border-[#B5EAD7] mb-6 flex justify-between items-center hidden">
@@ -269,14 +267,20 @@
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzC8FV-VwFLwjv7N9jyn4xy8IrCMjZy24-xdCT9rVgpRP5bXSudababRhaAkQloVmU2LA/exec";
         const LIFF_ID = "2009930258-GNJpigEk"; 
-        const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026"; // 僅為範例，後端現已透過「店家名單」動態驗證
-        const MAX_STAMPS = 5; 
+        const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026"; 
+        const MAX_STAMPS = 7; // ⭐ 修改為 7 點 (A7的7)
         
         let currentPoints = 0;
         let userData = { userId: null, displayName: '遊客' };
         let html5QrCode;
         let globalShopList = []; 
-        let globalHistoryList = []; // ⭐ 儲存後端傳來的歷史紀錄
+        let globalHistoryList = []; 
+
+        // 取得動態獎品 Icon (地瓜球專屬圖示)
+        function getPrizeIcon(prizeName, prizeType) {
+            if (prizeName.includes('地瓜')) return '🍠';
+            return prizeType === '電子' ? '🎟️' : '🎁';
+        }
 
         // --- 自訂精美對話視窗系統 (取代原生 alert & confirm) ---
         function showCustomAlert(message, title = "提示", icon = "🎡") {
@@ -419,7 +423,7 @@
             if (result.status === 'success') {
                 currentPoints = result.points;
                 globalShopList = result.shops || []; 
-                globalHistoryList = result.history || []; // ⭐ 儲存後端傳來的歷史紀錄
+                globalHistoryList = result.history || []; 
 
                 if(result.isNewUser) {
                     setTimeout(() => showCustomAlert("歡迎加入柒樂部！已贈送您入園禮 1 點！", "新朋友加入", "🎉"), 500);
@@ -427,7 +431,7 @@
 
                 renderUI(result.prizes || []);
                 renderMapShops(); 
-                renderHistoryList(); // ⭐ 渲染歷史紀錄清單
+                renderHistoryList(); 
                 
                 document.getElementById('loading').style.opacity = '0';
                 setTimeout(() => document.getElementById('loading').style.display = 'none', 300);
@@ -439,7 +443,8 @@
 
         function renderUI(prizes = []) {
             const grid = document.getElementById('stamp-grid');
-            const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫'];
+            // ⭐ 擴充到 7 種圖示 (加入爆米花與氣球)
+            const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫', '🍿', '🎈'];
             grid.innerHTML = '';
             
             const displayPoints = currentPoints % MAX_STAMPS === 0 && currentPoints > 0 ? MAX_STAMPS : currentPoints % MAX_STAMPS;
@@ -469,13 +474,14 @@
             prizes.forEach(prize => {
                 const isOutOfStock = prize.type === '實體' && parseInt(prize.stock) <= 0;
                 const canRedeem = currentPoints >= prize.points && !isOutOfStock;
+                const displayIcon = getPrizeIcon(prize.name, prize.type); // ⭐ 取得專屬圖示
                 
                 const item = document.createElement('div');
                 item.className = `flex justify-between items-center p-4 rounded-2xl border transition-all ${canRedeem ? 'bg-white border-macaron-sky shadow-sm' : 'bg-gray-100/30 border-gray-200 opacity-60'}`;
                 
                 item.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-macaron-yellow/20 flex items-center justify-center text-xl">${prize.type === '電子' ? '🎟️' : '🎁'}</div>
+                        <div class="w-10 h-10 rounded-full bg-macaron-yellow/20 flex items-center justify-center text-xl">${displayIcon}</div>
                         <div>
                             <p class="font-bold text-[#4A4A4A] text-sm">${prize.name}</p>
                             <p class="text-[10px] text-gray-400 font-medium">${prize.points} 點 • ${prize.type}獎勵 ${isOutOfStock ? '(庫存不足)' : ''}</p>
@@ -490,7 +496,6 @@
             });
         }
 
-        // ⭐ 新增：渲染個人歷史紀錄清單
         function renderHistoryList() {
             const container = document.getElementById('history-list-container');
             container.innerHTML = '';
@@ -507,13 +512,13 @@
 
             globalHistoryList.forEach(item => {
                 const isStamp = item.type === 'stamp';
-                const icon = isStamp ? '🎈' : '🎁';
+                // ⭐ 歷史紀錄同樣帶入地瓜專屬圖示
+                const icon = isStamp ? '🎈' : getPrizeIcon(item.prizeName, '實體'); 
                 const title = isStamp ? '集點成功' : '兌換獎品';
                 const detail = isStamp ? `於 ${item.shopName} 集點` : `兌換 ${item.prizeName}`;
                 const pointChange = isStamp ? '+1 點' : `-${item.points} 點`;
                 const pointColorClass = isStamp ? 'text-macaron-blue' : 'text-[#FF8C94]';
                 
-                // 格式化時間 (YYYY/MM/DD HH:mm)
                 const d = new Date(item.time);
                 const dateStr = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 
@@ -535,7 +540,6 @@
             lucide.createIcons();
         }
 
-        // ⭐ 新增：打開與關閉歷史紀錄彈窗
         function openHistoryModal() {
             const modal = document.getElementById('history-modal');
             const content = document.getElementById('history-modal-content');
@@ -611,11 +615,15 @@
         // 兌換與核銷核心邏輯
         // ==========================================
         async function handleRedeem(prizeName, prizeType) {
+            const displayIcon = getPrizeIcon(prizeName, prizeType); // ⭐ 帶入專屬圖示
+
             if (prizeType === '實體') {
                 const qrData = `REDEEM:::${userData.userId}:::${userData.displayName}:::${prizeName}`;
                 const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=6B5B95&data=${encodeURIComponent(qrData)}`;
                 document.getElementById('physical-qr-img').src = qrUrl;
                 document.getElementById('physical-qr-prize').innerText = prizeName;
+                document.getElementById('physical-qr-icon').innerText = displayIcon; // 更新實體核銷畫面的圖示
+
                 const modal = document.getElementById('physical-qr-modal');
                 const content = document.getElementById('physical-qr-content');
                 modal.classList.remove('hidden');
@@ -626,7 +634,7 @@
                 return;
             }
 
-            const confirmed = await showCustomConfirm(`確定要兌換「${prizeName}」嗎？`, "兌換確認", "🎁");
+            const confirmed = await showCustomConfirm(`確定要兌換「${prizeName}」嗎？`, "兌換確認", displayIcon);
             if (!confirmed) return;
 
             document.getElementById('loading').style.display = 'flex';
@@ -642,6 +650,7 @@
             if (result.status === 'success') {
                 const modal = document.getElementById('redeem-modal');
                 const content = document.getElementById('redeem-modal-content');
+                document.getElementById('redeem-modal-icon').innerText = displayIcon; // 更新電子兌換畫面的圖示
                 modal.classList.remove('hidden');
                 setTimeout(() => {
                     content.classList.replace('scale-95', 'scale-100');
@@ -672,11 +681,12 @@
             const parts = text.split(":::");
             if (parts.length !== 4) return;
             const [prefix, targetUserId, targetDisplayName, targetPrizeName] = parts;
+            const displayIcon = getPrizeIcon(targetPrizeName, '實體'); // ⭐ 核銷視窗帶入專屬圖示
 
             const confirmed = await showCustomConfirm(
                 `【店家核銷確認】\n確定要為「${targetDisplayName}」核銷實體獎品「${targetPrizeName}」嗎？\n\n確認後將自動扣除該用戶之集點點數。`, 
                 "店家核銷確認", 
-                "🧸"
+                displayIcon
             );
             if (!confirmed) return;
 
