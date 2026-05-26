@@ -156,11 +156,31 @@
                 <i data-lucide="map-pinned" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-gray-400">地圖</span>
             </button>
-            <button class="flex flex-col items-center gap-1 text-gray-400 opacity-50" onclick="showCustomAlert('請在社群中向管理員查詢兌換紀錄哦！', '兌換紀錄', '📝')">
+            <!-- 綁定打開歷史紀錄的函式 -->
+            <button class="flex flex-col items-center gap-1 text-gray-400 active-scale transition-all" onclick="openHistoryModal()">
                 <i data-lucide="scroll-text" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-gray-400">紀錄</span>
             </button>
         </nav>
+
+        <!-- ⭐ 歷史紀錄彈窗 (順暢滑出式選單) -->
+        <div id="history-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden flex flex-col items-center justify-end sm:justify-center p-0 sm:p-6 transition-all duration-300">
+            <div class="w-full max-w-[400px] bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] transform translate-y-full transition-transform duration-300" id="history-modal-content">
+                <div class="bg-macaron-yellow/60 p-5 flex justify-between items-center text-[#6B5B95] font-bold shadow-sm z-10">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="scroll-text" class="w-5 h-5 text-[#4A4A4A]"></i>
+                        <span class="text-[#4A4A4A]">個人歷史紀錄</span>
+                    </div>
+                    <button onclick="closeHistoryModal()" class="bg-white/80 rounded-full p-1.5 active-scale"><i data-lucide="x" class="w-5 h-5 text-gray-600"></i></button>
+                </div>
+                <!-- 紀錄列表容器 -->
+                <div class="p-5 overflow-y-auto flex-1 bg-gray-50/50 flex flex-col gap-3" id="history-list-container">
+                    <div class="flex items-center justify-center py-10">
+                        <div class="animate-spin text-2xl">⏳</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- 合作店家地圖彈窗 (順暢滑出式選單) -->
         <div id="map-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] hidden flex flex-col items-center justify-end sm:justify-center p-0 sm:p-6 transition-all duration-300">
@@ -249,13 +269,14 @@
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzC8FV-VwFLwjv7N9jyn4xy8IrCMjZy24-xdCT9rVgpRP5bXSudababRhaAkQloVmU2LA/exec";
         const LIFF_ID = "2009930258-GNJpigEk"; 
-        const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026";
-        const MAX_STAMPS = 5; // 修改為 5 點
+        const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026"; // 僅為範例，後端現已透過「店家名單」動態驗證
+        const MAX_STAMPS = 5; 
         
         let currentPoints = 0;
         let userData = { userId: null, displayName: '遊客' };
         let html5QrCode;
-        let globalShopList = []; // 儲存店家名單
+        let globalShopList = []; 
+        let globalHistoryList = []; // ⭐ 儲存後端傳來的歷史紀錄
 
         // --- 自訂精美對話視窗系統 (取代原生 alert & confirm) ---
         function showCustomAlert(message, title = "提示", icon = "🎡") {
@@ -398,6 +419,7 @@
             if (result.status === 'success') {
                 currentPoints = result.points;
                 globalShopList = result.shops || []; 
+                globalHistoryList = result.history || []; // ⭐ 儲存後端傳來的歷史紀錄
 
                 if(result.isNewUser) {
                     setTimeout(() => showCustomAlert("歡迎加入柒樂部！已贈送您入園禮 1 點！", "新朋友加入", "🎉"), 500);
@@ -405,6 +427,7 @@
 
                 renderUI(result.prizes || []);
                 renderMapShops(); 
+                renderHistoryList(); // ⭐ 渲染歷史紀錄清單
                 
                 document.getElementById('loading').style.opacity = '0';
                 setTimeout(() => document.getElementById('loading').style.display = 'none', 300);
@@ -465,6 +488,70 @@
                 `;
                 listEl.appendChild(item);
             });
+        }
+
+        // ⭐ 新增：渲染個人歷史紀錄清單
+        function renderHistoryList() {
+            const container = document.getElementById('history-list-container');
+            container.innerHTML = '';
+
+            if (globalHistoryList.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 opacity-50">
+                        <i data-lucide="file-question" class="w-12 h-12 text-gray-400 mb-2"></i>
+                        <p class="text-sm text-gray-500 font-bold">目前尚無任何紀錄</p>
+                    </div>`;
+                lucide.createIcons();
+                return;
+            }
+
+            globalHistoryList.forEach(item => {
+                const isStamp = item.type === 'stamp';
+                const icon = isStamp ? '🎈' : '🎁';
+                const title = isStamp ? '集點成功' : '兌換獎品';
+                const detail = isStamp ? `於 ${item.shopName} 集點` : `兌換 ${item.prizeName}`;
+                const pointChange = isStamp ? '+1 點' : `-${item.points} 點`;
+                const pointColorClass = isStamp ? 'text-macaron-blue' : 'text-[#FF8C94]';
+                
+                // 格式化時間 (YYYY/MM/DD HH:mm)
+                const d = new Date(item.time);
+                const dateStr = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+                const el = document.createElement('div');
+                el.className = 'bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center justify-between';
+                el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-xl shrink-0">${icon}</div>
+                        <div>
+                            <h4 class="font-bold text-[#4A4A4A] text-sm">${title}</h4>
+                            <p class="text-[11px] text-gray-500 mt-0.5">${detail}</p>
+                            <p class="text-[10px] text-gray-400 mt-0.5">${dateStr}</p>
+                        </div>
+                    </div>
+                    <div class="font-black text-sm ${pointColorClass}">${pointChange}</div>
+                `;
+                container.appendChild(el);
+            });
+            lucide.createIcons();
+        }
+
+        // ⭐ 新增：打開與關閉歷史紀錄彈窗
+        function openHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            const content = document.getElementById('history-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('translate-y-full');
+            }, 10);
+        }
+
+        function closeHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            const content = document.getElementById('history-modal-content');
+            content.classList.add('translate-y-full');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
         }
 
         function renderMapShops() {
@@ -600,7 +687,8 @@
                 action: 'redeem', 
                 userId: targetUserId, 
                 displayName: targetDisplayName, 
-                prizeName: targetPrizeName 
+                prizeName: targetPrizeName,
+                adminId: userData.userId // 傳送當前操作者的 LINE ID 以供權限驗證
             });
 
             document.getElementById('loading').style.display = 'none';
@@ -616,7 +704,7 @@
             }
         }
 
-        async function handleScanSuccess() {
+        async function handleScanSuccess(scannedCode) {
             if (html5QrCode) await html5QrCode.stop().catch(e => console.log(e));
             document.getElementById('scanner-modal').classList.add('hidden');
             document.getElementById('loading').style.display = 'flex';
@@ -626,7 +714,7 @@
                 action: 'addStamp', 
                 userId: userData.userId, 
                 displayName: userData.displayName, 
-                shopCode: SHOP_QR_CODE 
+                shopCode: scannedCode // 傳遞實際掃描到的代碼，由後端驗證
             });
             
             if (result.status === 'success') {
@@ -661,8 +749,12 @@
                     { facingMode: "environment" }, 
                     { fps: 20, qrbox: 260, aspectRatio: 1.0 }, 
                     (text) => { 
-                        if (text === SHOP_QR_CODE) handleScanSuccess(); 
-                        else if (text.startsWith("REDEEM:::")) handleAdminRedeem(text);
+                        if (text.startsWith("REDEEM:::")) {
+                            handleAdminRedeem(text);
+                        } else {
+                            // 任何非 REDEEM 開頭的 QR Code 都當作集點碼送給後端驗證
+                            handleScanSuccess(text); 
+                        }
                     }
                 );
             } catch (err) {
