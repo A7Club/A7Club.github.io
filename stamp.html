@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>柒樂部遊樂園 - A7 🅟ᴏɪɴᴛꜱ</title>
+    <title>柒樂部遊樂園 - A7 🅟OINTS</title>
 
-    <!-- 📊 Google Analytics (GA4)追蹤代碼放置區 -->
-    <!-- Google tag (gtag.js) -->
+        <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJ9RJC2DRS"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -15,6 +14,7 @@
 
       gtag('config', 'G-YJ9RJC2DRS');
     </script>
+
     
     <!-- 引入核心庫 -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -57,8 +57,6 @@
         .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 2px dashed rgba(255, 209, 220, 0.8); }
         .active-scale:active { transform: scale(0.95); transition: transform 0.1s; }
         
-        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,1); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
         /* --- 掃描器自訂樣式 --- */
         .scanner-laser { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: #FF8C94; box-shadow: 0 0 12px #FF8C94; animation: scanning 2.5s ease-in-out infinite; z-index: 10; }
         @keyframes scanning { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
@@ -67,25 +65,49 @@
         .corner-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
         .corner-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
         .corner-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-
-        /* 強制隱藏 html5-qrcode 預設的白色邊框 */
-        #qr-shaded-region > div {
-            display: none !important;
-        }
+        #qr-shaded-region > div { display: none !important; }
     </style>
 </head>
 <body class="min-h-screen flex justify-center bg-gray-100">
 
-    <!-- 讀取遮罩 (強制身分驗證) -->
-    <div id="loading" class="loading-overlay">
-        <div id="loading-spinner" class="animate-spin text-4xl mb-4 text-[#6B5B95]">🎡</div>
-        <p id="loading-text" class="font-bold text-[#6B5B95]">遊樂園門票驗證中...</p>
-        <p id="error-display" class="text-xs text-red-400 mt-4 px-10 text-center hidden"></p>
-        <div id="setup-hint" class="hidden mt-6 p-4 bg-white border-2 border-dashed border-[#FFD1DC] rounded-2xl mx-10 text-center">
-             <p class="text-[10px] text-gray-500 mb-2">💡 設定提示</p>
-             <p class="text-xs text-[#4A4A4A]">請至 LINE Developers 後台複製 LIFF ID 並替換程式碼中的 <b>"您的_LIFF_ID"</b> 位置。</p>
+    <!-- ⭐ 全新專業驗證畫面 (進度條與掃描雷達) -->
+    <div id="loading" class="fixed inset-0 bg-[#F8FAFC]/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center transition-opacity duration-500">
+        <!-- 雷達波紋與安全驗證圖示 -->
+        <div class="relative flex justify-center items-center mb-8">
+            <div id="loading-ping" class="absolute w-24 h-24 bg-macaron-sky/40 rounded-full animate-ping"></div>
+            <div id="loading-spin" class="absolute w-32 h-32 border-2 border-dashed border-macaron-sky/60 rounded-full animate-[spin_4s_linear_infinite]"></div>
+            <div class="relative w-16 h-16 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 border-macaron-sky flex items-center justify-center z-10">
+                <!-- 直接內聯 SVG 以確保最快顯示，無需等待外部腳本載入 -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-[#6B5B95]">
+                    <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-2 7-2 2.94.94 5.06 1.9 7 3a1 1 0 0 1 1 1z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                </svg>
+            </div>
         </div>
-        <button id="retry-btn" class="mt-4 px-6 py-2 bg-macaron-sky rounded-full text-[#4A4A4A] font-bold text-xs hidden" onclick="location.reload()">重新連線</button>
+
+        <h2 class="text-xl font-extrabold text-[#4A4A4A] tracking-widest mb-1 font-rounded drop-shadow-sm">A7 🅟OINTS</h2>
+        
+        <div class="h-6 flex items-center justify-center mb-5">
+            <p id="loading-text" class="text-xs text-[#6B5B95] font-bold tracking-widest animate-pulse">初始化系統環境...</p>
+        </div>
+
+        <!-- 進度條 -->
+        <div id="loading-progress-container" class="w-64 h-2 bg-gray-200 rounded-full overflow-hidden shadow-inner mb-6 relative">
+            <div id="loading-progress" class="absolute top-0 left-0 h-full bg-gradient-to-r from-macaron-sky to-macaron-purple w-[5%] transition-all duration-300 ease-out"></div>
+        </div>
+
+        <!-- 錯誤狀態容器 (預設隱藏) -->
+        <div id="error-container" class="hidden flex-col items-center w-full px-8 mt-2">
+            <p id="error-display" class="text-xs text-red-500 font-bold mb-4 text-center leading-relaxed bg-red-50 p-3 rounded-xl border border-red-100"></p>
+            <div id="setup-hint" class="hidden w-full p-4 bg-white border-2 border-dashed border-[#FFD1DC] rounded-2xl text-center mb-4 shadow-sm">
+                 <p class="text-[10px] text-gray-500 mb-1">💡 開發者提示</p>
+                 <p class="text-xs text-[#4A4A4A]">請替換程式碼中的 <b>"您的_LIFF_ID"</b></p>
+            </div>
+            <button id="retry-btn" onclick="location.reload()" class="px-8 py-3 bg-white border border-gray-200 text-[#4A4A4A] rounded-2xl font-bold text-xs shadow-sm active-scale flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                重新載入
+            </button>
+        </div>
     </div>
 
     <!-- 自訂對話框/確認框 -->
@@ -95,9 +117,7 @@
                 <div id="custom-alert-icon" class="text-4xl mb-3">🔔</div>
                 <h3 id="custom-alert-title" class="text-lg font-bold text-[#4A4A4A] mb-2">提示</h3>
                 <p id="custom-alert-message" class="text-sm text-gray-600 mb-6 whitespace-pre-line leading-relaxed"></p>
-                <div class="flex gap-3 justify-center" id="custom-alert-buttons">
-                    <!-- JS 動態插入按鈕 -->
-                </div>
+                <div class="flex gap-3 justify-center" id="custom-alert-buttons"></div>
             </div>
         </div>
     </div>
@@ -112,7 +132,7 @@
                         <i data-lucide="ticket" class="w-4 h-4"></i> 柒樂部 LINE 社群專屬
                     </h2>
                     <h1 class="text-2xl font-extrabold text-[#4A4A4A] mt-1 animate-float tracking-tight">
-                        柒樂部 A7 🅟ᴏɪɴᴛꜱ 🎡
+                        遊樂園 A7 🅟OINTS 🎡
                     </h1>
                 </div>
                 <div class="w-12 h-12 rounded-full border-4 border-white shadow-sm bg-macaron-yellow overflow-hidden ring-2 ring-white/50">
@@ -131,13 +151,11 @@
                 </div>
             </div>
 
-            <!-- 集點卡本體 (改為 7 格置中排列) -->
+            <!-- 集點卡本體 (7 格) -->
             <div class="glass-card rounded-3xl p-6 shadow-md relative mb-6 overflow-hidden">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4/5 h-6 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSIyMCI+PHBvbHlnb24gcG9pbnRzPSIwLDExIDIwLDAgNDAsMTEgMjAsMjIiIGZpbGw9IiNGRkQxREMiLz48L3N2Zz4=')] bg-repeat-x opacity-60"></div>
                 
-                <div id="stamp-grid" class="flex flex-wrap justify-center gap-y-4 gap-x-3 mt-4 px-2">
-                    <!-- JavaScript 動態渲染集點章 -->
-                </div>
+                <div id="stamp-grid" class="flex flex-wrap justify-center gap-y-4 gap-x-3 mt-4 px-2"></div>
             </div>
 
             <!-- 獎品區域 -->
@@ -145,9 +163,7 @@
                 <h3 class="text-sm font-bold text-[#6B5B95] mb-3 px-1 flex items-center gap-2">
                     <i data-lucide="sparkles" class="w-4 h-4"></i> 獎品換領處
                 </h3>
-                <div id="prize-list" class="flex flex-col gap-3">
-                    <!-- 獎品項目由同步數據產生 -->
-                </div>
+                <div id="prize-list" class="flex flex-col gap-3"></div>
             </div>
 
             <!-- 操作按鈕 -->
@@ -168,7 +184,6 @@
                 <i data-lucide="map-pinned" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-gray-400">地圖</span>
             </button>
-            <!-- 綁定打開歷史紀錄的函式 -->
             <button class="flex flex-col items-center gap-1 text-gray-400 active-scale transition-all" onclick="openHistoryModal()">
                 <i data-lucide="scroll-text" class="w-6 h-6"></i>
                 <span class="text-[10px] font-bold text-gray-400">紀錄</span>
@@ -186,9 +201,7 @@
                     <button onclick="closeHistoryModal()" class="bg-white/80 rounded-full p-1.5 active-scale"><i data-lucide="x" class="w-5 h-5 text-gray-600"></i></button>
                 </div>
                 <div class="p-5 overflow-y-auto flex-1 bg-gray-50/50 flex flex-col gap-3" id="history-list-container">
-                    <div class="flex items-center justify-center py-10">
-                        <div class="animate-spin text-2xl">⏳</div>
-                    </div>
+                    <div class="flex items-center justify-center py-10"><div class="animate-spin text-2xl">⏳</div></div>
                 </div>
             </div>
         </div>
@@ -204,12 +217,9 @@
                     <button onclick="closeMapModal()" class="bg-white/80 rounded-full p-1.5 active-scale"><i data-lucide="x" class="w-5 h-5 text-gray-600"></i></button>
                 </div>
                 <div class="p-5 overflow-y-auto flex-1 bg-gray-50/50 flex flex-col gap-3" id="shop-list-container">
-                    <div class="flex items-center justify-center py-10">
-                        <div class="animate-spin text-2xl">⏳</div>
-                    </div>
+                    <div class="flex items-center justify-center py-10"><div class="animate-spin text-2xl">⏳</div></div>
                 </div>
-                
-                <!-- ⭐ 新增：招募合作店家按鈕 (固定在底部) -->
+                <!-- 招募合作店家按鈕 -->
                 <div class="p-4 bg-white border-t border-gray-100 z-10 shrink-0">
                     <a href="https://line.me/ti/g2/GBG7FOYaVN8Ek3Zn3wAEjfAumASOabXHP6hLzg" target="_blank" class="w-full bg-macaron-yellow text-[#6B5B95] font-bold py-3 rounded-2xl shadow-sm active-scale flex items-center justify-center gap-2 transition-transform">
                         <i data-lucide="store" class="w-5 h-5"></i>
@@ -250,7 +260,7 @@
             </div>
         </div>
 
-        <!-- 實體獎品出示 QR Code 彈窗 (用戶端) -->
+        <!-- 實體獎品出示 QR Code 彈窗 -->
         <div id="physical-qr-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center px-4">
             <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="physical-qr-content">
                 <div class="text-center">
@@ -265,7 +275,7 @@
             </div>
         </div>
 
-        <!-- 電子兌換成功彈窗 (用戶端) -->
+        <!-- 電子兌換成功彈窗 -->
         <div id="redeem-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[70] hidden flex items-center justify-center px-4">
             <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl transform scale-95 opacity-0 transition-all duration-300" id="redeem-modal-content">
                 <div class="text-center">
@@ -287,11 +297,10 @@
 
         const GAS_URL = "https://script.google.com/macros/s/AKfycbzC8FV-VwFLwjv7N9jyn4xy8IrCMjZy24-xdCT9rVgpRP5bXSudababRhaAkQloVmU2LA/exec";
         const LIFF_ID = "2009930258-GNJpigEk"; 
-        const SHOP_QR_CODE = "SEVEN_CLUB_JOY_2026"; 
-        const MAX_STAMPS = 7; // ⭐ 7 點 (A7的7)
+        const MAX_STAMPS = 7; 
         
         let currentPoints = 0;
-        let userData = { userId: null, displayName: '遊客', isAdmin: false, shopName: '' }; // ⭐ 新增權限狀態
+        let userData = { userId: null, displayName: '遊客', isAdmin: false, shopName: '' };
         let html5QrCode;
         let globalShopList = []; 
         let globalHistoryList = []; 
@@ -299,6 +308,141 @@
         function getPrizeIcon(prizeName, prizeType) {
             if (prizeName.includes('地瓜')) return '🍠';
             return prizeType === '電子' ? '🎟️' : '🎁';
+        }
+
+        // --- 進度條與狀態控制系統 ---
+        function updateLoadingState(percent, text) {
+            const bar = document.getElementById('loading-progress');
+            const textEl = document.getElementById('loading-text');
+            if(bar) bar.style.width = percent + '%';
+            if(textEl && text) textEl.innerText = text;
+        }
+
+        function showLoadingScreen(text = "處理中...") {
+            const loadingEl = document.getElementById('loading');
+            loadingEl.style.display = 'flex';
+            
+            // 重置錯誤狀態隱藏的元件
+            document.getElementById('loading-progress-container').classList.remove('hidden');
+            document.getElementById('loading-ping').classList.remove('hidden');
+            document.getElementById('loading-spin').classList.remove('hidden');
+            document.getElementById('error-container').classList.add('hidden');
+            document.getElementById('loading-text').classList.remove('text-red-500');
+            
+            // 強制重繪以啟動動畫
+            void loadingEl.offsetWidth; 
+            loadingEl.style.opacity = '1';
+            updateLoadingState(60, text);
+        }
+
+        function showError(msg) {
+            // 驗證失敗時，停止動畫與進度條，顯示錯誤
+            document.getElementById('loading-progress-container').classList.add('hidden');
+            document.getElementById('loading-ping').classList.add('hidden');
+            document.getElementById('loading-spin').classList.add('hidden');
+            
+            const textEl = document.getElementById('loading-text');
+            textEl.innerText = "連線已中斷";
+            textEl.classList.add('text-red-500');
+            textEl.classList.remove('animate-pulse');
+
+            document.getElementById('error-container').classList.remove('hidden');
+            document.getElementById('error-display').innerText = msg;
+        }
+
+        // --- 初始化流程 ---
+        async function init() {
+            updateLoadingState(15, "初始化安全環境...");
+            try {
+                if (LIFF_ID === "您的_LIFF_ID" || LIFF_ID === "") {
+                    updateLoadingState(0, "系統設定異常");
+                    showError("尚未完成 LIFF ID 設定，無法連線。");
+                    document.getElementById('setup-hint').classList.remove('hidden');
+                    return;
+                }
+                
+                updateLoadingState(35, "啟動 LINE 授權服務...");
+                await liff.init({ liffId: LIFF_ID });
+
+                if (!liff.isLoggedIn()) {
+                    updateLoadingState(45, "要求存取身分識別...");
+                    liff.login(); 
+                    return;
+                }
+                
+                updateLoadingState(60, "驗證 A7 🅟OINTS 身分...");
+                const profile = await liff.getProfile();
+                userData.userId = profile.userId;
+                userData.displayName = profile.displayName;
+                document.getElementById('user-avatar').src = profile.pictureUrl || document.getElementById('user-avatar').src;
+
+                await syncData(true);
+            } catch (err) {
+                console.error("LIFF/Init Error:", err);
+                let errorMsg = "請從 LINE App 內開啟此網址進行驗證。";
+                if (err.message.includes("channel not found")) {
+                    errorMsg = "安全驗證失敗：無效的 LIFF ID。請確認開發者後台設定。";
+                }
+                showError(errorMsg);
+            }
+        }
+
+        // --- 與後端同步資料 ---
+        async function syncData(isInit = false) {
+            if (!userData.userId) return;
+            
+            if (!isInit) {
+                showLoadingScreen("同步最新護照資料...");
+            } else {
+                updateLoadingState(80, "下載集點與兌換紀錄...");
+            }
+            
+            const result = await callGAS({ 
+                action: 'getPoints', 
+                userId: userData.userId, 
+                displayName: userData.displayName 
+            });
+            
+            if (result.status === 'success') {
+                currentPoints = result.points;
+                globalShopList = result.shops || []; 
+                globalHistoryList = result.history || []; 
+                userData.isAdmin = !!result.isAdmin; 
+                userData.shopName = result.shopName || ''; 
+
+                renderUI(result.prizes || []);
+                renderMapShops(); 
+                renderHistoryList(); 
+                
+                updateLoadingState(100, "驗證完成！歡迎入園 🎉");
+                
+                // 延遲淡出，讓使用者看到完成的狀態
+                setTimeout(() => {
+                    const loadingEl = document.getElementById('loading');
+                    loadingEl.style.opacity = '0';
+                    setTimeout(() => { loadingEl.style.display = 'none'; }, 500);
+                    
+                    if(result.isNewUser && isInit) {
+                        setTimeout(() => showCustomAlert("歡迎加入柒樂部！已贈送您入園禮 1 點！", "新朋友加入", "🎉"), 300);
+                    }
+                }, 600);
+
+            } else {
+                showError(result.message);
+            }
+        }
+
+        async function callGAS(payload) {
+            try {
+                const response = await fetch(GAS_URL, {
+                    method: "POST", mode: "cors", redirect: "follow",
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error("網路請求失敗");
+                return await response.json();
+            } catch (e) {
+                return { status: "error", message: "無法連線至雲端資料庫，請檢查網路連線。" };
+            }
         }
 
         // --- 自訂精美對話視窗系統 ---
@@ -317,10 +461,7 @@
                 const okBtn = document.createElement('button');
                 okBtn.className = 'w-full bg-macaron-sky text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale';
                 okBtn.innerText = '好的';
-                okBtn.onclick = () => {
-                    closeCustomAlert();
-                    resolve(true);
-                };
+                okBtn.onclick = () => { closeCustomAlert(); resolve(true); };
                 btnContainer.appendChild(okBtn);
                 
                 modal.classList.remove('hidden');
@@ -346,18 +487,12 @@
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'w-1/2 bg-gray-100 text-gray-500 font-bold py-3 rounded-2xl active-scale';
                 cancelBtn.innerText = '取消';
-                cancelBtn.onclick = () => {
-                    closeCustomAlert();
-                    resolve(false);
-                };
+                cancelBtn.onclick = () => { closeCustomAlert(); resolve(false); };
                 
                 const confirmBtn = document.createElement('button');
                 confirmBtn.className = 'w-1/2 bg-macaron-sky text-[#4A4A4A] font-extrabold py-3 rounded-2xl shadow-sm active-scale';
                 confirmBtn.innerText = '確定';
-                confirmBtn.onclick = () => {
-                    closeCustomAlert();
-                    resolve(true);
-                };
+                confirmBtn.onclick = () => { closeCustomAlert(); resolve(true); };
                 
                 btnContainer.appendChild(cancelBtn);
                 btnContainer.appendChild(confirmBtn);
@@ -378,92 +513,7 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        function showError(msg) {
-            document.getElementById('loading-spinner').classList.add('hidden');
-            document.getElementById('error-display').innerText = msg;
-            document.getElementById('error-display').classList.remove('hidden');
-            document.getElementById('retry-btn').classList.remove('hidden');
-        }
-
-        async function init() {
-            try {
-                if (LIFF_ID === "您的_LIFF_ID" || LIFF_ID === "") {
-                    document.getElementById('loading-text').innerText = "尚未完成 LIFF ID 設定";
-                    document.getElementById('setup-hint').classList.remove('hidden');
-                    return;
-                }
-                await liff.init({ liffId: LIFF_ID });
-                if (!liff.isLoggedIn()) {
-                    document.getElementById('loading-text').innerText = "引導至 LINE 登入中...";
-                    liff.login(); 
-                    return;
-                }
-                const profile = await liff.getProfile();
-                userData.userId = profile.userId;
-                userData.displayName = profile.displayName;
-                document.getElementById('user-avatar').src = profile.pictureUrl || document.getElementById('user-avatar').src;
-
-                await syncData();
-            } catch (err) {
-                console.error("LIFF/Init Error:", err);
-                let errorMsg = "請從 LINE App 內開啟此網址。";
-                if (err.message.includes("channel not found")) {
-                    errorMsg = "LIFF ID 無效（Channel Not Found）。請確認 LINE Developers 後台設定是否正確。";
-                }
-                showError(errorMsg);
-            }
-        }
-
-        async function callGAS(payload) {
-            try {
-                const response = await fetch(GAS_URL, {
-                    method: "POST",
-                    mode: "cors",
-                    redirect: "follow",
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error("網路請求失敗");
-                return await response.json();
-            } catch (e) {
-                return { status: "error", message: "無法連線至雲端資料庫" };
-            }
-        }
-
-        async function syncData() {
-            if (!userData.userId) return;
-            document.getElementById('loading').style.display = 'flex';
-            
-            const result = await callGAS({ 
-                action: 'getPoints', 
-                userId: userData.userId, 
-                displayName: userData.displayName 
-            });
-            
-            if (result.status === 'success') {
-                currentPoints = result.points;
-                globalShopList = result.shops || []; 
-                globalHistoryList = result.history || []; 
-                
-                // ⭐ 儲存後端傳來的店家權限狀態
-                userData.isAdmin = !!result.isAdmin; 
-                userData.shopName = result.shopName || ''; 
-
-                if(result.isNewUser) {
-                    setTimeout(() => showCustomAlert("歡迎加入柒樂部！已贈送您入園禮 1 點！", "新朋友加入", "🎉"), 500);
-                }
-
-                renderUI(result.prizes || []);
-                renderMapShops(); 
-                renderHistoryList(); 
-                
-                document.getElementById('loading').style.opacity = '0';
-                setTimeout(() => document.getElementById('loading').style.display = 'none', 300);
-            } else {
-                showCustomAlert(result.message, "同步失敗", "❌");
-                document.getElementById('retry-btn').classList.remove('hidden');
-            }
-        }
-
+        // --- UI 渲染區塊 ---
         function renderUI(prizes = []) {
             const grid = document.getElementById('stamp-grid');
             const stampIcons = ['🎠', '🎡', '🎪', '🎢', '🎫', '🍿', '🎈'];
@@ -561,24 +611,6 @@
             lucide.createIcons();
         }
 
-        function openHistoryModal() {
-            const modal = document.getElementById('history-modal');
-            const content = document.getElementById('history-modal-content');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('translate-y-full');
-            }, 10);
-        }
-
-        function closeHistoryModal() {
-            const modal = document.getElementById('history-modal');
-            const content = document.getElementById('history-modal-content');
-            content.classList.add('translate-y-full');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
-        }
-
         function renderMapShops() {
             const listContainer = document.getElementById('shop-list-container');
             listContainer.innerHTML = '';
@@ -614,27 +646,35 @@
             lucide.createIcons();
         }
 
+        function openHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            const content = document.getElementById('history-modal-content');
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.remove('translate-y-full'), 10);
+        }
+
+        function closeHistoryModal() {
+            const modal = document.getElementById('history-modal');
+            const content = document.getElementById('history-modal-content');
+            content.classList.add('translate-y-full');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
         function openMapModal() {
             const modal = document.getElementById('map-modal');
             const content = document.getElementById('map-modal-content');
             modal.classList.remove('hidden');
-            setTimeout(() => {
-                content.classList.remove('translate-y-full');
-            }, 10);
+            setTimeout(() => content.classList.remove('translate-y-full'), 10);
         }
 
         function closeMapModal() {
             const modal = document.getElementById('map-modal');
             const content = document.getElementById('map-modal-content');
             content.classList.add('translate-y-full');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 300);
+            setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        // ==========================================
-        // 兌換與核銷核心邏輯
-        // ==========================================
+        // --- 兌換與核銷核心邏輯 ---
         async function handleRedeem(prizeName, prizeType) {
             const displayIcon = getPrizeIcon(prizeName, prizeType); 
 
@@ -658,15 +698,9 @@
             const confirmed = await showCustomConfirm(`確定要兌換「${prizeName}」嗎？`, "兌換確認", displayIcon);
             if (!confirmed) return;
 
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading').style.opacity = '1';
+            showLoadingScreen("兌換處理中...");
             
-            const result = await callGAS({ 
-                action: 'redeem', 
-                userId: userData.userId, 
-                displayName: userData.displayName, 
-                prizeName 
-            });
+            const result = await callGAS({ action: 'redeem', userId: userData.userId, displayName: userData.displayName, prizeName });
             
             if (result.status === 'success') {
                 const modal = document.getElementById('redeem-modal');
@@ -682,8 +716,7 @@
                 document.getElementById('redemption-code').innerText = result.code;
                 await syncData();
             } else {
-                document.getElementById('loading').style.display = 'none';
-                showCustomAlert(result.message, "兌換失敗", "❌");
+                showError(result.message);
             }
         }
 
@@ -695,12 +728,10 @@
             await syncData();
         }
 
-        // ⭐ 新增：前端店家權限阻擋驗證
         async function handleAdminRedeem(text) {
             if (html5QrCode) await html5QrCode.stop().catch(e => console.log(e));
             document.getElementById('scanner-modal').classList.add('hidden');
             
-            // ⭐ 1. 提早攔截非店家用戶
             if (!userData.isAdmin) {
                 showCustomAlert("此功能僅限「柒樂部授權店家」使用，一般用戶無法執行核銷作業哦！", "權限不足", "🚫");
                 return;
@@ -711,7 +742,6 @@
             const [prefix, targetUserId, targetDisplayName, targetPrizeName] = parts;
             const displayIcon = getPrizeIcon(targetPrizeName, '實體'); 
 
-            // ⭐ 2. 確認視窗動態顯示該「店家名稱」
             const confirmed = await showCustomConfirm(
                 `【${userData.shopName} 核銷確認】\n確定要為「${targetDisplayName}」核銷實體獎品「${targetPrizeName}」嗎？\n\n確認後將自動扣除該用戶之集點點數。`, 
                 "店家核銷確認", 
@@ -719,49 +749,39 @@
             );
             if (!confirmed) return;
 
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading').style.opacity = '1';
+            showLoadingScreen("核銷處理中...");
             
             const result = await callGAS({ 
-                action: 'redeem', 
-                userId: targetUserId, 
-                displayName: targetDisplayName, 
-                prizeName: targetPrizeName,
-                adminId: userData.userId 
+                action: 'redeem', userId: targetUserId, displayName: targetDisplayName, 
+                prizeName: targetPrizeName, adminId: userData.userId 
             });
 
-            document.getElementById('loading').style.display = 'none';
             if (result.status === 'success') {
-                await showCustomAlert(
-                    `✅ 核銷成功！\n\n用戶：${targetDisplayName}\n獎品：${targetPrizeName}\n系統紀錄碼：${result.code}\n\n請現場發放實體禮品。`, 
-                    "核銷成功", 
-                    "🎉"
-                );
-                await syncData(); 
+                // 等待畫面淡出後再顯示成功 Alert，避免視覺重疊
+                setTimeout(async () => {
+                    await showCustomAlert(`✅ 核銷成功！\n\n用戶：${targetDisplayName}\n獎品：${targetPrizeName}\n系統紀錄碼：${result.code}\n\n請現場發放實體禮品。`, "核銷成功", "🎉");
+                    await syncData(); 
+                }, 500);
             } else {
-                showCustomAlert(`❌ 核銷失敗：${result.message}`, "核銷失敗", "⚠️");
+                showError(result.message);
             }
         }
 
         async function handleScanSuccess(scannedCode) {
             if (html5QrCode) await html5QrCode.stop().catch(e => console.log(e));
             document.getElementById('scanner-modal').classList.add('hidden');
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading').style.opacity = '1';
+            showLoadingScreen("驗證集點碼中...");
             
             const result = await callGAS({ 
-                action: 'addStamp', 
-                userId: userData.userId, 
-                displayName: userData.displayName, 
-                shopCode: scannedCode 
+                action: 'addStamp', userId: userData.userId, 
+                displayName: userData.displayName, shopCode: scannedCode 
             });
             
             if (result.status === 'success') {
                 await syncData();
                 if (navigator.vibrate) navigator.vibrate(200);
             } else {
-                document.getElementById('loading').style.display = 'none';
-                showCustomAlert(result.message, "集點失敗", "⚠️");
+                showError(result.message);
             }
         }
 
