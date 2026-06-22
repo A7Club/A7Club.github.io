@@ -416,8 +416,8 @@
         async function init() {
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             if (!isMobile) {
-                const desktopMsg = `此活動為 <a href="https://line.me/ti/g2/GBG7FOYaVN8Ek3Zn3wAEjfAumASOabXHP6hLzg" target="_blank" class="text-[#6B5B95] font-black underline decoration-[#6B5B95] decoration-2 underline-offset-2 mx-1 hover:text-macaron-purple transition-colors">A7ᴄʟᴜʙ | 柒楽部</a> 社群優惠，<br><br>電腦版請由社群內的連結，<br>或由合作店家LINE社群中的連結開啟集點哦！`;
-                showError(desktopMsg, "請使用手機開啟");
+                const desktopMsg = `請由 A7ᴄʟᴜʙ 柒楽部 LINE社群內點擊連結，<br>或由合作店家專屬連結開啟集點哦！`;
+                showError(desktopMsg, "請使用 LINE社群 開啟");
                 document.getElementById('retry-btn').classList.add('hidden');
                 return;
             }
