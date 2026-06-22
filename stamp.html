@@ -105,7 +105,7 @@
             </div>
 
             <div id="error-container" class="hidden flex-col items-center w-full mt-4 z-20">
-                <p id="error-display" class="text-[12px] text-[#B35C66] font-bold mb-4 text-center leading-loose bg-[#FFF0F5] p-4 rounded-2xl border border-[#FFD1DC] w-full"></p>
+                <p id="error-display" class="text-[11px] text-[#B35C66] font-bold mb-4 text-center leading-relaxed bg-[#FFF0F5] p-3 rounded-xl border border-[#FFD1DC] whitespace-pre-line w-full"></p>
                 <div id="setup-hint" class="hidden w-full p-3 bg-white border-2 border-dashed border-[#FFD1DC] rounded-xl text-center mb-4 shadow-sm">
                      <p class="text-[10px] text-gray-500 mb-1">💡 開發者提示</p>
                      <p class="text-[11px] text-[#4A4A4A]">請替換程式碼中的 <b>"您的_LIFF_ID"</b></p>
@@ -412,7 +412,7 @@
         async function init() {
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             if (!isMobile) {
-                showError('此活動為 <a href="https://line.me/ti/g2/GBG7FOYaVN8Ek3Zn3wAEjfAumASOabXHP6hLzg" target="_blank" class="text-[#6B5B95] underline text-[13px] font-black active-scale inline-block mx-1">A7ᴄʟᴜʙ | 柒楽部</a> 社群串聯優惠。<br>電腦版請由社群內的連結，或由合作店家 LINE 社群中的連結，並使用「手機版」開啟集點哦！', "請使用手機開啟");
+                showError('此活動為 <a href="https://line.me/ti/g2/GBG7FOYaVN8Ek3Zn3wAEjfAumASOabXHP6hLzg" target="_blank" class="text-[#6B5B95] underline font-extrabold active-scale inline-block"><b>A7ᴄʟᴜʙ | 柒楽部</b></a> 社群優惠，<br>請透過手機版 LINE App 開啟集點哦！', "請使用手機開啟");
                 document.getElementById('retry-btn').classList.add('hidden');
                 return;
             }
