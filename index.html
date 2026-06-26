@@ -1290,6 +1290,16 @@
                             <i
                                 class="fa-solid fa-chevron-right text-[10px] text-gray-300 group-hover:text-green-400 ml-auto shrink-0"></i>
                         </div>
+
+                        <!-- Pill: 有球必應地瓜球 -->
+                        <div onclick="openStoreModal('有球必應地瓜球', '美食', 'bg-themeGreen', '外酥內軟、金黃飽滿，「有球必應」帶給你最極致的療癒點心時間。', '桃園市龜山區文青路246號', '營業時間二、四、五、日 17:30～21:30', 'https://candylife.tw/wp-content/uploads/20220331115700_95.jpg', 'https://line.me/ti/g2/Am7CU_m1o8pIU2unPefVsEUfc5E8uyz0AzKi4Q')"
+                            class="bg-white hover:bg-yellow-50 text-gray-700 hover:text-themeYellow border border-gray-200 hover:border-yellow-200 px-3.5 py-2 rounded-full text-xs sm:text-sm font-black shadow-sm transition-all flex items-center gap-1.5 cursor-pointer group hover:-translate-y-0.5 lg:w-full">
+                            <span
+                                class="bg-themeYellow text-white text-[9px] px-1.5 py-0.5 rounded-md shadow-sm shrink-0">美食</span>
+                            <span class="truncate flex-1">有球必應地瓜球</span>
+                            <i
+                                class="fa-solid fa-chevron-right text-[10px] text-gray-300 group-hover:text-green-400 ml-auto shrink-0"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -2966,9 +2976,11 @@ if (displayBuses.length === 0) {
             if (runnerUps.length > 0) {
                 const runnerUpHtml = runnerUps.map((item, index) => {
                     const rank = index + 4;
+                    // 手機與平板隱藏第 6 到 10 名，僅在 lg 螢幕以上顯示
+                    const visibilityClass = rank > 5 ? 'hidden lg:flex' : 'flex';
                     return `
                         <div onclick="loadPage('food'); setTimeout(()=>updateFoodMap('${(item.address || '').replace(/'/g, "\\'")}', '${(item.name || '').replace(/'/g, "\\'")}', ${item.lat || null}, ${item.lng || null}, '${(item.category || '').replace(/'/g, "\\'")}', true), 500);" 
-                             class="flex items-center justify-between p-2 sm:p-2.5 bg-white/80 hover:bg-white rounded-xl shadow-sm border border-pink-50 hover:border-pink-300 transition-all cursor-pointer group">
+                             class="${visibilityClass} items-center justify-between p-2 sm:p-2.5 bg-white/80 hover:bg-white rounded-xl shadow-sm border border-pink-50 hover:border-pink-300 transition-all cursor-pointer group">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 <span class="w-5 sm:w-6 font-black text-gray-400 text-center shrink-0 italic">${rank}</span>
                                 <h4 class="font-bold text-gray-700 text-xs sm:text-sm truncate group-hover:text-themePink transition-colors" title="${item.name}">${item.name}</h4>
@@ -2984,7 +2996,9 @@ if (displayBuses.length === 0) {
                 runnerUpSection = `
                     <div class="w-full lg:w-[40%] flex flex-col pt-6 lg:pt-0 lg:pl-6 lg:border-l-2 lg:border-pink-100 border-t-2 lg:border-t-0 border-pink-100 mt-8 lg:mt-0">
                         <h4 class="text-xs sm:text-sm font-black text-pink-500 mb-3 flex items-center justify-center lg:justify-start">
-                            <i class="fa-solid fa-ranking-star mr-1.5 text-yellow-400"></i> 熱門潛力店家 (Top 4 - 10)
+                            <i class="fa-solid fa-ranking-star mr-1.5 text-yellow-400"></i> 熱門潛力店家 
+                            <span class="inline lg:hidden ml-1">(Top 4 - 5)</span>
+                            <span class="hidden lg:inline ml-1">(Top 4 - 10)</span>
                         </h4>
                         <div class="flex flex-col gap-2">
                             ${runnerUpHtml}
