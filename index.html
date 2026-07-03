@@ -1674,6 +1674,9 @@
         let shoppingClusterGroups = {};
         let shoppingMarkersMap = {};
 
+        // 追蹤當前渲染的基礎頁面
+        window.currentRenderedPage = null;
+
         // 初始化與路由監聽 
         document.addEventListener('DOMContentLoaded', () => {
             handleRoute();
@@ -1694,19 +1697,42 @@
                 }
             }
 
+            let basePage = hash.split('?')[0];
+
             // 處理搜尋的特殊路由
             if (hash.startsWith('search=')) {
                 const query = decodeURIComponent(hash.substring(7));
                 renderPage('search');
                 executeSearchLogic(query);
-            } else if (hash === 'buildings' || hash === 'explore') {
+            } else if (basePage === 'buildings' || basePage === 'explore') {
                 // 原本 explore 頁面的錨點或路由，直接導向新的獨立頁面
                 window.location.href = 'explore.html' + (hash === 'buildings' ? '#buildings' : '');
-            } else if (hash === 'school') {
+            } else if (basePage === 'school') {
                 // 特殊錨點路由：切換到外部生活通頁面並定位
                 window.location.href = 'lifehub.html#school';
+            } else if (basePage === 'food-gacha') {
+                renderPage('home');
+                document.title = 'A7 柒樂部🎡｜美食隨機輪盤';
+                setTimeout(() => {
+                    const gachaEl = document.getElementById('food-gacha');
+                    if (gachaEl) {
+                        gachaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        gachaEl.classList.add('ring-4', 'ring-themePink', 'ring-offset-4', 'transition-shadow', 'duration-500');
+                        setTimeout(() => gachaEl.classList.remove('ring-4', 'ring-themePink', 'ring-offset-4'), 2500);
+                    }
+                }, 350);
             } else {
-                renderPage(hash);
+                if (window.currentRenderedPage === basePage && basePage === 'food') {
+                    // 若已經在美食頁面，且僅是分類改變，則只更新資料而不重整整個頁面與地圖
+                    let activeCategory = '全部';
+                    if (hash.includes('?cat=')) {
+                        activeCategory = decodeURIComponent(hash.split('?cat=')[1]);
+                    }
+                    document.title = activeCategory === '全部' ? 'A7 柒樂部🎡｜美食販賣部' : 'A7 柒樂部🎡｜美食販賣部 - ' + activeCategory;
+                    if (globalFoodData) renderFoodData(globalFoodData, activeCategory);
+                } else {
+                    renderPage(basePage);
+                }
             }
         }
 
@@ -1820,6 +1846,7 @@
 
         // 頁面動態注入核心函數 
         function renderPage(pageId, skipScrollTop = false) {
+            window.currentRenderedPage = pageId;
             const root = document.getElementById('app-root');
             const template = document.getElementById('tpl-' + pageId);
 
@@ -1828,10 +1855,17 @@
                 const pageTitles = {
                     'home': 'A7 柒樂部🎡｜生活地圖指南',
                     'food': 'A7 柒樂部🎡｜美食販賣部',
+                    'food-gacha': 'A7 柒樂部🎡｜美食隨機輪盤',
                     'shopping': 'A7 柒樂部🎡｜生活補給站',
                     'search': 'A7 柒樂部🎡｜全站搜尋'
                 };
-                document.title = pageTitles[pageId] || 'A7 柒樂部🎡｜林口、龜山美食生活地圖指南';
+                
+                let titleStr = pageTitles[pageId] || 'A7 柒樂部🎡｜林口、龜山美食生活地圖指南';
+                if (pageId === 'food' && window.location.hash.includes('?cat=')) {
+                    let cat = decodeURIComponent(window.location.hash.split('?cat=')[1]);
+                    titleStr += ' - ' + cat;
+                }
+                document.title = titleStr;
 
                 // --- 2. 觸發 GA 虛擬頁面追蹤 ---
                 const pagePaths = {
@@ -3865,7 +3899,12 @@ if (displayBuses.length === 0) {
                 if (data.length === 0) {
                     container.innerHTML = '<div class="col-span-full text-center text-gray-500 font-bold py-8">目前沒有美食資料</div>';
                 } else {
-                    renderFoodData(data, '全部');
+                    let activeCategory = '全部';
+                    const hash = window.location.hash;
+                    if (hash.includes('?cat=')) {
+                        activeCategory = decodeURIComponent(hash.split('?cat=')[1]);
+                    }
+                    renderFoodData(data, activeCategory);
                 }
             }).catch(err => {
                 console.error('Food CSV Fetch Error:', err);
@@ -3965,6 +4004,27 @@ if (displayBuses.length === 0) {
             }
         }
 
+        // 美食分類改變時更新網址與畫面
+        window.changeFoodCategory = function(cat) {
+            const newHash = cat === '全部' ? 'food' : 'food?cat=' + encodeURIComponent(cat);
+            history.pushState(null, '', '#' + newHash);
+            
+            document.title = cat === '全部' ? 'A7 柒樂部🎡｜美食販賣部' : 'A7 柒樂部🎡｜美食販賣部 - ' + cat;
+            
+            // 觸發 GA 追蹤
+            if (typeof gtag === 'function') {
+                gtag('event', 'page_view', {
+                    page_title: document.title,
+                    page_location: window.location.origin + window.location.pathname + '#' + newHash,
+                    page_path: '/food?cat=' + encodeURIComponent(cat)
+                });
+            }
+            
+            if (globalFoodData) {
+                renderFoodData(globalFoodData, cat);
+            }
+        };
+
         function renderFoodData(data, activeCategory) {
             const container = document.getElementById('food-list-container');
             const desktopTagsContainer = document.getElementById('food-tags-desktop');
@@ -3981,7 +4041,7 @@ if (displayBuses.length === 0) {
 
                 let icon = cat === '全部' ? '🎡' : getCategoryStyle(cat).emoji;
 
-                return `<button onclick="renderFoodData(globalFoodData, '${cat.replace(/'/g, "\\'")}')" class="flex-auto lg:flex-none w-auto py-2 md:py-2.5 px-4 md:px-6 rounded-full font-black text-xs md:text-sm transition-all transform flex items-center justify-center gap-1 md:gap-2 border border-pink-100 whitespace-nowrap ${activeClass}">
+                return `<button onclick="changeFoodCategory('${cat.replace(/'/g, "\\'")}')" class="flex-auto lg:flex-none w-auto py-2 md:py-2.5 px-4 md:px-6 rounded-full font-black text-xs md:text-sm transition-all transform flex items-center justify-center gap-1 md:gap-2 border border-pink-100 whitespace-nowrap ${activeClass}">
                             <span class="hidden md:inline-block shrink-0">${icon}</span>
                             <span>${cat}</span>
                         </button>`;
