@@ -1315,8 +1315,8 @@
             </div>
 
             <!-- Google Maps 區塊 (使用 JS API，並設定 1:1 長寬比) -->
-            <div id="traffic-map-section-transit"
-                class="bg-white rounded-xl overflow-hidden shadow-sm w-full max-w-3xl border-2 border-gray-200 mx-auto group flex flex-col aspect-square relative scroll-mt-24">
+            <div
+                class="bg-white rounded-xl overflow-hidden shadow-sm w-full max-w-3xl border-2 border-gray-200 mx-auto group flex flex-col aspect-square relative">
                 <div
                     class="bg-white/90 backdrop-blur-sm px-3 py-2.5 flex justify-between items-center border-b border-gray-200 shrink-0 z-10 shadow-sm">
                     <div class="flex items-center text-[11px] sm:text-xs font-black text-gray-700">
@@ -2284,7 +2284,7 @@
 
                     <!-- Q4: 交通塞車與路況 (使用 JS API，並設定 1:1 長寬比) -->
                     <details id="traffic-details"
-                        class="group bg-yellow-50 rounded-2xl p-4 cursor-pointer border border-pink-100 hover:border-pink-300 transition-colors scroll-mt-24">
+                        class="group bg-yellow-50 rounded-2xl p-4 cursor-pointer border border-pink-100 hover:border-pink-300 transition-colors">
                         <summary
                             class="font-black text-gray-800 list-none flex justify-between items-center text-lg outline-none">
                             <span class="flex items-center"><i class="fa-solid fa-q text-themePink mr-2"></i>
@@ -2304,8 +2304,8 @@
                             </p>
 
                             <!-- Google Maps 區塊 (使用 JS API，並設定 1:1 長寬比) -->
-                            <div id="traffic-map-section-faq"
-                                class="bg-white rounded-xl overflow-hidden shadow-sm w-full max-w-lg border-2 border-gray-200 mx-auto group flex flex-col aspect-square relative scroll-mt-24">
+                            <div
+                                class="bg-white rounded-xl overflow-hidden shadow-sm w-full max-w-lg border-2 border-gray-200 mx-auto group flex flex-col aspect-square relative">
                                 <div
                                     class="bg-white/90 backdrop-blur-sm px-3 py-2.5 flex justify-between items-center border-b border-gray-200 shrink-0 z-10 shadow-sm">
                                     <div class="flex items-center text-[11px] sm:text-xs font-black text-gray-700">
@@ -2314,7 +2314,7 @@
                                     </div>
                                 </div>
                                 <!-- 地圖容器 -->
-                                <div id="traffic-map-container-fqa" class="w-full flex-1 relative bg-gray-100">
+                                <div id="traffic-map-container" class="w-full flex-1 relative bg-gray-100">
                                     <div id="traffic-map-fqa" class="w-full h-full absolute inset-0"></div>
                                 </div>
                             </div>
@@ -5804,66 +5804,108 @@
             }
         }
 
+        // 🌟 新增：處理特定錨點跳轉 (例如：#traffic-map)
+        function handleSpecialAnchors() {
+            const hash = window.location.hash.replace('#', '');
+            if (!hash) return false;
+
+            // 定義特殊錨點的行為
+            if (hash === 'traffic-map' || hash === 'traffic' || hash === 'traffic-details') {
+                // 1. 切換到包含該內容的 Tab (A7area)
+                window.switchTab('A7area', true);
+                
+                // 2. 找到目標 details 標籤並展開
+                const targetDetails = document.getElementById('traffic-details');
+                if (targetDetails) {
+                    targetDetails.open = true;
+                    
+                    // 3. 延遲捲動，等待 DOM 更新與地圖重新渲染
+                    setTimeout(() => {
+                        // 確保地圖重繪
+                        if (window.google && window.google.maps) {
+                             const mapEl = document.getElementById('traffic-map-fqa');
+                             // 這裡透過觸發自訂事件或直接重繪，但最簡單是讓它 resize
+                             window.dispatchEvent(new Event('resize')); 
+                        }
+                        
+                        // 捲動到該區塊，並加上一些偏移避免被 header 擋住
+                        const yOffset = -100; 
+                        const y = targetDetails.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({top: y, behavior: 'smooth'});
+                    }, 500);
+                    return true; // 表示已處理過特殊錨點
+                }
+            }
+            return false;
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
             const query = params.get('search');
             const address = params.get('address');
 
-            // 1. 處理村里查詢 (舊邏輯)
-            if (address || (query && (query.includes('里') || query.includes('鄰')))) {
-                const targetAddress = address || query;
-                if (window.switchTab) window.switchTab('A7area');
-                const searchInput = document.getElementById('address-input');
-                if (searchInput) {
-                    searchInput.value = targetAddress;
-                    setTimeout(() => checkVillage(), 800);
-                }
-                if (!address) return; // 如果是透過 search 來的且又是地址，就不再跑全文高亮
-            }
+            // --- 執行順序：1. 特殊錨點 -> 2. 村里查詢 -> 3. 全文高亮 ---
 
-            // 2. 處理全文高亮 (新邏輯)
-            if (query) {
-                // 等待分頁切換與可能的動態內容載入後再執行
-                setTimeout(() => highlightAndScrollTo(query), 1200);
-            }
+            // 1. 處理特殊錨點跳轉 (例如: #traffic-map)
+            const handledSpecial = handleSpecialAnchors();
 
-            // 3. 處理網址 Hash 錨點跳轉 (特別是交通地圖)
-            const hash = window.location.hash;
-            if (hash === '#traffic-map' || hash === '#traffic' || hash === '#traffic-details' || hash === '#traffic-map-section-transit' || hash === '#traffic-map-section-faq') {
-                // 決定要跳去哪一個地圖 (優先跳去常見問題裡的，或是交通指南裡的)
-                // 預設跳去 常見問題 (A7area) 裡面的
-                setTimeout(() => {
-                    window.switchTab('A7area');
-                    const detailsEl = document.getElementById('traffic-details');
-                    if (detailsEl) {
-                        detailsEl.open = true; // 打開折疊面板
-                        // 讓地圖重新計算大小以防破版
-                        if (typeof google !== 'undefined' && google.maps) {
-                            setTimeout(() => {
-                                const mapEl = document.getElementById('traffic-map-fqa');
-                                // 嘗試觸發 resize
-                                const mapInstance = new google.maps.Map(mapEl);
-                                google.maps.event.trigger(mapInstance, 'resize');
-                            }, 500);
-                        }
-                        
-                        detailsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // 如果沒有處理特殊錨點，再執行原本的查詢邏輯
+            if (!handledSpecial) {
+                // 2. 處理村里查詢 (舊邏輯)
+                if (address || (query && (query.includes('里') || query.includes('鄰')))) {
+                    const targetAddress = address || query;
+                    if (window.switchTab) window.switchTab('A7area');
+                    const searchInput = document.getElementById('address-input');
+                    if (searchInput) {
+                        searchInput.value = targetAddress;
+                        setTimeout(() => checkVillage(), 800);
                     }
-                }, 800);
+                    if (!address) return; // 如果是透過 search 來的且又是地址，就不再跑全文高亮
+                }
+
+                // 3. 處理全文高亮 (新邏輯)
+                if (query) {
+                    // 等待分頁切換與可能的動態內容載入後再執行
+                    setTimeout(() => highlightAndScrollTo(query), 1200);
+                }
             }
         });
 
         // --- 手機選單切換 ---
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            if (menu) {
-                if (menu.classList.contains('hidden')) {
-                    menu.classList.remove('hidden');
-                    menu.classList.add('flex');
-                } else {
-                    menu.classList.remove('flex');
-                    menu.classList.add('hidden');
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.switchTab(btn.getAttribute('data-tab'), true); // 傳入 true 標示為點擊行為
+                });
+            });
+
+            // 支援使用瀏覽器上一頁/下一頁功能時切換 tab 與標題，確保 GA 停留時間計算正確
+            window.addEventListener('popstate', () => {
+                let currentTab = 'overview';
+                if (window.location.hash) {
+                    const hashTab = window.location.hash.replace('#', '');
+                    const validTabs = ['overview', 'engineering', 'community', 'faq', 'A7area', 'school', 'transit', 'news'];
+                    if (validTabs.includes(hashTab)) {
+                        currentTab = hashTab;
+                    }
                 }
+                window.switchTab(currentTab, false);
+            });
+
+            let initialTab = 'overview';
+            try {
+                const hash = window.location.hash.replace('#', '');
+                const validTabs = ['overview', 'engineering', 'community', 'faq', 'A7area', 'school', 'transit', 'news'];
+                // 避免特殊錨點 (如 traffic-map) 被當作 Tab 來切換
+                if (validTabs.includes(hash)) {
+                    initialTab = hash;
+                }
+            } catch (e) { }
+            // 這裡不再直接覆蓋，因為在 DOMContentLoaded 會處理特殊錨點
+            if(initialTab !== 'overview' || !window.location.hash) {
+                 window.switchTab(initialTab);
+            } else if (window.location.hash && !['traffic-map', 'traffic', 'traffic-details'].includes(window.location.hash.replace('#', ''))) {
+                 window.switchTab('overview'); // 其他無效 hash 預設為 overview
             }
         }
 
