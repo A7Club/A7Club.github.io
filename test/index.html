@@ -671,7 +671,174 @@
             if (pageId === 'food') { setTimeout(() => { initFoodMap(); fetchFoodData(); }, 50); }
             if (pageId === 'shopping') fetchShoppingData();
         }
+<!-- ... existing code ... -->
+        // --- Leaflet 全域變數 ---
+        let foodMapInstance = null;
+        let foodClusterGroup = null;
+        let foodMarkersMap = {};
+        let activeFoodMarkerName = null;
 
+        // 生活補給站的全域地圖變數
+        let shoppingMaps = {};
+        let shoppingClusterGroups = {};
+        let shoppingMarkersMap = {};
+
+        // 🌟 新增：美食分類中英對照表 (確保網址漂亮不亂碼)
+        const FOOD_CAT_SLUG_MAP = {
+            '早午餐': 'brunch', '早餐': 'breakfast', '飲料': 'drinks', '手搖飲': 'bubble-tea',
+            '冰品': 'ice-cream', '甜點': 'dessert', '蛋糕': 'cake', '麵包': 'bakery',
+            '咖啡': 'coffee', '西餐': 'western', '美式': 'american', '義式': 'italian',
+            '披薩': 'pizza', '漢堡': 'burger', '拉麵': 'ramen', '麵食': 'noodles',
+            '飯食': 'rice', '便當': 'bento', '水餃': 'dumplings', '小吃': 'snack',
+            '炸物': 'fried', '烤物': 'bbq', '滷味': 'braised', '宵夜': 'midnight',
+            '火鍋': 'hotpot', '鍋物': 'hotpot', '鐵板': 'teppanyaki', '異國': 'exotic',
+            '日式': 'japanese', '韓式': 'korean', '泰式': 'thai', '素食': 'vegetarian',
+            '蔬食': 'vegan', '健康': 'healthy', '寵物': 'pet-friendly', '其他': 'others',
+            '全部': 'all'
+        };
+
+        // 轉換中文分類為英文 slug
+        window.getCategorySlug = function(catName) {
+            if (!catName || catName === '全部') return 'all';
+            if (FOOD_CAT_SLUG_MAP[catName]) return FOOD_CAT_SLUG_MAP[catName];
+            
+            // 如果剛好有部分配對
+            for (const [key, slug] of Object.entries(FOOD_CAT_SLUG_MAP)) {
+                if (catName.includes(key)) return slug;
+            }
+            // 找不到就用 base64 處理避免亂碼，加上前綴
+            return 'c-' + btoa(encodeURIComponent(catName)).substring(0, 6).toLowerCase();
+        };
+
+
+        // 初始化與路由監聽 
+        document.addEventListener('DOMContentLoaded', () => {
+<!-- ... existing code ... -->
+```
+
+### 第二步：修改 `handleRoute` 攔截附帶參數的美食網址
+
+修改核心路由功能，讓網址含有 `#food?cat=brunch` 時能正確提取 `cat` 參數並渲染頁面。請找到 `function handleRoute` 並修改成以下樣子：
+
+```html:A7 柒樂部首頁:index.html
+<!-- ... existing code ... -->
+        // 核心路由控制處理器
+        function handleRoute(customRoute) {
+            let hash = 'home';
+            if (typeof customRoute === 'string') {
+                hash = customRoute;
+            } else {
+                try {
+                    hash = window.location.hash.substring(1) || 'home';
+                } catch (e) {
+                    hash = 'home';
+                }
+            }
+            
+            // 提取基礎路由 (拿掉 ? 後面的參數)
+            let routePath = hash.split('?')[0];
+
+            // 處理搜尋的特殊路由
+            if (routePath.startsWith('search=')) {
+                const query = decodeURIComponent(routePath.substring(7));
+                renderPage('search');
+                executeSearchLogic(query);
+            } else if (routePath === 'buildings' || routePath === 'explore') {
+                // 原本 explore 頁面的錨點或路由，直接導向新的獨立頁面
+                window.location.href = 'explore.html' + (routePath === 'buildings' ? '#buildings' : '');
+            } else if (routePath === 'school') {
+                // 特殊錨點路由：切換到外部生活通頁面並定位
+                window.location.href = 'lifehub.html#school';
+            } else if (routePath === 'food-gacha') {
+                renderPage('home');
+                document.title = 'A7 柒樂部🎡｜美食隨機輪盤';
+                setTimeout(() => {
+                    const gachaEl = document.getElementById('food-gacha');
+                    if (gachaEl) {
+                        gachaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        gachaEl.classList.add('ring-4', 'ring-themePink', 'ring-offset-4', 'transition-shadow', 'duration-500');
+                        setTimeout(() => gachaEl.classList.remove('ring-4', 'ring-themePink', 'ring-offset-4'), 2500);
+                    }
+                }, 350);
+            } else {
+                renderPage(routePath);
+                
+                // 🌟 新增：如果是 food 頁面且有 cat 參數，延遲套用該分類
+                if (routePath === 'food') {
+                    const params = new URLSearchParams(hash.split('?')[1]);
+                    const catSlug = params.get('cat');
+                    
+                    if (catSlug && globalFoodData) {
+                        let targetCat = '全部';
+                        
+                        // 反向尋找中文名稱
+                        for (const [key, slug] of Object.entries(FOOD_CAT_SLUG_MAP)) {
+                            if (slug === catSlug) {
+                                targetCat = key;
+                                break;
+                            }
+                        }
+                        
+                        // 使用 setTimeout 確保 DOM 渲染完畢
+                        setTimeout(() => {
+                            renderFoodData(globalFoodData, targetCat);
+                        }, 100); 
+                    }
+                }
+            }
+        }
+<!-- ... existing code ... -->
+```
+
+### 第三步：修改分類按鈕的點擊行為
+
+目前分類標籤按鈕直接呼叫 `renderFoodData`，我們要寫一個中間函式 `changeFoodCategory` 來修改網址並觸發渲染。接著修改 `renderFoodData` 中產生 TAG 按鈕的迴圈：
+
+```html:A7 柒樂部首頁:index.html
+<!-- ... existing code ... -->
+        function getCategoryIcon(category, storeName = '', state = 'normal', isBouncing = false) {
+<!-- ... existing code ... -->
+            } else {
+                alert("您的瀏覽器不支援定位功能。");
+                if (btnIcon) { btnIcon.classList.remove('fa-spinner', 'fa-spin'); btnIcon.classList.add('fa-crosshairs'); }
+            }
+        }
+
+        // 🌟 新增：改變美食分類並推播網址
+        window.changeFoodCategory = function(catName) {
+            const slug = getCategorySlug(catName);
+            history.pushState(null, '', `#food?cat=${slug}`);
+            renderFoodData(globalFoodData, catName);
+        };
+
+        function renderFoodData(data, activeCategory) {
+            const container = document.getElementById('food-list-container');
+            const desktopTagsContainer = document.getElementById('food-tags-desktop');
+            const mobileTagsContainer = document.getElementById('food-tags-mobile');
+            if (!container) return;
+
+            const categories = ['全部', ...new Set(data.map(item => item.category).filter(c => c))];
+
+            const tagsHtml = categories.map(cat => {
+                const isActive = cat === activeCategory;
+                const activeClass = isActive
+                    ? 'bg-themePink text-white shadow-md scale-[1.02] md:scale-105 z-10'
+                    : 'bg-white text-gray-600 hover:bg-pink-50 shadow-sm border-2 border-transparent hover:-translate-y-1';
+
+                let icon = cat === '全部' ? '🎡' : getCategoryStyle(cat).emoji;
+
+                // 🌟 修改：onclick 呼叫 changeFoodCategory
+                return `<button onclick="changeFoodCategory('${cat.replace(/'/g, "\\'")}')" class="flex-auto lg:flex-none w-auto py-2 md:py-2.5 px-4 md:px-6 rounded-full font-black text-xs md:text-sm transition-all transform flex items-center justify-center gap-1 md:gap-2 border border-pink-100 whitespace-nowrap ${activeClass}">
+                            <span class="hidden md:inline-block shrink-0">${icon}</span>
+                            <span>${cat}</span>
+                        </button>`;
+            }).join('');
+
+            if (desktopTagsContainer) desktopTagsContainer.innerHTML = tagsHtml;
+            if (mobileTagsContainer) mobileTagsContainer.innerHTML = tagsHtml;
+
+            const filteredData = activeCategory === '全部' ? data : data.filter(item => item.category === activeCategory);
+<!-- ... existing code ... -->
         // ==========================================
         // 資料與 API 邏輯 (整合版)
         // ==========================================
