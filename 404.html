@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html style="display: none !important;"> <head>
+    <meta charset="UTF-8">
+    <title>Redirecting</title>
+    <script>
+        var currentPath = window.location.pathname;
+
+        if (currentPath.indexOf('/life/') !== -1) {
+            var newPath = currentPath.replace('/life/', '/');
+            // 使用 replace 可以讓瀏覽器不記錄這一次的 404 歷史紀錄，上一頁不會卡住
+            window.location.replace(window.location.origin + newPath + window.location.search);
+        } else {
+            window.location.replace("https://a7club.github.io/");
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>
