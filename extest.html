@@ -982,7 +982,7 @@
                     </h3>
                 </div>
 
-                <div id="eng-bulletin-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                <div id="eng-bulletin-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 relative z-10">
                     <div class="col-span-full text-center text-orange-400 py-12">
                         <i class="fa-solid fa-spinner fa-spin text-4xl mb-5"></i>
                         <p class="font-bold tracking-widest text-sm">正在載入公告資料...</p>
@@ -3999,44 +3999,47 @@
                 let itemsHtml = '';
                 validRows.forEach((row, i) => {
                     const name = row[1] || '未命名工程';
-                    const amount = row[2] || '-';
                     const period = row[3] || '未定';
-                    const host = row[4] || '-';
-                    const supervisor = row[5] || '-';
-                    const constructor = row[6] || '-';
                     const note = row[7] || '';
-                    const phone = row[8] || '-';
                     
                     const delay = (i % 6) * 100;
                     
                     itemsHtml += `
-                        <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-orange-100 hover:shadow-md hover:border-orange-200 transition-all hover:-translate-y-1 animate-fade-in-up flex flex-col h-full group" style="animation-delay: ${delay}ms">
-                            <div class="flex items-start gap-3 mb-4">
-                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                                    <i class="fa-solid fa-person-digging"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-black text-gray-800 text-lg leading-tight group-hover:text-orange-600 transition-colors">${name}</h4>
-                                    <div class="text-xs text-gray-400 mt-1 flex items-center gap-1.5 font-bold">
-                                        <i class="fa-regular fa-clock"></i> ${period}
+                        <div class="relative bg-[#FFFBEA] rounded-2xl shadow-md border-4 border-[#FFD100] hover:shadow-lg transition-all hover:-translate-y-1 animate-fade-in-up flex flex-col h-full overflow-hidden" style="animation-delay: ${delay}ms">
+                            <!-- Yellow/Black Warning Stripe Header -->
+                            <div class="h-4 w-full bg-[repeating-linear-gradient(45deg,#FFD100,#FFD100_15px,#333_15px,#333_30px)]"></div>
+                            
+                            <!-- Signboard Content -->
+                            <div class="p-5 flex flex-col flex-1 relative">
+                                <!-- Screws/Pins decoration -->
+                                <div class="absolute top-2.5 left-2.5 w-2 h-2 rounded-full bg-gray-300 shadow-inner border border-gray-400"></div>
+                                <div class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-gray-300 shadow-inner border border-gray-400"></div>
+                                
+                                <div class="flex items-start gap-3.5 mb-4 mt-2">
+                                    <div class="w-12 h-12 rounded-xl bg-[#FFD100] text-gray-800 flex items-center justify-center shrink-0 shadow-sm border-2 border-gray-800 rotate-[-5deg]">
+                                        <i class="fa-solid fa-helmet-safety text-2xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-black text-gray-800 text-lg leading-snug">${name}</h4>
+                                        <div class="text-xs text-amber-700 mt-1.5 flex items-center gap-1.5 font-black bg-amber-100/60 px-2.5 py-1 rounded-md inline-flex border border-amber-200">
+                                            <i class="fa-solid fa-cone-excavation"></i> 施工期間：${period}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div class="bg-gray-50 rounded-2xl p-4 mb-4 flex-1 border border-gray-100 space-y-2">
-                                <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-                                    <div class="flex flex-col"><span class="text-gray-400 font-bold text-[10px]">主辦機關</span><span class="font-black text-gray-700">${host}</span></div>
-                                    <div class="flex flex-col"><span class="text-gray-400 font-bold text-[10px]">決標金額</span><span class="font-black text-rose-500">${amount}</span></div>
-                                    <div class="flex flex-col col-span-full mt-1"><span class="text-gray-400 font-bold text-[10px]">施工/監造單位</span><span class="font-black text-gray-600">${constructor} / ${supervisor}</span></div>
-                                    <div class="flex flex-col col-span-full mt-1"><span class="text-gray-400 font-bold text-[10px]">聯絡電話</span><span class="font-black text-blue-600 flex items-center gap-1"><i class="fa-solid fa-phone text-[10px]"></i> ${phone}</span></div>
+                                
+                                <div class="mt-2 flex-1 flex flex-col relative z-10">
+                                    <div class="text-[11px] font-black text-amber-600 mb-1 flex items-center gap-1 ml-1">
+                                        <i class="fa-solid fa-clipboard-check"></i> 執行進度
+                                    </div>
+                                    <div class="bg-white rounded-xl p-3.5 text-sm text-gray-700 font-bold border-2 border-dashed border-amber-300 whitespace-pre-line leading-relaxed flex-1 shadow-sm">
+                                        ${note || '目前尚無進度更新。'}
+                                    </div>
                                 </div>
+                                
+                                <!-- Bottom Screws -->
+                                <div class="absolute bottom-2.5 left-2.5 w-2 h-2 rounded-full bg-gray-300 shadow-inner border border-gray-400"></div>
+                                <div class="absolute bottom-2.5 right-2.5 w-2 h-2 rounded-full bg-gray-300 shadow-inner border border-gray-400"></div>
                             </div>
-                            
-                            ${note ? `
-                            <div class="bg-orange-50/50 rounded-xl p-3 text-sm text-gray-700 font-bold border-l-4 border-orange-400 whitespace-pre-line leading-relaxed">
-                                ${note}
-                            </div>
-                            ` : ''}
                         </div>
                     `;
                 });
