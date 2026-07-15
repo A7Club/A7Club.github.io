@@ -1039,13 +1039,10 @@
                 <!-- 外層使用 Flex 控制電腦版與手機版的佈局切換 -->
                 <div class="flex flex-col lg:flex-row gap-5 relative z-10">
                     <!-- 主要推廣卡片區塊 (左側：改為自動填滿剩餘空間，解決寬度衝突) -->
-                    <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 gap-4">
-                        
-                        <div id="new-stores-container" class="w-full flex flex-col gap-4">
-                            <div class="text-center text-orange-300 py-8 font-bold text-sm">
+                    <div id="new-stores-container" class="flex-1 min-w-0 w-full grid grid-cols-1 gap-4">
+                            <div class="text-center text-orange-300 py-8 font-bold text-sm col-span-full">
                                 <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 block"></i> 正在連線讀取最新商家情報...
                             </div>
-                        </div>
                     </div>
                     <!-- 藥丸標籤區塊 (右側/下方：更多情報) -->
                     <div
@@ -2315,6 +2312,7 @@
                 }
 
                 if (display) display.innerHTML = `為您找到關於 <span class="text-themePink font-black">「${query}」</span> 的結果：`;
+                
                 container.innerHTML = html;
 
             } catch (err) {
@@ -3073,14 +3071,53 @@ if (displayBuses.length === 0) {
                 const csvText = await res.text();
                 const rows = parseCSV(csvText);
                 
-                if (rows.length < 2) {
-                    container.innerHTML = '<div class="text-gray-400 text-sm font-bold p-3 text-center col-span-1 md:col-span-2">目前無新商家情報</div>';
+                // Filter out empty rows based on Name column (index 1)
+                const validRows = rows.slice(1).filter(row => row[1] && row[1].trim() !== '');
+
+                if (validRows.length === 0) {
+                    container.innerHTML = '<div class="text-gray-400 text-sm font-bold p-3 text-center col-span-full">目前無新商家情報</div>';
+                    container.className = "flex-1 min-w-0 w-full grid grid-cols-1 gap-4";
                     return;
                 }
 
+                const themes = [
+                    {
+                        border: "border-orange-300/40", shadowHover: "hover:shadow-[0_15px_35px_-5px_rgba(249,115,22,0.3)]",
+                        blob: "bg-red-400/10 group-hover:bg-red-400/20", tagGradient: "from-red-500 to-orange-400",
+                        iconLarge: "text-orange-400", titleHover: "group-hover:text-red-500",
+                        promoBg: "bg-orange-50/80", promoBorder: "border-orange-100", promoText: "text-orange-600",
+                        promoIcon: "text-red-400", clockIcon: "text-orange-400", addrIcon: "text-red-400",
+                        navGradient: "from-orange-400 to-red-500", navShadow: "shadow-orange-100 group-hover:shadow-red-200"
+                    },
+                    {
+                        border: "border-blue-300/40", shadowHover: "hover:shadow-[0_15px_35px_-5px_rgba(59,130,246,0.3)]",
+                        blob: "bg-blue-400/10 group-hover:bg-blue-400/20", tagGradient: "from-blue-500 to-indigo-400",
+                        iconLarge: "text-blue-400", titleHover: "group-hover:text-blue-500",
+                        promoBg: "bg-blue-50/80", promoBorder: "border-blue-100", promoText: "text-blue-600",
+                        promoIcon: "text-indigo-400", clockIcon: "text-blue-400", addrIcon: "text-indigo-400",
+                        navGradient: "from-blue-400 to-indigo-500", navShadow: "shadow-blue-100 group-hover:shadow-indigo-200"
+                    },
+                    {
+                        border: "border-emerald-300/40", shadowHover: "hover:shadow-[0_15px_35px_-5px_rgba(16,185,129,0.3)]",
+                        blob: "bg-emerald-400/10 group-hover:bg-emerald-400/20", tagGradient: "from-emerald-500 to-teal-400",
+                        iconLarge: "text-emerald-400", titleHover: "group-hover:text-emerald-500",
+                        promoBg: "bg-emerald-50/80", promoBorder: "border-emerald-100", promoText: "text-emerald-600",
+                        promoIcon: "text-teal-400", clockIcon: "text-emerald-400", addrIcon: "text-teal-400",
+                        navGradient: "from-emerald-400 to-teal-500", navShadow: "shadow-emerald-100 group-hover:shadow-teal-200"
+                    },
+                    {
+                        border: "border-purple-300/40", shadowHover: "hover:shadow-[0_15px_35px_-5px_rgba(168,85,247,0.3)]",
+                        blob: "bg-purple-400/10 group-hover:bg-purple-400/20", tagGradient: "from-purple-500 to-fuchsia-400",
+                        iconLarge: "text-purple-400", titleHover: "group-hover:text-purple-500",
+                        promoBg: "bg-purple-50/80", promoBorder: "border-purple-100", promoText: "text-purple-600",
+                        promoIcon: "text-fuchsia-400", clockIcon: "text-purple-400", addrIcon: "text-fuchsia-400",
+                        navGradient: "from-purple-400 to-fuchsia-500", navShadow: "shadow-purple-100 group-hover:shadow-fuchsia-200"
+                    }
+                ];
+
                 let html = '';
                 
-                rows.slice(1).forEach(row => {
+                validRows.forEach((row, index) => {
                     const tag = row[0] ? row[0].trim() : '新開幕';
                     const name = row[1] ? row[1].trim() : '';
                     const link = row[2] ? row[2].trim() : '';
@@ -3089,7 +3126,7 @@ if (displayBuses.length === 0) {
                     const time = row[5] ? row[5].trim() : '';
                     const addr = row[6] ? row[6].trim() : '';
                     
-                    if (!name) return;
+                    const theme = themes[index % themes.length];
 
                     const isLink = link && link !== '';
                     let actionBtn = '';
@@ -3105,26 +3142,26 @@ if (displayBuses.length === 0) {
                     }
 
                     html += `
-                        <div class="w-full bg-[#FFFDF7] rounded-[2rem] p-5 shadow-[0_10px_25px_-5px_rgba(249,115,22,0.2)] border-2 border-orange-300/40 relative group hover:-translate-y-2 hover:shadow-[0_15px_35px_-5px_rgba(249,115,22,0.3)] transition-all duration-500 flex flex-col justify-between overflow-hidden">
-                            <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-400/10 rounded-full blur-3xl group-hover:bg-red-400/20 transition-colors"></div>
+                        <div class="w-full bg-[#FFFDF7] rounded-[2rem] p-5 shadow-sm border-2 ${theme.border} relative group hover:-translate-y-2 ${theme.shadowHover} transition-all duration-500 flex flex-col justify-between overflow-hidden">
+                            <div class="absolute -top-10 -right-10 w-32 h-32 ${theme.blob} rounded-full blur-3xl transition-colors"></div>
                             <div class="absolute top-0 left-0 flex flex-col items-start z-20">
-                                <div class="bg-gradient-to-r from-red-500 to-orange-400 text-white text-[11px] font-black px-4 py-1.5 rounded-br-2xl shadow-md animate-pulse flex items-center">
+                                <div class="bg-gradient-to-r ${theme.tagGradient} text-white text-[11px] font-black px-4 py-1.5 rounded-br-2xl shadow-md animate-pulse flex items-center">
                                     <i class="fa-solid fa-sparkles mr-1.5"></i> ${tag}
                                 </div>
                             </div>
-                            <div class="absolute -right-4 -bottom-4 text-orange-400 opacity-[0.08] text-8xl transform rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-700">
+                            <div class="absolute -right-4 -bottom-4 ${theme.iconLarge} opacity-[0.08] text-8xl transform rotate-12 pointer-events-none group-hover:rotate-0 transition-transform duration-700">
                                 <i class="fa-solid fa-store"></i>
                             </div>
                             <div class="relative z-10 mt-6">
-                                <h4 class="font-black text-gray-800 text-lg sm:text-xl mb-2 group-hover:text-red-500 transition-colors flex items-center">
+                                <h4 class="font-black text-gray-800 text-lg sm:text-xl mb-2 ${theme.titleHover} transition-colors flex items-center">
                                     ${name}
                                 </h4>
                                 <p class="text-xs sm:text-sm text-gray-600 font-bold mb-3 leading-relaxed whitespace-pre-line">
                                     ${desc}
                                 </p>
                                 ${promo ? `
-                                <div class="bg-orange-50/80 p-3 rounded-xl border border-orange-100 text-orange-600 text-xs sm:text-sm font-bold mb-3 whitespace-pre-line">
-                                    <i class="fa-solid fa-gift mr-1 text-red-400"></i> ${promo}
+                                <div class="${theme.promoBg} p-3 rounded-xl border ${theme.promoBorder} ${theme.promoText} text-xs sm:text-sm font-bold mb-3 whitespace-pre-line">
+                                    <i class="fa-solid fa-gift mr-1 ${theme.promoIcon}"></i> ${promo}
                                 </div>` : ''}
                             </div>
                             ${actionBtn}
@@ -3132,15 +3169,15 @@ if (displayBuses.length === 0) {
                                 <div class="flex flex-col gap-2">
                                     ${time ? `
                                     <span class="text-gray-500 bg-white px-2.5 py-1.5 rounded-lg shadow-sm border border-gray-100 flex items-center w-fit">
-                                        <i class="fa-solid fa-clock mr-1.5 text-orange-400"></i>${time}
+                                        <i class="fa-solid fa-clock mr-1.5 ${theme.clockIcon}"></i>${time}
                                     </span>` : ''}
                                     ${addr ? `
                                     <span class="text-gray-500 bg-white px-2.5 py-1.5 rounded-lg shadow-sm border border-gray-100 flex items-center w-fit line-clamp-1">
-                                        <i class="fa-solid fa-location-dot mr-1.5 text-red-400"></i>${addr}
+                                        <i class="fa-solid fa-location-dot mr-1.5 ${theme.addrIcon}"></i>${addr}
                                     </span>` : ''}
                                 </div>
                                 ${addr ? `
-                                <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('桃園市龜山區' + addr.replace('桃園市龜山區', ''))}" target="_blank" class="bg-gradient-to-r from-orange-400 to-red-500 text-white px-4 py-3 sm:py-4 rounded-xl flex items-center gap-1.5 shadow-lg shadow-orange-100 group-hover:shadow-red-200 transition-all duration-500 active:scale-95 shrink-0 ml-2">
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent('桃園市龜山區' + addr.replace('桃園市龜山區', ''))}" target="_blank" class="bg-gradient-to-r ${theme.navGradient} text-white px-4 py-3 sm:py-4 rounded-xl flex items-center gap-1.5 shadow-lg ${theme.navShadow} transition-all duration-500 active:scale-95 shrink-0 ml-2">
                                     <i class="fa-solid fa-location-arrow text-sm sm:text-base"></i> 
                                     <span class="whitespace-nowrap font-black">導航去</span>
                                 </a>` : ''}
@@ -3149,15 +3186,23 @@ if (displayBuses.length === 0) {
                     `;
                 });
 
+                const storeCount = validRows.length;
+                if (storeCount === 1) {
+                    container.className = "flex-1 min-w-0 w-full grid grid-cols-1 gap-4";
+                } else if (storeCount === 2) {
+                    container.className = "flex-1 min-w-0 w-full grid grid-cols-1 md:grid-cols-2 gap-4";
+                } else if (storeCount >= 3) {
+                    container.className = "flex-1 min-w-0 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4";
+                }
+                
                 container.innerHTML = html;
 
             } catch (error) {
                 console.error("Fetch New Stores Error:", error);
-                container.innerHTML = '<div class="text-red-400 text-sm font-bold p-3 text-center col-span-1 md:col-span-2">無法載入商家情報，請稍後再試。</div>';
+                container.innerHTML = '<div class="text-red-400 text-sm font-bold p-3 text-center col-span-full">無法載入商家情報，請稍後再試。</div>';
             }
         }
 
-        // --- 首頁：抓取自動新聞邏輯 ---
         async function fetchLocalNews() {
             const container = document.getElementById('dynamic-news-container');
             if (!container) return;
