@@ -966,6 +966,31 @@
         <!-- ============================================== -->
         <!-- 模組：機捷 A7 站轉乘指南 (僅交通轉乘分頁顯示) -->
         <!-- ============================================== -->
+        
+        <!-- ============================================== -->
+        <!-- 模組：市政工程公告欄 (新增) -->
+        <!-- ============================================== -->
+        <div id="mod-eng-bulletin" class="content-module mb-12 hidden" data-shows-on="overview,engineering">
+            <div class="bg-gradient-to-br from-orange-50 to-amber-50 rounded-[2.5rem] shadow-cute p-6 md:p-10 border-4 border-white relative overflow-hidden">
+                <div class="absolute -right-6 -bottom-6 text-orange-100 text-8xl floating pointer-events-none z-0">
+                    <i class="fa-solid fa-person-digging"></i>
+                </div>
+
+                <div class="flex flex-row items-center justify-between mb-8 md:mb-10 relative z-10 gap-2">
+                    <h3 class="text-lg sm:text-xl md:text-2xl font-black text-orange-700 flex items-center shrink-0">
+                        <i class="fa-solid fa-bullhorn mr-2 sm:mr-3"></i>市政工程公告欄
+                    </h3>
+                </div>
+
+                <div id="eng-bulletin-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                    <div class="col-span-full text-center text-orange-400 py-12">
+                        <i class="fa-solid fa-spinner fa-spin text-4xl mb-5"></i>
+                        <p class="font-bold tracking-widest text-sm">正在載入公告資料...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="mod-transit-guide" class="content-module mb-12 hidden" data-shows-on="transit">
             <!-- H1: 前言段落 -->
             <div
@@ -3950,6 +3975,80 @@
         // ==========================================
         // 🚧 市政工程公告欄
         // ==========================================
+        
+        async function fetchEngBulletinData() {
+            const container = document.getElementById('eng-bulletin-container');
+            if (!container) return;
+
+            try {
+                const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyxMUDuyRs101UjixpG0xxqOcGftDJdDPqaxpnG9PGCGs-0atXYQ8N_uhqEWD6yC8JH42vJNxb-xm4/pub?gid=0&single=true&output=csv';
+                const response = await fetch(csvUrl, { redirect: 'follow' });
+                if (!response.ok) throw new Error('Network error');
+                const csvText = await response.text();
+                
+                const rows = parseCSV(csvText);
+                if (rows.length < 2) throw new Error('No data');
+
+                const validRows = rows.slice(1).filter(r => r[0] && r[0].trim().toUpperCase() === 'O');
+
+                if (validRows.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-orange-400 font-bold py-8">目前尚無最新工程公告。</div>';
+                    return;
+                }
+
+                let itemsHtml = '';
+                validRows.forEach((row, i) => {
+                    const name = row[1] || '未命名工程';
+                    const amount = row[2] || '-';
+                    const period = row[3] || '未定';
+                    const host = row[4] || '-';
+                    const supervisor = row[5] || '-';
+                    const constructor = row[6] || '-';
+                    const note = row[7] || '';
+                    const phone = row[8] || '-';
+                    
+                    const delay = (i % 6) * 100;
+                    
+                    itemsHtml += `
+                        <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-orange-100 hover:shadow-md hover:border-orange-200 transition-all hover:-translate-y-1 animate-fade-in-up flex flex-col h-full group" style="animation-delay: ${delay}ms">
+                            <div class="flex items-start gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                                    <i class="fa-solid fa-person-digging"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-gray-800 text-lg leading-tight group-hover:text-orange-600 transition-colors">${name}</h4>
+                                    <div class="text-xs text-gray-400 mt-1 flex items-center gap-1.5 font-bold">
+                                        <i class="fa-regular fa-clock"></i> ${period}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-2xl p-4 mb-4 flex-1 border border-gray-100 space-y-2">
+                                <div class="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+                                    <div class="flex flex-col"><span class="text-gray-400 font-bold text-[10px]">主辦機關</span><span class="font-black text-gray-700">${host}</span></div>
+                                    <div class="flex flex-col"><span class="text-gray-400 font-bold text-[10px]">決標金額</span><span class="font-black text-rose-500">${amount}</span></div>
+                                    <div class="flex flex-col col-span-full mt-1"><span class="text-gray-400 font-bold text-[10px]">施工/監造單位</span><span class="font-black text-gray-600">${constructor} / ${supervisor}</span></div>
+                                    <div class="flex flex-col col-span-full mt-1"><span class="text-gray-400 font-bold text-[10px]">聯絡電話</span><span class="font-black text-blue-600 flex items-center gap-1"><i class="fa-solid fa-phone text-[10px]"></i> ${phone}</span></div>
+                                </div>
+                            </div>
+                            
+                            ${note ? `
+                            <div class="bg-orange-50/50 rounded-xl p-3 text-sm text-gray-700 font-bold border-l-4 border-orange-400 whitespace-pre-line leading-relaxed">
+                                ${note}
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = itemsHtml;
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<div class="col-span-full text-center text-red-500 font-bold py-8">無法載入公告資料，請稍後再試。</div>';
+            }
+        }
+
         async function fetchEngineeringData() {
             const container = document.getElementById('engineering-board-content');
             if (!container) return;
@@ -4899,6 +4998,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initTabs();
             fetchEngineeringData();
+            fetchEngBulletinData();
             fetchCommunityData();
             fetchBuildingData();
             fetchLocalNews();
