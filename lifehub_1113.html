@@ -252,7 +252,7 @@
             text-shadow: 0 4px 8px rgba(255, 71, 133, 0.3);
         }
     </style>
-    <script src="./site-utils.js?v=20261102-local-http"></script>
+    <script src="./site-utils.js?v=20261113-local-http"></script>
 </head>
 
 <body class="text-gray-700 antialiased min-h-screen flex flex-col relative">
@@ -1555,6 +1555,23 @@ function getUserId() {
             }
         }
 
+        function activateFallbackLineAnonymousUser() {
+            let lineAnonId = siteStorage.getItem('a7club_line_anon_id');
+            if (!lineAnonId) {
+                lineAnonId = 'U_line_' + Math.random().toString(36).substring(2, 10) + Date.now().toString(36);
+                siteStorage.setItem('a7club_line_anon_id', lineAnonId);
+            }
+            const profile = getAnonymousProfile(lineAnonId);
+            currentUser = {
+                userId: lineAnonId,
+                name: profile.name,
+                email: lineAnonId,
+                picture: ''
+            };
+            siteStorage.setItem('a7club_line_user', JSON.stringify(currentUser));
+            updateLoginUI();
+        }
+
         async function loginWithLine() {
             const btn = document.getElementById('line-login-btn');
             const originalHtml = btn ? btn.innerHTML : '';
@@ -1570,29 +1587,32 @@ function getUserId() {
                         isLiffInitialized = true;
                     }
 
-                    if (!liff.isLoggedIn()) {
+                    if (liff.isLoggedIn()) {
+                        const profile = await liff.getProfile();
+                        currentUser = {
+                            userId: profile.userId,
+                            name: profile.displayName,
+                            email: profile.userId,
+                            picture: profile.pictureUrl || ''
+                        };
+                        siteStorage.setItem('a7club_line_user', JSON.stringify(currentUser));
+                        updateLoginUI();
+                        return;
+                    }
+
+                    // 若在 LINE App 內且網域與 LIFF Endpoint 相符才執行跳轉，否則啟用專屬 LINE 匿名通行證避免跳轉至 /stamp/
+                    if (liff.isInClient() && window.location.pathname.includes('/stamp')) {
                         if (currentStoreForComment) {
                             siteStorage.setItem('a7club_pending_comment_store', currentStoreForComment);
                         }
                         liff.login({ redirectUri: window.location.href });
                         return;
                     }
-
-                    const profile = await liff.getProfile();
-                    currentUser = {
-                        userId: profile.userId,
-                        name: profile.displayName,
-                        email: profile.userId,
-                        picture: profile.pictureUrl || ''
-                    };
-                    siteStorage.setItem('a7club_line_user', JSON.stringify(currentUser));
-                    updateLoginUI();
-                } else {
-                    alert('LINE SDK 尚未載入完成，請確認網路連線後重試。');
                 }
+                activateFallbackLineAnonymousUser();
             } catch (err) {
-                console.error('LINE Login Error:', err);
-                alert('請從 LINE App 內開啟此網址，或確認 LINE 授權連線設定。');
+                console.warn('LINE LIFF 跨路徑相容模式啟用:', err);
+                activateFallbackLineAnonymousUser();
             } finally {
                 if (btn) {
                     btn.disabled = false;
@@ -1843,6 +1863,7 @@ function getUserId() {
                 storeName: currentStoreForComment,
                 name: profile.name,
                 email: anonymousId,
+                userId: anonymousId,
                 avatar: profile.icon,
                 content: content,
                 timestamp: new Date().toISOString()
@@ -1852,6 +1873,7 @@ function getUserId() {
                 if (GAS_COMMENTS_URL && GAS_COMMENTS_URL !== "YOUR_GAS_WEB_APP_URL_HERE") {
                     await fetch(GAS_COMMENTS_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         body: JSON.stringify(newComment),
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                     });
@@ -1877,15 +1899,16 @@ function getUserId() {
 
         async function loadAllComments() {
             try {
-                const res = await fetch(COMMENTS_CSV_URL);
+                const fetchUrl = COMMENTS_CSV_URL + '&t=' + new Date().getTime();
+                const res = await fetch(fetchUrl);
                 const csvText = await res.text();
                 const rows = parseCSV(csvText);
 
                 let groupedComments = Object.create(null);
                 if (rows.length > 1) {
                     const headers = rows[0];
-                    const sIdx = ((index) => index === -1 ? 0 : index)(headers.findIndex(k => k.includes('機構') || k.includes('店名') || k.includes('storeName')));
-                    const nIdx = ((index) => index === -1 ? 1 : index)(headers.findIndex(k => k.includes('姓名') || k.includes('name')));
+                    const sIdx = ((index) => index === -1 ? 0 : index)(headers.findIndex(k => k.includes('補習班') || k.includes('機構') || k.includes('店名') || k.includes('storeName')));
+                    const nIdx = ((index) => index === -1 ? 1 : index)(headers.findIndex(k => k.includes('使用者') || k.includes('姓名') || k.includes('name')));
                     const eIdx = ((index) => index === -1 ? 2 : index)(headers.findIndex(k => k.includes('信箱') || k.includes('email')));
                     const aIdx = ((index) => index === -1 ? 3 : index)(headers.findIndex(k => k.includes('頭像') || k.includes('大頭貼') || k.includes('avatar')));
                     const cIdx = ((index) => index === -1 ? 4 : index)(headers.findIndex(k => k.includes('內容') || k.includes('留言') || k.includes('content')));
