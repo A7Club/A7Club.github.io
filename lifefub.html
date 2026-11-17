@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="ios.png">
+    <title>A7 柒樂部🎡｜安心支援所 </title>
+    <meta name="description" content="提供在地住戶推薦的桃園龜山 A7 重劃區生活資訊。包含美食推薦、診所藥局、生活代辦及在地社群及建案地圖，讓住戶輕鬆掌握社區大小事。">
+    <meta name="keywords" content="A7重劃區, 龜山美食, A7生活圈, 林口龜山, 桃園建案, 柒樂部">
+    <meta property="og:image" content="https://raw.githubusercontent.com/A7Club/life/main/website.jpg">
+
+    <!-- 📊 Google Analytics (GA4)追蹤代碼放置區 -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YJ9RJC2DRS"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-YJ9RJC2DRS');
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts (可愛圓潤字體) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&family=Noto+Sans+TC:wght@400;700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- 🗺️ 加入 Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- 🗺️ 加入 Leaflet.MarkerCluster (地標群聚套件) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+    <script>
+        window.tailwind = window.tailwind || {};
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        themePink: '#FF9EBB',
+                        themeBlue: '#80CFFF',
+                        themeYellow: '#FFD166',
+                        themeGreen: '#06D6A0',
+                        themePurple: '#C197FF',
+                        bgPastel: '#FDFBF7'
+                    },
+                    boxShadow: {
+                        'cute': '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04)',
+                        'sticker': '0 0 0 4px white, 0 8px 20px rgba(0,0,0,0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FDFBF7;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(128, 207, 255, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(6, 214, 160, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #1E293B;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .num-counter {
+            font-family: 'Nunito', sans-serif;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased min-h-screen flex flex-col relative">
+
+    <!-- 🎪 導航列 (延續品牌懸浮膠囊風格) -->
+    <nav class="sticky top-3 z-40 mx-4 sm:mx-8 lg:mx-auto max-w-6xl">
+        <div
+            class="bg-white/90 backdrop-blur-md rounded-full shadow-cute px-5 py-2.5 flex justify-between items-center border border-slate-200/80">
+            <div class="flex items-center cursor-pointer gap-2.5" onclick="window.location.href='index.html'">
+                <div
+                    class="w-9 h-9 bg-themeYellow rounded-full flex items-center justify-center text-white text-lg shadow-inner">
+                    <i class="fa-solid fa-mountain-city"></i>
+                </div>
+                <span class="font-black text-xl tracking-wide text-themePink">A7<span
+                        class="text-themePurple">柒</span><span class="text-themeBlue">樂部</span></span>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-1.5">
+                <button onclick="window.location.href='index.html#food'"
+                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-themePink hover:text-white transition-all">🍿
+                    找美食</button>
+                <button onclick="window.location.href='index.html#shopping'"
+                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-themeYellow hover:text-white transition-all">🛍️
+                    買東西</button>
+                <button onclick="window.location.href='lifehub.html'" id="nav-btn-home"
+                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-black bg-themeGreen text-white shadow-sm transition-all">🩺
+                    生活通</button>
+                <a href="explore.html"
+                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-themePurple hover:text-white transition-all">🎠
+                    探索柒</a>
+            </div>
+
+            <div class="md:hidden">
+                <button onclick="toggleMobileMenu()"
+                    class="text-themePink text-xl focus:outline-none w-9 h-9 bg-pink-50 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="mobile-menu"
+            class="hidden absolute top-full right-0 mt-2 bg-white rounded-3xl shadow-cute p-4 border border-pink-100 flex-col space-y-2 text-center z-50 w-48">
+            <a href="index.html#food" onclick="toggleMobileMenu()"
+                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-themePink bg-pink-50/70 flex items-center justify-center gap-2">🍿
+                美食販賣部</a>
+            <a href="index.html#shopping" onclick="toggleMobileMenu()"
+                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-amber-500 bg-yellow-50/70 flex items-center justify-center gap-2">🛍️
+                生活補給站</a>
+            <a href="lifehub.html" onclick="toggleMobileMenu()"
+                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-white bg-themeGreen flex items-center justify-center gap-2">🩺
+                安心支援所</a>
+            <a href="explore.html" onclick="toggleMobileMenu()"
+                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-themePurple bg-purple-50/70 flex items-center justify-center gap-2">🎠
+                探索在地A7</a>
+        </div>
+    </nav>
+
+    <!-- 🎈 動態內容容器 -->
+    <main id="app-root" class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 relative">
+        <!-- JS 將會注入內容 -->
+    </main>
+
+    <!-- 頁腳 -->
+    <footer class="bg-white border-t border-slate-200/70 py-6 text-center mt-auto">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <h2 class="text-sm font-black text-slate-700 flex items-center gap-2">
+                <span class="text-themePink">🎈 A7 柒樂部</span>
+                <span class="text-slate-300">|</span>
+                <span class="text-slate-500 font-bold">林口、龜山美食機能生活地圖指南</span>
+            </h2>
+            <p class="text-slate-400 text-xs font-bold">讓每天的生活都像在遊樂園一樣精彩！© 2026</p>
+        </div>
+    </footer>
+
+    <!-- 🧩 頁面模板區 -->
+
+    <!-- 🏠 新首頁模板 -->
+    <template id="tpl-home">
+        <div class="fade-in space-y-10">
+
+            <!-- 🌟 安心支援所頂部區塊：左搜尋 ＋ 右側「救護警消大主卡 + 醫療/教育上下雙卡」 -->
+            <section id="section-dashboard"
+                class="relative overflow-hidden rounded-[2rem] bg-white p-5 sm:p-7 border border-slate-200/80 shadow-cute">
+                
+                <!-- 背景柔和光暈裝飾 -->
+                <div class="absolute -top-24 -left-24 w-72 h-72 bg-rose-100/40 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-100/40 rounded-full blur-3xl pointer-events-none"></div>
+
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    <!-- 左側 (5/12)：品牌標題 ＋ 萬用快速檢索框 -->
+                    <div class="lg:col-span-5 flex flex-col justify-between gap-5">
+                        <div class="flex items-start gap-3.5">
+                            <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-themeGreen to-emerald-500 text-white flex items-center justify-center text-2xl shadow-md shadow-emerald-500/20 shrink-0 rotate-2">
+                                <i class="fa-solid fa-heart-pulse"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex items-center flex-wrap gap-2">
+                                    <h1 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">安心支援所</h1>
+                                    <span class="text-[11px] font-black bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
+                                        A7 公共與生活服務
+                                    </span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-slate-500 font-bold leading-relaxed">
+                                    一站式整合 24H 警消災情、周邊特約醫療與國中小學區速查。
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 space-y-2.5 shadow-inner">
+                            <div class="flex items-center justify-between text-xs font-black text-slate-700">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-magnifying-glass text-emerald-500"></i>
+                                    萬用快速檢索
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-bold">可搜科別、診所名或門牌查學區</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="hero-omni-input"
+                                    onkeypress="if(event.key === 'Enter') handleOmniSearch('hero-omni-input')"
+                                    placeholder="輸入「小兒科」、「藥局」或「文青路100號」..."
+                                    class="flex-1 min-w-0 px-3.5 py-2 rounded-xl bg-white border border-slate-200/90 text-xs sm:text-sm font-bold text-slate-700 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all">
+                                <button onclick="handleOmniSearch('hero-omni-input')"
+                                    class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-black shrink-0 shadow-sm active:scale-95 transition-all">
+                                    搜尋
+                                </button>
+                            </div>
+                            <div class="flex items-center flex-wrap gap-1.5 pt-0.5">
+                                <span class="text-[11px] font-bold text-slate-400 mr-0.5">快選：</span>
+                                <button onclick="scrollToMedicalCategory('牙')"
+                                    class="px-2.5 py-1 rounded-lg bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-600 border border-slate-200/80 text-[11px] font-black transition-all flex items-center gap-1 shadow-sm">
+                                    <span>🦷</span> 牙科
+                                </button>
+                                <button onclick="scrollToMedicalCategory(['小兒', '家醫', '診所'])"
+                                    class="px-2.5 py-1 rounded-lg bg-white hover:bg-pink-50 text-slate-600 hover:text-pink-600 border border-slate-200/80 text-[11px] font-black transition-all flex items-center gap-1 shadow-sm">
+                                    <span>👶</span> 小兒家醫
+                                </button>
+                                <button onclick="scrollToMedicalCategory('藥')"
+                                    class="px-2.5 py-1 rounded-lg bg-white hover:bg-amber-50 text-slate-600 hover:text-amber-600 border border-slate-200/80 text-[11px] font-black transition-all flex items-center gap-1 shadow-sm">
+                                    <span>💊</span> 藥局
+                                </button>
+                                <button onclick="document.getElementById('mod-school-district')?.scrollIntoView({behavior:'smooth'}); document.getElementById('school-address-input')?.focus();"
+                                    class="px-2.5 py-1 rounded-lg bg-white hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200/80 text-[11px] font-black transition-all flex items-center gap-1 shadow-sm">
+                                    <span>🏫</span> 查學區
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側 (7/12)：左大卡「救護與即時災情 (含派出所與消防分隊列表)」+ 右上下雙卡「醫療院所 + 教育學區」 -->
+                    <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-stretch">
+                        
+                        <!-- 左側主卡 (7/12)：救護與即時災情 (同框直接顯示派出所與消防分隊列表) -->
+                        <div class="sm:col-span-7 relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-500 via-rose-600 to-red-700 p-4 sm:p-5 text-white shadow-md flex flex-col justify-between gap-3">
+                            <div class="absolute -right-6 -bottom-6 w-36 h-36 rounded-full bg-white/10 blur-xl pointer-events-none"></div>
+                            <i class="fa-solid fa-truck-medical absolute right-3 top-3 text-6xl text-white/10 pointer-events-none"></i>
+
+                            <!-- 卡片頂部：標題與即時災情跳轉 -->
+                            <div class="flex items-center justify-between gap-2 relative z-10">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-black tracking-wide">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>24H 救護與警消
+                                    </span>
+                                    <h2 class="text-base sm:text-lg font-black tracking-tight drop-shadow-sm">轄區據點直撥</h2>
+                                </div>
+                                <a href="#section-emergency"
+                                    class="px-2.5 py-1 rounded-full bg-rose-950/40 hover:bg-white hover:text-rose-700 text-rose-100 text-[11px] font-black transition-colors flex items-center gap-1 shrink-0">
+                                    <span>即時災情</span>
+                                    <i class="fa-solid fa-arrow-down text-[9px]"></i>
+                                </a>
+                            </div>
+
+                            <!-- 內嵌派出所與消防分隊列表 (同框直接顯示、一鍵撥號與地圖) -->
+                            <div class="space-y-1.5 relative z-10">
+                                <!-- 1. 大埔派出所 -->
+                                <div class="bg-white/95 text-slate-800 rounded-2xl px-3 py-2 flex items-center justify-between gap-2 shadow-sm">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0 border border-blue-100">
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-black text-xs sm:text-sm text-slate-900 truncate">大埔派出所</span>
+                                                <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-1.5 py-0.2 rounded">110</span>
+                                            </div>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=桃園市龜山區文德二路80號" target="_blank"
+                                                class="text-[10px] font-bold text-slate-400 hover:text-blue-600 truncate block">
+                                                <i class="fa-solid fa-location-dot mr-0.5"></i>龜山區文德二路80號
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <a href="tel:03-3202554"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-1 shrink-0 shadow-sm active:scale-95 transition-all">
+                                        <i class="fa-solid fa-phone text-[10px]"></i>
+                                        <span class="num-counter">03-3202554</span>
+                                    </a>
+                                </div>
+
+                                <!-- 2. 坪頂派出所 -->
+                                <div class="bg-white/95 text-slate-800 rounded-2xl px-3 py-2 flex items-center justify-between gap-2 shadow-sm">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xs shrink-0 border border-blue-100">
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-black text-xs sm:text-sm text-slate-900 truncate">坪頂派出所</span>
+                                                <span class="text-[9px] font-black bg-blue-50 text-blue-600 px-1.5 py-0.2 rounded">110</span>
+                                            </div>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=桃園市龜山區大湖一路65號" target="_blank"
+                                                class="text-[10px] font-bold text-slate-400 hover:text-blue-600 truncate block">
+                                                <i class="fa-solid fa-location-dot mr-0.5"></i>龜山區大湖一路65號
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <a href="tel:03-3282570"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-1 shrink-0 shadow-sm active:scale-95 transition-all">
+                                        <i class="fa-solid fa-phone text-[10px]"></i>
+                                        <span class="num-counter">03-3282570</span>
+                                    </a>
+                                </div>
+
+                                <!-- 3. 坪頂消防分隊 -->
+                                <div class="bg-white/95 text-slate-800 rounded-2xl px-3 py-2 flex items-center justify-between gap-2 shadow-sm">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xs shrink-0 border border-rose-100">
+                                            <i class="fa-solid fa-fire-extinguisher"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="font-black text-xs sm:text-sm text-slate-900 truncate">坪頂消防分隊</span>
+                                                <span class="text-[9px] font-black bg-rose-50 text-rose-600 px-1.5 py-0.2 rounded">119</span>
+                                            </div>
+                                            <a href="https://www.google.com/maps/search/?api=1&query=桃園市龜山區復興三路80號" target="_blank"
+                                                class="text-[10px] font-bold text-slate-400 hover:text-rose-600 truncate block">
+                                                <i class="fa-solid fa-location-dot mr-0.5"></i>龜山區復興三路80號
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <a href="tel:03-3280309"
+                                        class="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1.5 rounded-xl text-[11px] font-black flex items-center gap-1 shrink-0 shadow-sm active:scale-95 transition-all">
+                                        <i class="fa-solid fa-phone text-[10px]"></i>
+                                        <span class="num-counter">03-3280309</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 右側上下雙橫卡 (5/12)：醫療院所與特約藥局 ＋ 教育學習殿堂 -->
+                        <div class="sm:col-span-5 flex flex-col gap-3.5 justify-between">
+                            <!-- 上卡：醫療院所與特約藥局 -->
+                            <a href="#section-medical"
+                                class="flex-1 group relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-50 to-teal-50/70 p-4 border-2 border-emerald-200/80 hover:border-emerald-400 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3.5">
+                                <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/20 shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="fa-solid fa-stethoscope"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-black bg-emerald-200/70 text-emerald-800 px-2 py-0.5 rounded-full">特約名錄</span>
+                                        <span class="text-[11px] font-black text-emerald-700 num-counter js-count-medical">載入中</span>
+                                    </div>
+                                    <div class="font-black text-base text-slate-800 group-hover:text-emerald-700 mt-0.5 truncate">醫療院所與特約藥局</div>
+                                    <div class="text-[11px] font-bold text-slate-500 truncate">醫院・牙科・小兒・健保藥局</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-emerald-400 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+
+                            <!-- 下卡：教育學習殿堂 -->
+                            <a href="#section-education-hall"
+                                class="flex-1 group relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-50 to-indigo-50/70 p-4 border-2 border-sky-200/80 hover:border-sky-400 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-3.5">
+                                <div class="w-13 h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center text-xl shadow-md shadow-sky-500/20 shrink-0 group-hover:scale-105 transition-transform">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-black bg-sky-200/70 text-sky-800 px-2 py-0.5 rounded-full">學區指南</span>
+                                        <span class="text-[11px] font-black text-sky-700 num-counter js-count-education">8 所學校</span>
+                                    </div>
+                                    <div class="font-black text-base text-slate-800 group-hover:text-sky-700 mt-0.5 truncate">教育學習殿堂</div>
+                                    <div class="text-[11px] font-bold text-slate-500 truncate">門牌查學區・里鄰對照表</div>
+                                </div>
+                                <i class="fa-solid fa-chevron-right text-xs text-sky-400 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- 🔥 主內容區塊 -->
+            <div class="space-y-14 pb-8">
+
+                <!-- 1. 龜山區即時災情與救護動態 (派出所與消防隊已整合於上方主卡，此處專注呈現即時案件) -->
+                <section id="section-emergency" class="scroll-mt-24 space-y-4">
+                    <div id="emergency-live-col" class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-4 sm:px-6 border-b border-slate-100 bg-slate-50/60 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+                            <div class="flex items-center flex-wrap gap-2.5">
+                                <span class="relative flex h-3 w-3 shrink-0">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                                </span>
+                                <h3 class="text-base sm:text-lg font-black text-slate-800">龜山區即時災情與救護動態</h3>
+                                <span id="tyfd-update-time" class="text-[11px] font-bold text-slate-500 bg-white px-2.5 py-0.5 rounded-md border border-slate-200/70">正在連線消防局官網...</span>
+                            </div>
+
+                            <div class="flex items-center flex-wrap gap-1.5">
+                                <div class="inline-flex flex-wrap rounded-xl bg-slate-200/70 p-0.5 text-xs font-black gap-0.5">
+                                    <button id="tyfd-filter-guishan" onclick="setTyfdFilter('GUISHAN')"
+                                        class="px-2.5 py-1 rounded-lg bg-white text-slate-800 shadow-sm transition-all">
+                                        龜山區 <span id="tyfd-count-guishan" class="ml-0.5 text-[10px] text-rose-600"></span>
+                                    </button>
+                                    <button id="tyfd-filter-a7" onclick="setTyfdFilter('A7')"
+                                        class="px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition-all">
+                                        坪頂 (A7) <span id="tyfd-count-a7" class="ml-0.5 text-[10px]"></span>
+                                    </button>
+                                    <button id="tyfd-filter-taoyuan" onclick="setTyfdFilter('TAOYUAN')"
+                                        class="px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition-all">
+                                        桃園全區 <span id="tyfd-count-taoyuan" class="ml-0.5 text-[10px]"></span>
+                                    </button>
+                                </div>
+
+                                <button onclick="fetchTyfdCaseList(true)" id="tyfd-refresh-btn"
+                                    class="px-2.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80 text-xs font-bold flex items-center gap-1 transition-all active:scale-95"
+                                    title="立即重新抓取消防局最新災情">
+                                    <i id="tyfd-refresh-icon" class="fa-solid fa-rotate"></i>
+                                </button>
+
+                                <a href="https://www.tyfd.gov.tw/cht/index.php?act=caselist" target="_blank" rel="noopener noreferrer"
+                                    class="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200/60 text-xs font-black flex items-center gap-1 transition-colors">
+                                    <span>消防局官網</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- 災情列表容器 -->
+                        <div id="tyfd-cases-container" class="divide-y divide-slate-100 flex-1 max-h-[320px] overflow-y-auto">
+                            <div class="p-8 text-center text-slate-400 text-xs font-bold">
+                                <i class="fa-solid fa-spinner fa-spin text-lg text-rose-500 mb-2"></i>
+                                <p>正在即時連線桃園市政府消防局抓取最新案件...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. 在地醫療與特約藥局 (除醫療中心外，全面改為一行三間) -->
+                <section id="section-medical" class="scroll-mt-24 space-y-4">
+                    
+                    <!-- 標題與衛福部查詢列 -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base shadow-inner">
+                                <i class="fa-solid fa-laptop-medical"></i>
+                            </div>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
+                                在地醫療與特約藥局
+                            </h3>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <!-- 診所即時關鍵字過濾 -->
+                            <div class="relative flex-1 sm:w-52">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="medical-search-input" oninput="filterMedicalByKeyword(this.value)"
+                                    placeholder="搜尋診所、藥局或路名..."
+                                    class="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 transition-all">
+                            </div>
+                            <a href="https://ma.mohw.gov.tw/Accessibility/BASSearch/MASearchBAS" target="_blank"
+                                title="前往衛福部醫事機構查詢系統"
+                                class="shrink-0 text-xs font-bold px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 transition-colors flex items-center gap-1.5">
+                                <i class="fa-solid fa-user-doctor"></i>
+                                <span class="hidden sm:inline">衛福部資格查詢</span>
+                                <span class="sm:hidden">醫事查詢</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 醫療分類膠囊與卡片容器 -->
+                    <div id="medical-list-container" class="space-y-4 w-full">
+                        <div class="w-full text-center text-slate-400 py-12 bg-white rounded-3xl border border-slate-200/80 shadow-sm">
+                            <i class="fa-solid fa-spinner fa-spin text-2xl text-emerald-500 mb-2"></i>
+                            <p class="font-bold text-xs">正在載入醫療機構名錄...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. 教育學習殿堂 (完整保留您喜愛的學校展示區) -->
+                <div id="section-education-hall" class="scroll-mt-24">
+                    <div class="flex items-center justify-between mb-4 px-1">
+                        <h3 class="text-xl sm:text-2xl font-black text-blue-900 flex items-center">
+                            <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-base mr-2.5 shadow-inner">
+                                <i class="fa-solid fa-book-open-reader"></i>
+                            </div>
+                            教育學習殿堂
+                        </h3>
+                    </div>
+
+                    <!-- 🏫 在地教育單位 (原封不動保留) -->
+                    <div id="school" class="p-0 md:p-2 my-4 relative overflow-hidden scroll-mt-24">
+                        <div
+                            class="absolute -right-4 -top-4 text-blue-50 text-8xl floating opacity-50 z-0 pointer-events-none">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+
+                        <div id="public-schools-container"
+                            class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10 items-start">
+                            <!-- JS 將動態注入大卡片與小列表 -->
+                        </div>
+                    </div>
+
+                    <!-- 模組：就學與設籍 (恢復經典左右對稱排版 + 學校專屬色系標籤) -->
+                    <div id="mod-school-district"
+                        class="mt-6 bg-white rounded-[2rem] p-6 md:p-8 shadow-cute border-4 border-blue-50 relative overflow-hidden group transition-transform">
+                        <div
+                            class="absolute -right-4 -bottom-4 text-8xl text-blue-100 opacity-40 group-hover:scale-110 transition-transform pointer-events-none">
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <div
+                            class="bg-blue-100 text-blue-600 text-xs font-black px-3 py-1.5 rounded-xl flex items-center w-max shadow-sm mb-5 relative z-10">
+                            <i class="fa-solid fa-info-circle mr-1.5"></i>
+                            <a href="https://ws.tycg.gov.tw/Download.ashx?u=LzAwMS9VcGxvYWQvNjYvcmVsZmlsZS8xMTI4Ni8xNjA4NTkzLzFmMTFkZjY1LThlYTMtNGNmZS05ZTFhLTU0MTFlNjRlOGEyNy5wZGY%3d&n=MTE15a245bm05bqm6b6c5bGx5Y2A5ZyL5rCR5Lit5bCP5a245a245Y2A5LiA6Ka96KGoLnBkZg%3d%3d"
+                                target="_blank" rel="noopener noreferrer" class="hover:underline">依照桃園市教育局公告</a>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 relative z-10 items-start">
+
+                            <!-- 左欄：一鍵查詢我家學區 + 自由學區與設籍提醒 -->
+                            <div class="flex flex-col gap-5">
+                                <div
+                                    class="bg-blue-50/50 p-5 md:p-6 rounded-[1.5rem] border-2 border-blue-100/60 shadow-inner flex flex-col gap-3">
+                                    <div class="w-full flex flex-col justify-center">
+                                        <h4 class="text-sm md:text-base font-black text-blue-700 mb-1.5 flex items-center">
+                                            <i
+                                                class="fa-solid fa-magnifying-glass-location mr-1.5 text-blue-500"></i>一鍵查詢我家學區
+                                        </h4>
+                                        <p class="text-xs text-blue-500 font-bold mb-3.5">
+                                            輸入完整地址即可快速對照最新學區（建議包含門牌號碼以利精確判斷）
+                                        </p>
+                                        <div class="flex gap-2 w-full">
+                                            <input type="text" id="school-address-input" placeholder="例如：文青路100號"
+                                                onkeypress="if(event.key === 'Enter') checkSchoolDistrict()"
+                                                class="flex-1 min-w-0 rounded-xl border-2 border-blue-200 px-3 sm:px-4 py-2 text-sm font-bold text-gray-700 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 bg-white shadow-inner transition-all">
+                                            <button onclick="checkSchoolDistrict()"
+                                                class="bg-blue-500 hover:bg-blue-600 text-white font-black px-4 py-2 rounded-xl transition-transform shadow-sm shrink-0 active:scale-95">查詢</button>
+                                        </div>
+                                    </div>
+                                    <div class="w-full flex flex-col justify-center">
+                                        <div id="school-result" class="hidden w-full h-full mt-1"></div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col gap-4">
+                                    <div
+                                        class="text-xs md:text-sm text-gray-500 bg-gray-50 p-4 rounded-xl border border-gray-100 shadow-inner flex items-start gap-3">
+                                        <i class="fa-solid fa-circle-exclamation mt-1 shrink-0 text-blue-400 text-lg"></i>
+                                        <div>
+                                            <strong class="text-gray-700 block mb-1">什麼是「自由學區」？</strong>
+                                            指該鄰里被劃分在兩個（或以上）學校的共同學區內，家長可依據自身考量，自由選擇將孩子戶籍遷入並就讀其中一所學校。實際額滿與否及分發順序，需依各校當年度招生簡章為準。
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="text-xs md:text-sm text-rose-600 bg-rose-50/50 p-4 rounded-xl border-2 border-rose-100 flex items-start gap-3">
+                                        <i class="fa-solid fa-triangle-exclamation mt-0.5 shrink-0 text-rose-400"></i>
+                                        <p class="font-black leading-relaxed">
+                                            具體學區劃分依照桃園市政府教育局公告「鄰里別」為準，建議設籍前先向區公所或學校教務處確認。
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 右欄：行政里別與所屬學區對照表 (長庚國小：青綠色 / 大埔國小：橘黃色) -->
+                            <div
+                                class="overflow-hidden rounded-[1.5rem] border-2 border-blue-100 shadow-sm bg-white h-full">
+                                <table class="w-full text-left text-xs sm:text-sm md:text-base border-collapse relative">
+                                    <thead class="bg-blue-50 text-blue-800 border-b-2 border-blue-200">
+                                        <tr>
+                                            <th
+                                                class="p-3.5 md:p-4 font-black whitespace-nowrap w-[32%] sm:w-[34%] border-r border-blue-100/50">
+                                                行政里別</th>
+                                            <th class="p-3.5 md:p-4 font-black">所屬學區 <span
+                                                    class="text-[10px] sm:text-xs text-blue-500 font-normal ml-1">(可自由選擇)</span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="village-district-tbody" class="text-gray-700 font-bold divide-y divide-blue-50">
+                                        <!-- 文青里 -->
+                                        <tr data-village="文青里" class="hover:bg-blue-50/40 transition-colors bg-gray-50/30">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                文青里
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex items-center justify-between flex-wrap gap-1.5">
+                                                    <div class="flex items-center flex-wrap gap-1.5">
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs sm:text-sm">文青國中小</span>
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200/80 text-xs sm:text-sm">大埔國小</span>
+                                                    </div>
+                                                    <span
+                                                        class="text-[10px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-2 py-0.5 rounded-lg shrink-0">自由學區</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- 文藝里 -->
+                                        <tr data-village="文藝里" class="hover:bg-blue-50/40 transition-colors bg-gray-50/30">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                文藝里
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex items-center justify-between flex-wrap gap-1.5">
+                                                    <div class="flex items-center flex-wrap gap-1.5">
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs sm:text-sm">文青國中小</span>
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200/80 text-xs sm:text-sm">大埔國小</span>
+                                                    </div>
+                                                    <span
+                                                        class="text-[10px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-2 py-0.5 rounded-lg shrink-0">自由學區</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- 樂善里 -->
+                                        <tr data-village="樂善里" class="hover:bg-blue-50/40 transition-colors">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                <div class="flex flex-col gap-y-2">
+                                                    <div class="flex items-center flex-wrap gap-1">
+                                                        <span>樂善里</span>
+                                                        <span class="text-[10px] sm:text-xs text-gray-400 font-normal bg-gray-100 px-1.5 py-0.5 rounded">1-3鄰</span>
+                                                    </div>
+                                                    <div class="flex items-center flex-wrap gap-1 mt-1 border-t border-dashed border-gray-200 pt-2">
+                                                        <span>樂善里</span>
+                                                        <span class="text-[10px] sm:text-xs text-gray-400 font-normal bg-gray-100 px-1.5 py-0.5 rounded">4-33鄰</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex flex-col gap-y-2">
+                                                    <div class="flex items-center justify-between flex-wrap gap-1.5">
+                                                        <div class="flex items-center flex-wrap gap-1.5">
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200/70 text-xs sm:text-sm">樂善國小</span>
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs sm:text-sm">文青國中小</span>
+                                                        </div>
+                                                        <span
+                                                            class="text-[10px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-2 py-0.5 rounded-lg shrink-0">自由學區</span>
+                                                    </div>
+                                                    <div class="flex items-center flex-wrap gap-1.5 mt-1 border-t border-dashed border-gray-200 pt-2">
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200/70 text-xs sm:text-sm">樂善國小</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- 長樂里 -->
+                                        <tr data-village="長樂里" class="hover:bg-blue-50/40 transition-colors">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                <div class="flex flex-col gap-y-2">
+                                                    <div class="flex items-center flex-wrap gap-1">
+                                                        <span>長樂里</span>
+                                                        <span class="text-[10px] sm:text-xs text-gray-400 font-normal bg-gray-100 px-1.5 py-0.5 rounded">1-9鄰</span>
+                                                    </div>
+                                                    <div class="flex items-center flex-wrap gap-1 mt-1 border-t border-dashed border-gray-200 pt-2">
+                                                        <span>長樂里</span>
+                                                        <span class="text-[10px] sm:text-xs text-gray-400 font-normal bg-gray-100 px-1.5 py-0.5 rounded">10-21鄰</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex flex-col gap-y-2">
+                                                    <div class="flex items-center justify-between flex-wrap gap-1.5">
+                                                        <div class="flex items-center flex-wrap gap-1.5">
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200/70 text-xs sm:text-sm">樂善國小</span>
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs sm:text-sm">文青國中小</span>
+                                                        </div>
+                                                        <span
+                                                            class="text-[10px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-2 py-0.5 rounded-lg shrink-0">自由學區</span>
+                                                    </div>
+                                                    <div class="flex items-center justify-between flex-wrap gap-1.5 mt-1 border-t border-dashed border-gray-200 pt-2">
+                                                        <div class="flex items-center flex-wrap gap-1.5">
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200/70 text-xs sm:text-sm">樂善國小</span>
+                                                            <span class="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200/80 text-xs sm:text-sm">長庚國小</span>
+                                                        </div>
+                                                        <span
+                                                            class="text-[10px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-2 py-0.5 rounded-lg shrink-0">自由學區</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- 文樂里 -->
+                                        <tr data-village="文樂里" class="hover:bg-blue-50/40 transition-colors bg-gray-50/30">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                文樂里
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex items-center justify-between flex-wrap gap-1.5">
+                                                    <div class="flex items-center flex-wrap gap-1.5">
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-200/70 text-xs sm:text-sm">樂善國小</span>
+                                                        <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs sm:text-sm">文青國中小</span>
+                                                    </div>
+                                                    <span
+                                                        class="text-[10px] sm:text-xs text-blue-600 bg-white border border-blue-200 shadow-sm px-2 py-0.5 rounded-lg shrink-0">自由學區</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- 文桃里 -->
+                                        <tr data-village="文桃里" class="hover:bg-blue-50/40 transition-colors">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                文桃里
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex items-center flex-wrap gap-1.5">
+                                                    <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200/70 text-xs sm:text-sm">文青國小、文青國中</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                        <!-- 長庚里 -->
+                                        <tr data-village="長庚里" class="hover:bg-blue-50/40 transition-colors bg-gray-50/30">
+                                            <td class="p-3.5 md:p-4 text-gray-800 border-r border-blue-50 leading-snug">
+                                                長庚里
+                                            </td>
+                                            <td class="p-3.5 md:p-4">
+                                                <div class="flex items-center flex-wrap gap-1.5">
+                                                    <span class="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200/80 text-xs sm:text-sm">長庚國小</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </template>
+
+    <!-- 🔍 搜尋結果模板 -->
+    <template id="tpl-search">
+        <div class="fade-in space-y-6">
+            <div
+                class="flex items-center justify-between mb-4 bg-white p-4 rounded-3xl shadow-sm border-2 border-gray-100">
+                <h2 class="text-2xl md:text-3xl font-black text-themeYellow flex items-center">
+                    <i class="fa-solid fa-magnifying-glass mr-3"></i> 搜尋結果
+                </h2>
+                <button onclick="window.location.href='lifehub.html'"
+                    class="bg-gray-100 text-gray-600 px-4 py-2 rounded-xl font-bold hover:bg-gray-200 transition-colors text-sm md:text-base">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> 返回
+                </button>
+            </div>
+            <p id="search-query-display" class="text-gray-500 font-bold px-2 text-lg"></p>
+            <div id="search-results-container" class="space-y-8"></div>
+        </div>
+    </template>
+
+    <script>
+        // 🔍 萬用快速檢索：自動判斷是找學區地址還是找醫療院所
+        window.handleOmniSearch = function (inputId = 'hero-omni-input') {
+            const val = document.getElementById(inputId)?.value.trim();
+            if (!val) return;
+            const isAddressOrSchool = /(路|街|巷|號|里|鄰|社區|國小|國中)/.test(val);
+            if (isAddressOrSchool) {
+                const schoolInput = document.getElementById('school-address-input');
+                if (schoolInput) {
+                    schoolInput.value = val;
+                    checkSchoolDistrict();
+                    document.getElementById('mod-school-district')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } else {
+                const medInput = document.getElementById('medical-search-input');
+                if (medInput) {
+                    medInput.value = val;
+                    filterMedicalByKeyword(val);
+                    document.getElementById('section-medical')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        };
+
+        // Setup Variables
+        window.PUBLIC_SCHOOLS = [
+            {
+                name: "桃園市立文青國民中小學",
+                type: "雙語教學",
+                tagBg: "bg-blue-500",
+                icon: "fa-star",
+                img: "https://i.meee.com.tw/AmbFUyw.jpg",
+                website: "https://www.wcjps.tyc.edu.tw/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區文青路",
+                desc: "約 40 班 / 總量管制校",
+                address: "桃園市龜山區文青路",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文桃里</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">樂善里(1,2,3)</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文青里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">長樂里(1-9)</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文樂里</a>等`
+            },
+            {
+                name: "桃園市立樂善國民小學",
+                type: "雙語教學",
+                tagBg: "bg-sky-500",
+                icon: "fa-star",
+                img: "https://img1.591.com.tw/house/2025/12/12/176550459390441101.jpg!900x.water3.jpg",
+                website: "http://www2.leses.tyc.edu.tw/school/web/index.php",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區樂善街200巷71號",
+                desc: "約 35 班 / 附設幼兒園",
+                address: "桃園市龜山區樂善街200巷71號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">樂善里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">樂善里(4-33)</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">樂善里(1,2,3)</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">長樂里(1-9)</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">長樂里(10-21)</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文樂里</a>等`
+            },
+            {
+                name: "桃園市立文華國民小學",
+                type: "雙語教學",
+                tagBg: "bg-indigo-500",
+                icon: "fa-star",
+                img: "https://www.nt168.com.tw/images/uploads/2019/01/S__117784642.jpg",
+                website: "http://www.sshes.tyc.edu.tw/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區文化七路116號",
+                desc: "約 60 班 / 大型學校",
+                address: "桃園市龜山區文化七路116號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文化里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">明德里</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">大華里</a>`
+            },
+            {
+                name: "桃園市立大崗國民小學",
+                type: "生態校園",
+                tagBg: "bg-cyan-500",
+                icon: "fa-leaf",
+                img: "https://www.edu099.com/assets/upload/images/organization/cover/5994/927a0322a87ac1757511e0164c50ec6c.jpg?f99f63044da574eab4c403f8",
+                website: "https://www.dges.tyc.edu.tw/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區大湖路175號",
+                desc: "約 50 班 / 歷史悠久",
+                address: "桃園市龜山區大湖路175號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">大崗里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">大湖里</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">公西里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">坪頂里</a>`
+            },
+            {
+                name: "桃園市立文欣國民小學",
+                type: "閱讀教育",
+                tagBg: "bg-blue-400",
+                icon: "fa-book-open-reader",
+                img: "https://i.ytimg.com/vi/UFrsnuq8QSw/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLACyAO9cU-McMhycwZeHPINEoRgvQ",
+                website: "https://www.weses.tyc.edu.tw/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區文德路81號",
+                desc: "約 30 班 / 美感校園",
+                address: "桃園市龜山區文德路81號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文化里(1-17,19,21-33)</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文化里(18,20)</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文化里</a>`
+            },
+            {
+                name: "桃園市立長庚國民小學",
+                type: "森林校園",
+                tagBg: "bg-sky-600",
+                icon: "fa-tree",
+                img: "https://pimg.1px.tw/dill4ms/1731339826-948896900-g.jpg",
+                website: "https://www.cgps.tyc.edu.tw/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區長庚醫護新村425號",
+                desc: "約 24 班 / 醫護社區",
+                address: "桃園市龜山區長庚醫護新村425號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">長庚里</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">長樂里(10-21)</a>`
+            },
+            {
+                name: "桃園市立大埔國民小學",
+                type: "田園教學",
+                tagBg: "bg-teal-500",
+                icon: "fa-seedling",
+                img: "https://i.ibb.co/jPHQRyKs/small-13145608667343-3-1.jpg",
+                website: "https://www.dpps.tyc.edu.tw/index.php/zh/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區振興路1169號",
+                desc: "約 15 班 / 特色小學",
+                address: "桃園市龜山區振興路1169號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">舊路里</a>`,
+                distFree: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">楓樹里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">兔坑里</a>`
+            },
+            {
+                name: "桃園市立大崗國民中學",
+                type: "多元社團",
+                tagBg: "bg-indigo-400",
+                icon: "fa-basketball",
+                img: "https://pimg.1px.tw/zaq0930/1568033990-1895178209.jpg",
+                website: "https://www.dgjh.tyc.edu.tw/",
+                navUrl: "https://www.google.com/maps/dir/?api=1&destination=桃園市龜山區文化二路168號",
+                desc: "約 40 班 / 體育班",
+                address: "桃園市龜山區文化二路168號",
+                distBasic: `<a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">樂善里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文化里</a><a href="https://a7club.github.io/life/explore.html#buildings" target="_blank" class="inline-block bg-gray-100 text-gray-600 border border-gray-200 hover:bg-themeBlue hover:text-white hover:border-themeBlue px-1.5 rounded transition-colors font-black mx-0.5 mb-1 shadow-sm">文青里</a>等`,
+                distFree: ``
+            }
+        ];
+        let globalMedicalData = null;
+
+        window.renderPublicSchools = function (selectedIndex = 0, retryCount = 0) {
+            const container = document.getElementById('public-schools-container');
+            if (!container) return;
+
+            if (typeof PUBLIC_SCHOOLS !== 'undefined') {
+                document.querySelectorAll('.js-count-education').forEach(el => {
+                    el.textContent = `${PUBLIC_SCHOOLS.length} 間`;
+                });
+            }
+
+            // 🛠️ 輔助函式：取得簡稱 (移除桃園市立、國民等字樣)
+            const getShortName = (name) => {
+                return name.replace('桃園市立', '').replace('國民', '');
+            }
+
+            // 確保資料已掛載，若未就緒則自動重試 (最多 5 次)
+            if (typeof PUBLIC_SCHOOLS === 'undefined' || !Array.isArray(PUBLIC_SCHOOLS) || PUBLIC_SCHOOLS.length === 0) {
+                if (retryCount < 5) {
+                    setTimeout(() => window.renderPublicSchools(selectedIndex, retryCount + 1), 300);
+                    return;
+                }
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-500 font-bold bg-white rounded-3xl border-4 border-red-50">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl mb-4 block"></i>
+                        無法讀取學區資料 (PUBLIC_SCHOOLS)<br>
+                        <span class="text-xs text-gray-400 mt-2 font-normal">請確認資料是否正確載入</span>
+                    </div>
+                `;
+                return;
+            }
+
+            const school = PUBLIC_SCHOOLS[selectedIndex] || PUBLIC_SCHOOLS[0];
+
+            let styledDistBasic = school.distBasic ? school.distBasic
+                .replace(/bg-gray-100/g, 'bg-slate-800/80')
+                .replace(/text-gray-600/g, 'text-amber-400')
+                .replace(/border-gray-200/g, 'border-amber-500/30')
+                .replace(/hover:bg-themeBlue/g, 'hover:bg-amber-500')
+                .replace(/hover:text-white/g, 'hover:text-slate-900')
+                .replace(/hover:border-themeBlue/g, 'hover:border-amber-400') : '';
+
+            let styledDistFree = school.distFree ? school.distFree
+                .replace(/bg-gray-100/g, 'bg-slate-800/80')
+                .replace(/text-gray-600/g, 'text-amber-400')
+                .replace(/border-gray-200/g, 'border-amber-500/30')
+                .replace(/hover:bg-themeBlue/g, 'hover:bg-amber-500')
+                .replace(/hover:text-white/g, 'hover:text-slate-900')
+                .replace(/hover:border-themeBlue/g, 'hover:border-amber-400') : '';
+
+            let leftHtml = `
+                <div class="lg:col-span-2 rounded-[2.5rem] shadow-[0_15px_50px_rgba(0,0,0,0.2)] overflow-hidden relative group flex flex-col h-full min-h-[550px] border-[6px] border-white ring-1 ring-slate-200">
+                    <img src="${school.img}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-105" alt="${school.name}">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent sm:bg-gradient-to-r sm:from-slate-900 sm:via-slate-900/80 sm:to-transparent"></div>
+                    <div class="absolute inset-0 opacity-[0.15] bg-[radial-gradient(#fbbf24_1px,transparent_1px)] [background-size:24px_24px] mix-blend-overlay pointer-events-none"></div>
+                    <div class="absolute top-6 right-6 z-20 flex items-center shadow-2xl">
+                        <div class="bg-slate-900/80 backdrop-blur-md text-amber-400 text-xs sm:text-sm font-black py-2 pl-4 pr-6 rounded-l-full border-y border-l border-amber-500/30 tracking-widest shadow-lg translate-x-3">
+                            ${school.type}
+                        </div>
+                        <div class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-300 to-amber-500 flex items-center justify-center text-slate-900 border-4 border-white relative z-10">
+                            <i class="fa-solid ${school.icon} text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full p-6 sm:p-8 md:p-10 w-full sm:w-[70%] lg:w-[75%] xl:w-[65%]">
+                        <div class="text-[10px] sm:text-xs font-black text-amber-400 tracking-[0.25em] uppercase mb-4 flex items-center gap-2 drop-shadow-md">
+                            <span class="w-10 h-[2px] bg-amber-400"></span> Academy of Excellence
+                        </div>
+                        <a href="${school.website}" target="_blank" class="font-black text-white text-xl lg:text-3xl leading-[1.2] hover:text-amber-300 transition-colors inline-flex items-start gap-3 group/link drop-shadow-lg mb-8">
+                            <span class="line-clamp-2">${school.name}</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-lg text-white/30 group-hover/link:text-amber-300 shrink-0 mt-3"></i>
+                        </a>
+                        <div class="space-y-4 mt-auto">
+                            <div class="flex items-center bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/20 shadow-lg hover:bg-white/20 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center shrink-0 mr-4 border border-amber-400/30">
+                                    <i class="fa-solid fa-users-viewfinder text-lg"></i>
+                                </div>
+                                <span class="text-sm sm:text-base text-white font-bold tracking-wide">${school.desc}</span>
+                            </div>
+                            <div class="flex items-start bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/20 shadow-lg hover:bg-white/20 transition-colors">
+                                <div class="w-10 h-10 rounded-full bg-blue-400/20 text-blue-300 flex items-center justify-center shrink-0 mr-4 border border-blue-400/30">
+                                    <i class="fa-solid fa-map-location-dot text-lg"></i>
+                                </div>
+                                <div class="flex flex-col gap-2 w-full pt-0.5">
+                                    <span class="text-sm sm:text-base font-bold text-white mb-1 leading-snug tracking-wide">${school.address}</span>
+                                    <div class="h-px w-full bg-white/20 my-1.5"></div>
+                                    ${styledDistBasic ? `<div class="text-[11px] sm:text-xs text-slate-300 font-bold flex items-start sm:items-center flex-col sm:flex-row gap-2.5"><span class="bg-slate-700/80 text-white px-2.5 py-1 rounded-md shadow-sm shrink-0 border border-slate-600">基本</span> <div class="flex flex-wrap gap-1.5">${styledDistBasic}</div></div>` : ''}
+                                    ${styledDistFree ? `<div class="text-[11px] sm:text-xs text-slate-300 font-bold flex items-start sm:items-center flex-col sm:flex-row gap-2.5 mt-1.5"><span class="bg-amber-600/80 text-white px-2.5 py-1 rounded-md shadow-sm shrink-0 border border-amber-500">自由</span> <div class="flex flex-wrap gap-1.5">${styledDistFree}</div></div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-3">
+                            <a href="${school.navUrl}" target="_blank" class="flex-1 sm:flex-none py-3.5 px-8 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 rounded-xl font-black flex items-center justify-center gap-2 hover:from-amber-300 hover:to-amber-400 transition-all shadow-[0_4px_15px_rgba(251,191,36,0.3)] hover:shadow-[0_6px_20px_rgba(251,191,36,0.5)] hover:-translate-y-1">
+                                <i class="fa-solid fa-location-arrow"></i> 開啟地圖導航
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            let rightHtml = `
+                <div class="lg:col-span-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-2.5 h-full lg:max-h-[550px] overflow-y-auto hide-scrollbar pr-1">
+                    ${PUBLIC_SCHOOLS.map((s, idx) => `
+                        <div onclick="renderPublicSchools(${idx})" class="cursor-pointer rounded-2xl p-2 flex items-center gap-2.5 border-2 ${idx === selectedIndex ? 'border-amber-400 bg-slate-900 shadow-md text-white scale-[1.02]' : 'bg-white border-blue-50 hover:border-blue-200 text-slate-700 hover:shadow-sm'} transition-all group relative overflow-hidden">
+                            <div class="relative shrink-0">
+                                <img src="${s.img}" class="w-12 h-12 sm:w-14 sm:h-14 object-cover rounded-full border-2 ${idx === selectedIndex ? 'border-amber-500/50' : 'border-white'} shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                ${idx === selectedIndex ? '<div class="absolute inset-0 border-2 border-amber-400 rounded-full pointer-events-none"></div>' : ''}
+                            </div>
+                            <div class="flex flex-col overflow-hidden py-0.5">
+                                <span class="text-[9px] ${idx === selectedIndex ? 'text-amber-300' : 'text-blue-500'} font-black flex items-center tracking-widest"><i class="fa-solid ${s.icon} mr-1"></i>${s.type}</span>
+                                <div class="text-xs sm:text-sm font-black ${idx === selectedIndex ? 'text-white' : 'text-gray-800 group-hover:text-blue-700'} truncate transition-colors leading-relaxed">
+                                    <span class="lg:hidden">${getShortName(s.name)}</span>
+                                    <span class="hidden lg:inline">${s.name}</span>
+                                </div>
+                            </div>
+                            ${idx === selectedIndex ? '<div class="absolute right-2 top-1/2 -translate-y-1/2 text-amber-400 text-base opacity-70"><i class="fa-solid fa-check-circle"></i></div>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            container.innerHTML = leftHtml + rightHtml;
+        };
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { handleRoute(); });
+        window.addEventListener('hashchange', () => { handleRoute(); });
+
+        function handleRoute(customRoute) {
+            let hash = typeof customRoute === 'string' ? customRoute : (window.location.hash.substring(1) || 'home');
+
+            if (hash.startsWith('search=')) {
+                const query = decodeURIComponent(hash.substring(7));
+                renderPage('search');
+                executeSearchLogic(query);
+            } else {
+                // 加強：如果 hash 指向的是特定區塊 (如 section-medical) 而非獨立頁面模板，則載入 home
+                const template = document.getElementById('tpl-' + hash);
+                if (!template && hash !== 'home') {
+                    // 檢查是否已經在 home 頁面，避免重複渲染清空表單
+                    const isAlreadyHome = document.getElementById('section-dashboard') !== null;
+                    if (!isAlreadyHome) {
+                        renderPage('home');
+                    }
+                    // 嘗試捲動到對應 ID 的區塊
+                    setTimeout(() => {
+                        const target = document.getElementById(hash) || document.querySelector(`[name="${hash}"]`);
+                        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, isAlreadyHome ? 50 : 500);
+                } else {
+                    renderPage(hash);
+                }
+            }
+        }
+
+        function loadPage(pageId) {
+            history.pushState(null, '', '#' + pageId);
+            handleRoute(pageId);
+        }
+
+        function renderPage(pageId) {
+            const root = document.getElementById('app-root');
+            const template = document.getElementById('tpl-' + pageId);
+            if (!template) return;
+
+            root.innerHTML = '';
+            root.appendChild(template.content.cloneNode(true));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (pageId === 'home') {
+                fetchMedicalData();
+                renderPublicSchools(0);
+                fetchTyfdCaseList();
+
+                // 🛸 處理來自 URL 的「一鍵查詢」參數 (優化版：確保內容已注入)
+                const params = new URLSearchParams(window.location.search);
+                const address = params.get('address') || params.get('search');
+                if (address) {
+                    const schoolInput = document.getElementById('school-address-input');
+                    const dashInput = document.getElementById('dash-school-input');
+                    if (schoolInput) {
+                        schoolInput.value = address;
+                        if (dashInput) dashInput.value = address;
+                        // 延遲執行確保數據與 DOM 完全就緒
+                        setTimeout(() => {
+                            checkSchoolDistrict();
+                            const section = document.getElementById('mod-school-district') || document.getElementById('section-education-hall');
+                            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 800);
+                    }
+                }
+            }
+        }
+
+        function parseCSV(text) {
+            let p = '', row = [''], ret = [row], i = 0, r = 0, s = !0, l;
+            for (l of text) {
+                if ('"' === l) { if (s && l === p) row[i] += l; s = !s; }
+                else if (',' === l && s) l = row[++i] = '';
+                else if ('\n' === l && s) { if ('\r' === p) row[i] = row[i].slice(0, -1); row = ret[++r] = [l = '']; i = 0; }
+                else row[i] += l;
+                p = l;
+            }
+            return ret.filter(r => r.join('').trim() !== '');
+        }
+
+        async function loadSharedMedicalData() {
+            if (globalMedicalData) return globalMedicalData;
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTmr3ebvX4CeJ_Dc-TK_57zxqaVlXfI4CPVcgTAWAIKM29dtR-SqiFs93i2iz1ScwYEBcty8mlIxKYO/pub?gid=368795626&single=true&output=csv';
+            try {
+                const res = await fetch(csvUrl);
+                const csvText = await res.text();
+                const rows = parseCSV(csvText);
+                if (!rows || rows.length === 0) return [];
+                const headers = rows[0];
+
+                let nameIdx = headers.findIndex(k => k.includes('名稱') || k.includes('機構'));
+                if (nameIdx === -1) nameIdx = 0;
+                let catIdx = headers.findIndex(k => k.includes('醫療分類'));
+                if (catIdx === -1) catIdx = headers.length > 8 ? 8 : headers.length - 1;
+
+                const addressIdx = headers.findIndex(k => k.includes('地址'));
+                const phoneIdx = headers.findIndex(k => k.includes('電話'));
+                const imgIdx = headers.findIndex(k => k.includes('照片') || k.includes('圖片'));
+                const licenseIdx = 16;
+
+                globalMedicalData = rows.slice(1).map(row => {
+                    let rawImg = (imgIdx !== -1 && row.length > imgIdx && row[imgIdx]) ? row[imgIdx].trim() : '';
+                    let finalImg = '';
+                    const urlMatch = rawImg.match(/https?:\/\/[^\s]+/);
+                    if (urlMatch) finalImg = urlMatch[0];
+
+                    let licenseData = '';
+                    if (row.length > licenseIdx) {
+                        licenseData = row[licenseIdx] ? row[licenseIdx].trim() : '';
+                    }
+
+                    return {
+                        name: row[nameIdx]?.trim() || '',
+                        category: row[catIdx]?.trim() || '其他醫療',
+                        address: addressIdx !== -1 ? row[addressIdx]?.trim() : '',
+                        phone: phoneIdx !== -1 ? row[phoneIdx]?.trim() : '',
+                        img: finalImg,
+                        license: licenseData
+                    };
+                }).filter(item => item.name);
+                return globalMedicalData;
+            } catch (e) {
+                return [];
+            }
+        }
+
+        async function fetchMedicalData() {
+            const data = await loadSharedMedicalData();
+            renderMedicalData(data);
+        }
+
+        // ==========================================
+        // 🚨 桃園市消防局即時災情 (GAS 中繼 / 多通道代理擷取)
+        // ==========================================
+        // 💡 推薦：若您部署下方的 Google Apps Script，將網址填入此處即可 100% 穩定讀取官網最新災情
+        const TYFD_GAS_API_URL = ""; 
+
+        let globalTyfdAllCases = [];
+        let globalTyfdUpdatedTime = '';
+        let globalTyfdFetchError = false;
+        let globalTyfdIsLoading = true;
+        let currentTyfdFilter = 'GUISHAN'; // 'GUISHAN' | 'A7' | 'TAOYUAN'
+
+        window.setTyfdFilter = function (mode) {
+            currentTyfdFilter = mode;
+            const tabIds = {
+                GUISHAN: 'tyfd-filter-guishan',
+                A7: 'tyfd-filter-a7',
+                TAOYUAN: 'tyfd-filter-taoyuan'
+            };
+            Object.entries(tabIds).forEach(([key, id]) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                if (key === mode) {
+                    btn.className = 'px-2.5 py-1 rounded-lg bg-white text-slate-900 shadow-sm transition-all';
+                } else {
+                    btn.className = 'px-2.5 py-1 rounded-lg text-slate-500 hover:text-slate-800 transition-all';
+                }
+            });
+            renderTyfdCases();
+        };
+
+        function parseTyfdHtml(rawText) {
+            const allCases = [];
+            const seenKeys = new Set();
+
+            const cleanField = (str, label) => {
+                if (!str) return '';
+                return str
+                    .replace(new RegExp('^\\s*' + label + '[：:\\s]*'), '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            };
+
+            const addCase = (time, category, type, location, unit, status) => {
+                if (!time || !location || !/\d{4}-\d{2}-\d{2}/.test(time)) return;
+                const key = `${time}_${location}_${unit}`;
+                if (!seenKeys.has(key)) {
+                    seenKeys.add(key);
+                    allCases.push({ time, category, type, location, unit, status });
+                }
+            };
+
+            // 方法 1：解析標準 HTML table tr
+            if (rawText.includes('<table') || rawText.includes('<tr')) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(rawText, 'text/html');
+                const rows = doc.querySelectorAll('table tr');
+                rows.forEach(tr => {
+                    const tds = tr.querySelectorAll('td');
+                    if (tds.length >= 6) {
+                        addCase(
+                            cleanField(tds[0].textContent, '發生時間'),
+                            cleanField(tds[1].textContent, '案類'),
+                            cleanField(tds[2].textContent, '案別'),
+                            cleanField(tds[3].textContent, '發生地點'),
+                            cleanField(tds[4].textContent, '派遣分隊'),
+                            cleanField(tds[5].textContent, '案件狀態')
+                        );
+                    }
+                });
+            }
+
+            // 方法 2：解析 Jina Reader 回傳的 Markdown 表格格式
+            if (allCases.length === 0) {
+                const mdRegex = /\|\s*(?:發生時間\s*)?(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})\s*\|\s*(?:案類\s*)?([^|]+?)\s*\|\s*(?:案別\s*)?([^|]+?)\s*\|\s*(?:發生地點\s*)?([^|]+?)\s*\|\s*(?:派遣分隊\s*)?([^|]+?)\s*\|\s*(?:案件狀態\s*)?([^|\n]+?)\s*\|/g;
+                let m;
+                while ((m = mdRegex.exec(rawText)) !== null) {
+                    addCase(m[1].trim(), m[2].trim(), m[3].trim(), m[4].trim(), m[5].trim(), m[6].trim());
+                }
+            }
+
+            // 方法 3：使用正規表示式從純文字擷取
+            if (allCases.length === 0) {
+                const bodyText = rawText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+                const rowRegex = /發生時間\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})\s*案類\s*(\S+)\s*案別\s*(\S+)\s*發生地點\s*(.+?)\s*派遣分隊\s*(\S+)\s*(?:案件狀態\s*)?(已受理|已出動|處理中|已到達|已控制|已撲滅|已完成|返隊中|\S+)/g;
+                let match;
+                while ((match = rowRegex.exec(bodyText)) !== null) {
+                    const [, time, category, type, location, unit, status] = match;
+                    addCase(time.trim(), category.trim(), type.trim(), location.trim(), unit.trim(), status.trim());
+                }
+            }
+
+            const timeMatch = rawText.match(/最後更新日期[：:]\s*([0-9\-:\s]+)/);
+            const updatedTime = timeMatch ? timeMatch[1].trim() : '';
+
+            return { cases: allCases, lastUpdated: updatedTime };
+        }
+
+        async function fetchSinglePageViaProxies(pageUrl) {
+            // 1. 若有設定自建的 Google Apps Script API，優先使用 (最穩定、零阻擋)
+            if (TYFD_GAS_API_URL) {
+                const res = await fetch(`${TYFD_GAS_API_URL}?_t=${Date.now()}`, { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && Array.isArray(data.cases)) return data;
+                    if (data && data.html) return parseTyfdHtml(data.html);
+                }
+            }
+
+            const cacheBustUrl = `${pageUrl}&_t=${Date.now()}`;
+
+            const fetchFromProxy = async (proxyUrl, isJson = false, customHeaders = {}) => {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                try {
+                    const res = await fetch(proxyUrl, {
+                        signal: controller.signal,
+                        cache: 'no-store',
+                        headers: customHeaders
+                    });
+                    clearTimeout(timeoutId);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    let text = '';
+                    if (isJson) {
+                        const data = await res.json();
+                        text = data.contents || '';
+                    } else {
+                        text = await res.text();
+                    }
+                    const parsed = parseTyfdHtml(text);
+                    if (!parsed.cases || parsed.cases.length === 0) {
+                        throw new Error('No valid cases parsed');
+                    }
+                    return parsed;
+                } catch (e) {
+                    clearTimeout(timeoutId);
+                    throw e;
+                }
+            };
+
+            // 2. 多節點並行請求 (包含 Jina Reader API 與多個 CORS 代理)
+            return Promise.any([
+                fetchFromProxy(`https://r.jina.ai/${pageUrl}`, false, { 'X-No-Cache': 'true' }),
+                fetchFromProxy(`https://api.allorigins.win/get?disableCache=true&url=${encodeURIComponent(cacheBustUrl)}`, true),
+                fetchFromProxy(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(cacheBustUrl)}`, false),
+                fetchFromProxy(`https://corsproxy.io/?url=${encodeURIComponent(cacheBustUrl)}`, false)
+            ]);
+        }
+
+        async function fetchTyfdCaseList(isManual = false) {
+            const icon = document.getElementById('tyfd-refresh-icon');
+            if (icon) icon.classList.add('fa-spin');
+
+            globalTyfdIsLoading = true;
+            globalTyfdFetchError = false;
+            if (isManual) renderTyfdCases();
+
+            try {
+                const parsed = await fetchSinglePageViaProxies('https://www.tyfd.gov.tw/cht/index.php?act=caselist');
+                globalTyfdAllCases = parsed.cases || [];
+                globalTyfdUpdatedTime = parsed.lastUpdated || new Date().toLocaleTimeString('zh-TW', { hour12: false });
+                globalTyfdIsLoading = false;
+                globalTyfdFetchError = false;
+            } catch (err) {
+                globalTyfdIsLoading = false;
+                globalTyfdFetchError = true;
+            }
+
+            if (icon) {
+                setTimeout(() => icon.classList.remove('fa-spin'), 300);
+            }
+            renderTyfdCases();
+        }
+
+        function renderTyfdCases() {
+            const container = document.getElementById('tyfd-cases-container');
+            const timeEl = document.getElementById('tyfd-update-time');
+            if (!container) return;
+
+            const a7RoadKeywords = ['坪頂', '復興', '文化', '文青', '文桃', '樂善', '文德', '文禾', '樂學', '長慶', '華亞', '大埔', '牛角坡'];
+            const isGuishan = (item) => item.location.includes('龜山') || item.unit.includes('龜山') || item.unit.includes('坪頂') || item.unit.includes('迴龍');
+            const isA7Area = (item) => item.unit.includes('坪頂') || (isGuishan(item) && a7RoadKeywords.some(k => item.location.includes(k)));
+
+            const guishanList = globalTyfdAllCases.filter(isGuishan);
+            const a7List = globalTyfdAllCases.filter(isA7Area);
+
+            // 更新按鈕上的數量標籤
+            const cGuishan = document.getElementById('tyfd-count-guishan');
+            const cA7 = document.getElementById('tyfd-count-a7');
+            const cTaoyuan = document.getElementById('tyfd-count-taoyuan');
+            if (!globalTyfdIsLoading && !globalTyfdFetchError) {
+                if (cGuishan) cGuishan.textContent = `(${guishanList.length})`;
+                if (cA7) cA7.textContent = `(${a7List.length})`;
+                if (cTaoyuan) cTaoyuan.textContent = `(${globalTyfdAllCases.length})`;
+            }
+
+            if (timeEl) {
+                if (globalTyfdIsLoading) {
+                    timeEl.textContent = '正在同步官網資料...';
+                } else if (globalTyfdFetchError) {
+                    timeEl.textContent = '政府防火牆安全限制';
+                } else if (globalTyfdUpdatedTime) {
+                    timeEl.textContent = `官網更新：${globalTyfdUpdatedTime}`;
+                }
+            }
+
+            if (globalTyfdIsLoading) {
+                container.innerHTML = `
+                    <div class="p-8 text-center text-slate-400 text-xs font-bold">
+                        <i class="fa-solid fa-spinner fa-spin text-lg text-rose-500 mb-2"></i>
+                        <p>正在即時連線桃園市政府消防局抓取最新案件...</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 當公開代理均被政府網站防火牆阻擋時，顯示乾淨的引導卡片（絕不使用會報錯的 iframe）
+            if (globalTyfdFetchError) {
+                container.innerHTML = `
+                    <div class="p-6 text-center flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50/50">
+                        <div class="flex items-center gap-3 text-left">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 border border-amber-200/60 flex items-center justify-center text-base shrink-0">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+                            <div>
+                                <div class="text-xs sm:text-sm font-black text-slate-700">桃園市政府消防局啟動跨網域連線保護</div>
+                                <p class="text-[11px] font-bold text-slate-500 mt-0.5">因政府網站限制外部網頁直接嵌入或頻繁抓取，請點擊右側按鈕直接開啟官方即時災情頁面。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                            <button onclick="fetchTyfdCaseList(true)" class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs font-black transition-all">
+                                <i class="fa-solid fa-rotate mr-1"></i>重試連線
+                            </button>
+                            <a href="https://www.tyfd.gov.tw/cht/index.php?act=caselist" target="_blank" rel="noopener noreferrer"
+                                class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black flex items-center gap-1.5 shadow-sm transition-all">
+                                <span>前往消防局即時災情</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            let filtered = [];
+            if (currentTyfdFilter === 'GUISHAN') filtered = guishanList;
+            else if (currentTyfdFilter === 'A7') filtered = a7List;
+            else filtered = globalTyfdAllCases;
+
+            if (filtered.length === 0) {
+                const scopeName = currentTyfdFilter === 'A7' ? '坪頂分隊 (A7 轄區)' : (currentTyfdFilter === 'GUISHAN' ? '龜山區' : '桃園市');
+                container.innerHTML = `
+                    <div class="p-6 text-center text-slate-500 text-xs font-bold flex flex-col sm:flex-row items-center justify-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+                            <span>目前消防局官網第一頁（共 ${globalTyfdAllCases.length} 筆通報）中，暫無發生於「${scopeName}」之案件。</span>
+                        </div>
+                        ${currentTyfdFilter !== 'TAOYUAN' && globalTyfdAllCases.length > 0 ? `
+                            <button onclick="setTyfdFilter('TAOYUAN')" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-black transition-colors">
+                                查看桃園全區 (${globalTyfdAllCases.length} 筆)
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            const getStatusBadge = (status) => {
+                if (status.includes('處理中') || status.includes('出動') || status.includes('到達')) {
+                    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-black bg-amber-50 text-amber-700 border border-amber-200/80"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>${status}</span>`;
+                }
+                if (status.includes('已受理') || status.includes('派遣')) {
+                    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-black bg-blue-50 text-blue-700 border border-blue-200/80"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>${status}</span>`;
+                }
+                return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-200/70">${status}</span>`;
+            };
+
+            const getCatBadge = (cat, type) => {
+                const isFire = cat.includes('火災');
+                const colorClass = isFire
+                    ? 'bg-rose-50 text-rose-600 border-rose-200/70'
+                    : 'bg-orange-50 text-orange-600 border-orange-200/70';
+                const icon = isFire ? 'fa-fire' : 'fa-truck-medical';
+                return `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-black border ${colorClass}">
+                        <i class="fa-solid ${icon} text-[10px]"></i>
+                        ${cat}${type ? '・' + type : ''}
+                    </span>
+                `;
+            };
+
+            container.innerHTML = filtered.map(item => {
+                const inA7 = isA7Area(item);
+                const shortAddr = item.location.replace(/^桃園市/, '');
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location)}`;
+
+                return `
+                    <div class="p-3.5 sm:px-6 hover:bg-slate-50/80 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                        <div class="flex items-start sm:items-center flex-wrap gap-2 min-w-0">
+                            ${getStatusBadge(item.status)}
+                            ${getCatBadge(item.category, item.type)}
+                            <a href="${mapUrl}" target="_blank" class="font-black text-slate-800 hover:text-rose-600 text-xs sm:text-sm flex items-center gap-1.5 transition-colors" title="於 Google 地圖查看概略位置">
+                                <i class="fa-solid fa-location-dot text-rose-400 text-xs"></i>
+                                <span>${shortAddr}</span>
+                            </a>
+                            ${inA7 ? `<span class="text-[10px] font-black bg-rose-100/80 text-rose-600 px-1.5 py-0.5 rounded border border-rose-200">A7 生活圈</span>` : ''}
+                        </div>
+
+                        <div class="flex items-center justify-between sm:justify-end gap-3 text-xs shrink-0 pl-1 sm:pl-0">
+                            <span class="font-black text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/70 flex items-center gap-1">
+                                <i class="fa-solid fa-helmet-safety text-slate-400 text-[10px]"></i>
+                                ${item.unit}
+                            </span>
+                            <span class="font-bold text-slate-400 num-counter text-[11px] sm:text-xs">
+                                <i class="fa-regular fa-clock mr-1"></i>${item.time}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 新增全域變數追蹤當前啟動的醫療分類與關鍵字
+        let currentMedicalCategory = '醫療中心';
+        let currentMedicalKeyword = '';
+
+        window.setMedicalFilter = function (cat) {
+            currentMedicalCategory = cat;
+            const searchInput = document.getElementById('medical-search-input');
+            if (searchInput) searchInput.value = '';
+            currentMedicalKeyword = '';
+            if (globalMedicalData) {
+                renderMedicalData(globalMedicalData);
+            }
+        }
+
+        window.filterMedicalByKeyword = function (val) {
+            currentMedicalKeyword = (val || '').trim().toLowerCase();
+            if (globalMedicalData) {
+                renderMedicalData(globalMedicalData);
+            }
+        }
+
+        function renderMedicalData(data) {
+            const container = document.getElementById('medical-list-container');
+            if (!container) return;
+
+            const grouped = {};
+            data.forEach(i => {
+                const catName = i.category || '一般/其他醫療';
+                if (!grouped[catName]) grouped[catName] = [];
+                grouped[catName].push(i);
+            });
+
+            if (Object.keys(grouped).length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-400 font-bold py-10 bg-white rounded-2xl border border-slate-200/80 shadow-sm">尚無相關醫療機構資料</div>';
+                return;
+            }
+
+            const sortedCats = Object.keys(grouped).sort((a, b) => {
+                const order = ['醫療中心', '牙', '小兒', '眼', '診所', '藥'];
+                let aIdx = order.findIndex(o => a.includes(o));
+                let bIdx = order.findIndex(o => b.includes(o));
+                aIdx = aIdx === -1 ? 99 : aIdx;
+                bIdx = bIdx === -1 ? 99 : bIdx;
+                return aIdx - bIdx;
+            });
+
+            if (!grouped[currentMedicalCategory] && sortedCats.length > 0) {
+                currentMedicalCategory = sortedCats[0];
+            }
+
+            const getCatTheme = (c) => {
+                if (c.includes('醫療中心')) return { icon: 'fa-hospital', color: 'emerald' };
+                if (c.includes('牙')) return { icon: 'fa-tooth', color: 'sky' };
+                if (c.includes('小兒') || c.includes('婦產') || c.includes('兒童')) return { icon: 'fa-baby', color: 'pink' };
+                if (c.includes('眼')) return { icon: 'fa-eye', color: 'purple' };
+                if (c.includes('藥')) return { icon: 'fa-pills', color: 'amber' };
+                if (c.includes('骨') || c.includes('復健')) return { icon: 'fa-bone', color: 'teal' };
+                return { icon: 'fa-stethoscope', color: 'emerald' };
+            };
+
+            // 1. 頂部橫向分類膠囊列
+            let tabsHtml = '<div class="flex items-center gap-2 overflow-x-auto hide-scrollbar pb-1">';
+            sortedCats.forEach(cat => {
+                const items = grouped[cat];
+                const theme = getCatTheme(cat);
+                const isActive = !currentMedicalKeyword && currentMedicalCategory === cat;
+                const btnClasses = isActive
+                    ? 'bg-slate-900 text-white shadow-sm border-slate-900'
+                    : 'bg-white text-slate-600 hover:bg-slate-100 border-slate-200/90';
+
+                tabsHtml += `
+                    <button onclick="setMedicalFilter('${cat.replace(/'/g, "\\'")}')" 
+                        class="shrink-0 flex items-center gap-2 px-3.5 py-2 rounded-xl font-black text-xs sm:text-sm border transition-all active:scale-95 ${btnClasses}">
+                        <i class="fa-solid ${theme.icon} ${isActive ? 'text-emerald-400' : 'text-slate-400'}"></i>
+                        <span>${cat}</span>
+                        <span class="text-[11px] font-black px-1.5 py-0.5 rounded-md ${isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}">${items.length}</span>
+                    </button>
+                `;
+            });
+            tabsHtml += '</div>';
+
+            // 2. 篩選要顯示的診所清單 (支援跨分類關鍵字搜尋)
+            let activeItems = [];
+            if (currentMedicalKeyword) {
+                activeItems = data.filter(item =>
+                    item.name.toLowerCase().includes(currentMedicalKeyword) ||
+                    (item.address && item.address.toLowerCase().includes(currentMedicalKeyword)) ||
+                    (item.category && item.category.toLowerCase().includes(currentMedicalKeyword))
+                );
+            } else {
+                activeItems = grouped[currentMedicalCategory] || [];
+            }
+
+            // 3. 建立卡片列表：醫療中心採用 2 欄大卡 (md:grid-cols-2)，其他所有分類嚴格採用一行三間 (md:grid-cols-3)
+            let cardsHtml = '';
+            const isMedicalCenterCat = !currentMedicalKeyword && currentMedicalCategory.includes('醫療中心');
+            const gridColsClass = isMedicalCenterCat
+                ? 'grid-cols-1 md:grid-cols-2 gap-4'
+                : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5';
+
+            if (activeItems.length === 0) {
+                cardsHtml = `
+                    <div class="bg-white rounded-2xl p-8 text-center border border-slate-200/80 text-slate-400 font-bold text-sm">
+                        找不到符合「${currentMedicalKeyword}」的醫療院所或藥局
+                    </div>
+                `;
+            } else {
+                cardsHtml = `
+                    <div class="grid ${gridColsClass} fade-in">
+                        ${activeItems.map(item => {
+                            const theme = getCatTheme(item.category || currentMedicalCategory);
+                            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address || item.name)}`;
+                            const thumbHtml = item.img
+                                ? `<img src="${item.img}" class="${isMedicalCenterCat ? 'w-16 h-16' : 'w-12 h-12'} rounded-xl object-cover shrink-0 border border-slate-100 bg-slate-50" alt="${item.name}">`
+                                : `<div class="${isMedicalCenterCat ? 'w-16 h-16 text-2xl' : 'w-12 h-12 text-lg'} rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center shrink-0"><i class="fa-solid ${theme.icon}"></i></div>`;
+
+                            return `
+                                <div class="bg-white p-3.5 rounded-2xl border border-slate-200/90 hover:border-emerald-400 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-3 group/clinic">
+                                    <div class="flex items-start gap-3">
+                                        ${thumbHtml}
+                                        <div class="min-w-0 flex-1">
+                                            <div class="flex items-start justify-between gap-1.5">
+                                                <h4 class="font-black text-slate-800 ${isMedicalCenterCat ? 'text-base sm:text-lg' : 'text-sm'} leading-snug truncate group-hover/clinic:text-emerald-600 transition-colors" title="${item.name}">${item.name}</h4>
+                                            </div>
+                                            <div class="flex items-center flex-wrap gap-1.5 mt-1">
+                                                <span class="text-[10px] font-black bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">${item.category || currentMedicalCategory}</span>
+                                                ${item.license ? `<span class="text-[10px] text-slate-400 font-bold truncate" title="${item.license}">${item.license.includes('字第') ? item.license : '衛醫字第 ' + item.license}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-slate-100">
+                                        <a href="${mapUrl}" target="_blank" class="text-xs font-bold text-slate-500 hover:text-emerald-600 flex items-center gap-1.5 min-w-0 flex-1 truncate" title="${item.address || '點擊開啟地圖'}">
+                                            <i class="fa-solid fa-location-dot text-slate-400 shrink-0"></i>
+                                            <span class="truncate">${(item.address || '查看地圖位置').replace(/桃園市|龜山區/g, '')}</span>
+                                        </a>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            ${item.phone ? `
+                                            <a href="tel:${item.phone}" title="撥打電話：${item.phone}" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs transition-colors">
+                                                <i class="fa-solid fa-phone"></i>
+                                            </a>
+                                            ` : ''}
+                                            <a href="${mapUrl}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-xs font-black flex items-center gap-1 transition-colors">
+                                                <i class="fa-solid fa-location-arrow text-[10px]"></i> 導航
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            container.innerHTML = tabsHtml + cardsHtml;
+
+            document.querySelectorAll('.js-count-medical').forEach(el => {
+                el.textContent = `${data.length} 間`;
+            });
+        }
+
+        function quickCheckSchoolDistrict() {
+            const val = document.getElementById('dash-school-input')?.value.trim();
+            if (!val) return;
+            const mainInput = document.getElementById('school-address-input');
+            if (mainInput) {
+                mainInput.value = val;
+                const targetBlock = document.getElementById('mod-school-district') || document.getElementById('section-education-hall');
+
+                if (targetBlock) {
+                    window.location.hash = targetBlock.id;
+                    targetBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+
+                setTimeout(() => {
+                    if (document.getElementById('school-address-input').value === val) {
+                        checkSchoolDistrict();
+                    } else {
+                        mainInput.value = val;
+                        checkSchoolDistrict();
+                    }
+                }, 300);
+            }
+        }
+
+        async function executeSearchLogic(q) {
+            const data = await loadSharedMedicalData();
+            const matched = data.filter(i => i.name.includes(q) || i.category.includes(q));
+            renderMedicalData(matched);
+        }
+
+        const VILLAGE_DATA = [
+            { "village": "長樂里", "neighborhoods": [1], "streets": ["文信路289號、299之9號、325號、325之9號", "文化一路103號", "文桃路650號", "文茂路86-90（雙）", "文信路95-101（單）", "文禾路188-200（雙）、289號、259-265（單）"], "tag": "由原樂善里9、8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [2], "streets": ["文禾路239-245（單）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [3], "streets": ["文禾路247-257（單）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [4], "streets": ["文禾路199-201（單）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [5], "streets": ["文禾路187-197（單）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [6], "streets": ["文禾路169-185（單）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [7], "streets": ["文禾路105、107", "樂學路192-210（雙）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [8], "streets": ["文禾路101、103", "樂學路156-190（雙）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [9], "streets": ["文達路258-268（雙）", "樂學路118-152（雙）"], "tag": "由原樂善里8鄰調整" },
+            { "village": "長樂里", "neighborhoods": [10], "streets": ["長慶一街28-30、38-60（雙）"], "tag": "由原長庚里30鄰調整" },
+            { "village": "長樂里", "neighborhoods": [11], "streets": ["樂學路470-490（雙）"], "tag": "由原長庚里30鄰調整" },
+            { "village": "長樂里", "neighborhoods": [12], "streets": ["長慶一街45巷33-39（單）", "長慶二街6-26（雙）", "樂學路492-512（雙）"], "tag": "由原長庚里30鄰調整" },
+            { "village": "長樂里", "neighborhoods": [13], "streets": ["長慶一街39、41", "長慶一街45巷1-31（單）"], "tag": "由原長庚里30鄰調整" },
+            { "village": "長樂里", "neighborhoods": [14], "streets": ["長慶二街78-82（雙）", "長慶一街45巷26-58（雙）", "長慶一街87-97（單）", "長慶一街85巷2-18（雙）"], "tag": "由原長庚里30鄰調整" },
+            { "village": "長樂里", "neighborhoods": [15], "streets": ["長慶二街1-17（單）", "樂學路528-560（雙）"], "tag": "由原長庚里27鄰調整" },
+            { "village": "長樂里", "neighborhoods": [16], "streets": ["長慶二街61-83（單）", "長慶三街18-36（雙）"], "tag": "由原長庚里27鄰調整" },
+            { "village": "長樂里", "neighborhoods": [17], "streets": ["長慶二街85-111（單）", "長慶三街38-58（雙）"], "tag": "由原長庚里28鄰調整" },
+            { "village": "長樂里", "neighborhoods": [18], "streets": ["長慶二街113-123（單）", "長慶三街60-82（雙）"], "tag": "由原長庚里28鄰調整" },
+            { "village": "長樂里", "neighborhoods": [19], "streets": ["樂學路590巷20-32（雙）", "長慶三街41-79（單）、81、83"], "tag": "由原長庚里29鄰調整" },
+            { "village": "長樂里", "neighborhoods": [20], "streets": ["樂學路590巷29-43（單）", "樂學路622巷26-62（雙）"], "tag": "由原長庚里29鄰調整" },
+            { "village": "長樂里", "neighborhoods": [21], "streets": ["樂學路672-686（雙）"], "tag": "由原長庚里29鄰調整" },
+            { "village": "文樂里", "neighborhoods": [1], "streets": ["文化一路196-216（雙）、236-242（雙）"], "tag": "由原樂善里30鄰調整" },
+            { "village": "文樂里", "neighborhoods": [2], "streets": ["文化一路246-258（雙）、262-278（雙）"], "tag": "由原樂善里30鄰調整" },
+            { "village": "文樂里", "neighborhoods": [3], "streets": ["文化一路280-296（雙）、316-328（雙）"], "tag": "由原樂善里30鄰調整" },
+            { "village": "文樂里", "neighborhoods": [4], "streets": ["文化一路298-312（雙）、218-232（雙）"], "tag": "由原樂善里30鄰調整" },
+            { "village": "文樂里", "neighborhoods": [5], "streets": ["文山街1-20號", "【樂善妍社區】", "文化一路366號（雙）、368號（雙）、368之1-368之9"], "tag": "由原樂善里1、19鄰調整" },
+            { "village": "文樂里", "neighborhoods": [6], "streets": ["文化一路370號（雙）、370之1-370之7、372號（雙）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [7], "streets": ["文化一路386-388（雙）", "樂善二路221、223、203-219（單）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [8], "streets": ["樂善二路185-201（單）、181-183（單）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [9], "streets": ["樂善三路85-109（單）、111-149（單）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [10], "streets": ["樂善三路151-175（單）", "樂善二路153-167（單）、139-151（單）", "樂善三路177-191（單）", "樂善二路169號"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [11], "streets": ["文化一路512巷66之1號、66之2號及66號（雙）", "樂善二路316-326（雙）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [12], "streets": ["文化一路662-668（雙）", "文學路49-55（單）、31-47（單）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "文樂里", "neighborhoods": [13], "streets": ["文學路13-29（單）、1-11（單）", "文化一路512巷25-69（單）", "文化一路688號(機捷體育大學A7站)、248之6號", "樂善街346之1號", "樂善街206巷43號、45之1號、45之7號、51之1號、59之1號、61號、65號"], "tag": "由原樂善里1、6鄰調整" },
+            { "village": "文桃里", "neighborhoods": [1], "streets": ["文桃路426號、428號", "文華路18號", "文信路286號、288號、329、389號", "文工一路220-618（雙）、527-539（單）", "文工一路298巷(全部單雙號含各樓層)", "文桃路476巷18-42", "文桃路36之8號（雙）", "文南路85-286（雙）", "文桃路192-262"], "tag": "由原樂善里9、5鄰調整" },
+            { "village": "文桃里", "neighborhoods": [2], "streets": ["文桃路123-155（單）、131之1號、147之1號、147之2號、263-273（單）", "文桃路121巷31之7號", "文桃路235-251（單）"], "tag": "由原樂善里5鄰調整" },
+            { "village": "文桃里", "neighborhoods": [3], "streets": ["樂善二路513-543（單）", "文吉路31、33", "文工一路27、29"], "tag": "由原樂善里4鄰調整" },
+            { "village": "文桃里", "neighborhoods": [4], "streets": ["文桃路339-365（單）"], "tag": "由原樂善里4鄰調整" },
+            { "village": "文桃里", "neighborhoods": [5], "streets": ["樂善二路477-511（單）", "文吉路28號", "文桃路399號"], "tag": "由原樂善里4鄰調整" },
+            { "village": "文桃里", "neighborhoods": [6], "streets": ["文桃路419-435（單）", "樂善二路427-457（單）"], "tag": "由原樂善里4鄰調整" },
+            { "village": "文桃里", "neighborhoods": [7], "streets": ["文桃路437-447（單）"], "tag": "由原樂善里4鄰調整" },
+            { "village": "文桃里", "neighborhoods": [8], "streets": ["牛角坡路29-51（單）、27之1號", "文桃路489-493（單）"], "tag": "由原樂善里4、2鄰調整" },
+            { "village": "文桃里", "neighborhoods": [9], "streets": ["樂善二路341-395（單）", "牛角坡路58號", "樂善一路1-99（單雙）、500之1號"], "tag": "由原樂善里2鄰調整" },
+            { "village": "文桃里", "neighborhoods": [10], "streets": ["樂善二路778號(文青國中小)、778之1號(文青幼兒園)、818-830", "文吉路115-133（單）、116-146（雙）、116之1號", "樂善二路816號", "文吉路111、113"], "tag": "由原樂善里3、4鄰調整" },
+            { "village": "文桃里", "neighborhoods": [11], "streets": ["牛角坡路115-135（單）、91-109（單）", "樂善二路650號、652號（雙）"], "tag": "由原樂善里3鄰調整" },
+            { "village": "文桃里", "neighborhoods": [12], "streets": ["樂善二路518-580（雙）"], "tag": "由原樂善里2鄰調整" },
+            { "village": "文桃里", "neighborhoods": [13], "streets": ["牛角坡路252-290（雙）、163-177（單）"], "tag": "由原樂善里2鄰調整" },
+            { "village": "文桃里", "neighborhoods": [14], "streets": ["樂善一路250-276（雙）", "牛角坡路300-316（雙）"], "tag": "由原樂善里2鄰調整" },
+            { "village": "文桃里", "neighborhoods": [15], "streets": ["樂善一路269-295（單）、297-323（單）", "樂善二路458-468（雙）"], "tag": "由原樂善里2鄰調整" },
+            { "village": "樂善里", "neighborhoods": [1], "streets": ["樂善三路2-56（雙）", "文化一路90-100（雙）、88號"], "tag": "由原樂善里1鄰調整" },
+            { "village": "樂善里", "neighborhoods": [2], "streets": ["樂善三路62-88（雙）", "華亞三路39巷49-55（單）"], "tag": "由原樂善里1鄰調整" },
+            { "village": "樂善里", "neighborhoods": [3], "streets": ["華亞三路39巷1-47（單）", "華亞三路35號、37號"], "tag": "由原樂善里1鄰調整" },
+            { "village": "樂善里", "neighborhoods": [4], "streets": ["文化二路506-522（雙）、526-528（雙）", "華亞三路39巷36-78（雙）"], "tag": "由原樂善里6鄰調整" },
+            { "village": "樂善里", "neighborhoods": [5], "streets": ["文化二路466-502（雙）", "樂善二路101-119（單）"], "tag": "由原樂善里6鄰調整" },
+            { "village": "樂善里", "neighborhoods": [6], "streets": ["樂善三路100-110（雙）、112-118（雙）", "樂善街206巷72、90"], "tag": "由原樂善里6鄰調整" },
+            { "village": "樂善里", "neighborhoods": [7], "streets": ["樂學路111-149（單）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "樂善里", "neighborhoods": [8], "streets": ["樂學路99-109（單）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "樂善里", "neighborhoods": [9], "streets": ["樂學路95、97", "樂學一路122-128（雙）", "文達路270-322（雙）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "樂善里", "neighborhoods": [10], "streets": ["文達路233-235（單）", "樂學二路46-50（雙）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "樂善里", "neighborhoods": [11], "streets": ["樂學一路56-78（雙）", "樂學二路52-70（雙）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "樂善里", "neighborhoods": [15], "streets": ["文明路2號、6號(無人設籍)、13-51", "文明路29巷8號(無人設籍)", "文德二路6號、6之1號(無人設籍)、8之1號(無人設籍)", "文化一路1巷16-108（雙）", "文德二路1號"], "tag": "由原樂善里17、22、23、28鄰調整" },
+            { "village": "樂善里", "neighborhoods": [16], "streets": ["文德二路5-9（單）", "文德二路11巷7號"], "tag": "由原樂善里22鄰調整" },
+            { "village": "樂善里", "neighborhoods": [17], "streets": ["文康街7號、12-20（雙）、28-30（雙）、36-42（雙）、37-39（單）、51-53（單）", "文明路2號、6號(無人設籍)、13-51", "文明路29巷8號(無人設籍)"], "tag": "由原樂善里17鄰調整" },
+            { "village": "樂善里", "neighborhoods": [22], "streets": ["文德二路18號(無人設籍)、5-9（單）", "文德二路11巷7號"], "tag": "由原樂善里22鄰調整" },
+            { "village": "樂善里", "neighborhoods": [23], "streets": ["文德二路90-122（雙）、39號、80號、88號", "文德二路116巷2、8、12、14號", "文德二路6號、6之1號(無人設籍)、8之1號(無人設籍)"], "tag": "由原樂善里23鄰調整" },
+            { "village": "樂善里", "neighborhoods": [28], "streets": ["文德二路1號、3號", "文德路12號", "文化一路1巷16-108（雙）"], "tag": "由原樂善里28鄰調整" },
+            { "village": "樂善里", "neighborhoods": [29], "streets": ["華亞三路41號", "文化二路515之1號"], "tag": "由原樂善里29、6鄰調整" },
+            { "village": "樂善里", "neighborhoods": [30], "streets": ["樂學三路71-99（單）", "樂學路339巷1、3號"], "tag": "由原樂善里11鄰調整" },
+            { "village": "樂善里", "neighborhoods": [31], "streets": ["樂學三路63-67（單）", "樂學三路69巷1-35（單）", "樂學路339巷2號(樂善國小)", "339巷35號(樂善市民活動中心)", "文明路135號(顯安嚴)、135之1號、155號"], "tag": "由原樂善里11鄰調整" },
+            { "village": "樂善里", "neighborhoods": [32], "streets": ["文德二路138巷", "文德二路123-157（單）", "文德二路130-160（雙）", "樂學三路88號、90號、92號", "文達路293-299（單）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "樂善里", "neighborhoods": [33], "streets": ["文化一路87-89、87-1", "樂學一路3-29（單）"], "tag": "由原樂善里7鄰調整" },
+            { "village": "文青里", "neighborhoods": [1], "streets": ["【麗寶社區】", "文青路383號", "文青路395巷3號、28之1號"], "tag": "由原文青里36、4鄰調整" },
+            { "village": "文青里", "neighborhoods": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "streets": ["【麗寶社區】詳細門牌請查社區登記資料"], "tag": "麗寶社區新編鄰別" },
+            { "village": "文青里", "neighborhoods": [12, 13, 14, 15, 16, 17, 18, 19], "streets": ["【遠雄文青社區】詳細門牌請查社區登記資料"], "tag": "遠雄文青社區新編鄰別" },
+            { "village": "文青里", "neighborhoods": [20, 21, 22, 23, 24], "streets": ["【名軒社區】詳細門牌請查社區登記資料"], "tag": "名軒社區新編鄰別" },
+            { "village": "文青里", "neighborhoods": [26, 27], "streets": ["文青路227號", "【遠雄新未來一期】", "【新未來社區】"], "tag": "新未來社區新編鄰別" },
+            { "village": "文青里", "neighborhoods": [28], "streets": ["【遠雄新未來二期】詳細門牌請查社區登記資料"], "tag": "新未來二期社區新編鄰別" },
+            { "village": "文藝里", "neighborhoods": [3], "streets": ["文藝街61-97（單）、36、36-1、101號", "文青二路238巷29-5", "文青二路138號"], "tag": "由原文青里4鄰調整" },
+            { "village": "文藝里", "neighborhoods": [4], "streets": ["文青二路98-116（雙）、6-58（雙）", "青山路二段536之6號", "文青路198號", "文化一路257之1號"], "tag": "由原文青里4鄰調整" },
+            { "village": "文藝里", "neighborhoods": [5], "streets": ["文青二路218-236（雙）"], "tag": "由原文青里46鄰調整" },
+            { "village": "文藝里", "neighborhoods": [6], "streets": ["文青二路188-216（雙）"], "tag": "由原文青里46鄰調整" },
+            { "village": "文藝里", "neighborhoods": [9, 10, 11, 12, 13, 14, 15], "streets": ["【皇翔歡喜城社區】詳細門牌請查社區登記資料"], "tag": "皇翔歡喜城社區新編鄰別" },
+            { "village": "文藝里", "neighborhoods": [17, 18], "streets": ["文青路335號", "【麗寶快樂家社區】"], "tag": "由原文青里14、15鄰調整" },
+            { "village": "長庚里", "neighborhoods": [1], "streets": ["文德路108號"], "tag": "由原樂善里28鄰調整" },
+            { "village": "長庚里", "neighborhoods": [2, 3, 4, 5, 24], "streets": ["文化二路386號及周邊", "長庚醫護新村"], "tag": "長庚里核心區域" }
+        ];
+
+        // 智慧解析引擎
+        function searchVillage(input) {
+            const cleanedInput = input.replace(/^\d{3,5}\s*/, '').replace(/台灣|臺灣|桃園市|桃園縣|龜山區|龜山鄉|林口區|林口鄉/g, '').trim();
+            if (!cleanedInput) return [];
+            let parsedStreet = "";
+            let parsedNum = null;
+            const match = cleanedInput.match(/([一-龥]+(?:路|街|大道|段))((?:\d+巷)?(?:\d+弄)?)(?:\s*(\d+)(?:[~-～－]\d+)?\s*(?:號|之))?/);
+            if (match) {
+                parsedStreet = match[1];
+                if (match[2]) parsedStreet += match[2].trim();
+                if (match[3]) parsedNum = parseInt(match[3], 10);
+            } else {
+                parsedStreet = cleanedInput.replace(/\d+[~-～－]?\d*號?/, '').trim();
+            }
+            let strongMatches = [];
+            let weakMatches = [];
+            for (const item of VILLAGE_DATA) {
+                if (item.village === cleanedInput || item.village.replace('里', '') === cleanedInput) {
+                    strongMatches.push({ ...item, matchType: 'village' });
+                    continue;
+                }
+                if (item.tag && (item.tag.includes(cleanedInput) || cleanedInput.includes(item.tag.replace(/相關社區|社區/g, '')))) {
+                    strongMatches.push({ ...item, matchType: 'tag' });
+                    continue;
+                }
+                for (const streetStr of item.streets) {
+                    if (!streetStr.includes(parsedStreet)) continue;
+                    if (!parsedStreet.includes("巷") && (new RegExp(parsedStreet + "\\d+巷")).test(streetStr)) continue;
+                    if (parsedNum !== null) {
+                        let isMatch = false;
+                        const hasGlobalEven = (streetStr.match(/雙/g) || []).length > 0 && (streetStr.match(/單/g) || []).length === 0;
+                        const hasGlobalOdd = (streetStr.match(/單/g) || []).length > 0 && (streetStr.match(/雙/g) || []).length === 0;
+                        const rangeRegex = /(\d+)\s*(?:號)?\s*(?:至|~|-|～|－)\s*(\d+)\s*(?:號)?(?:[^0-9,，]{0,10}?(單|雙))?/g;
+                        let rMatch;
+                        let rangeFound = false;
+                        while ((rMatch = rangeRegex.exec(streetStr)) !== null) {
+                            rangeFound = true;
+                            let start = parseInt(rMatch[1], 10);
+                            let end = parseInt(rMatch[2], 10);
+                            if (start > end) { let temp = start; start = end; end = temp; }
+                            if (parsedNum >= start && parsedNum <= end) {
+                                const isEven = parsedNum % 2 === 0;
+                                const localModifier = rMatch[3];
+                                const requiresEven = localModifier === '雙' || (!localModifier && hasGlobalEven);
+                                const requiresOdd = localModifier === '單' || (!localModifier && hasGlobalOdd);
+                                if (requiresEven && !isEven) continue;
+                                if (requiresOdd && isEven) continue;
+                                isMatch = true;
+                                break;
+                            }
+                        }
+                        if (isMatch) {
+                            strongMatches.push({ ...item, matchType: 'condition', matchedRule: streetStr });
+                            continue;
+                        }
+                        if (!rangeFound || !isMatch) {
+                            const stringWithoutRanges = streetStr.replace(/(\d+)\s*(?:號)?\s*(?:至|~|-|～|－)\s*(\d+)\s*(?:號)?/g, '');
+                            const exactRegex = /(\d+)/g;
+                            let exactMatch;
+                            while ((exactMatch = exactRegex.exec(stringWithoutRanges)) !== null) {
+                                if (parseInt(exactMatch[0], 10) === parsedNum) {
+                                    isMatch = true;
+                                    break;
+                                }
+                            }
+                            if (!isMatch && !rangeFound) {
+                                if (hasGlobalEven && parsedNum % 2 === 0) isMatch = true;
+                                if (hasGlobalOdd && parsedNum % 2 === 1) isMatch = true;
+                            }
+                            const hasNumbers = /\d/.test(streetStr.replace(/第\d+鄰/g, ''));
+                            if (!hasNumbers) {
+                                strongMatches.push({ ...item, matchType: 'street_only', matchedRule: streetStr });
+                                continue;
+                            }
+                            if (isMatch) strongMatches.push({ ...item, matchType: 'condition', matchedRule: streetStr });
+                            else weakMatches.push({ ...item, matchType: 'street_only', matchedRule: streetStr });
+                        }
+                    } else {
+                        weakMatches.push({ ...item, matchType: 'street_only', matchedRule: streetStr });
+                    }
+                }
+            }
+            const uniqueStrong = [];
+            const seen = new Set();
+            const hasConditionMatch = strongMatches.some(m => m.matchType === 'condition' || m.matchType === 'tag' || m.matchType === 'village');
+            const filteredStrong = hasConditionMatch ? strongMatches.filter(m => m.matchType !== 'street_only') : strongMatches;
+            for (const match of filteredStrong) {
+                const key = match.village + (match.neighborhoods ? match.neighborhoods.join(',') : '');
+                if (!seen.has(key)) { seen.add(key); uniqueStrong.push(match); }
+            }
+            return uniqueStrong.length > 0 ? uniqueStrong : weakMatches;
+        }
+
+        function checkSchoolDistrict() {
+            const inputEl = document.getElementById('school-address-input');
+            const msgBox = document.getElementById('school-result');
+            if (!inputEl || !msgBox) return;
+            const input = inputEl.value.trim();
+            if (!input) {
+                msgBox.innerHTML = '<div class="bg-red-50 text-red-500 text-sm font-bold p-4 rounded-xl border border-red-200 flex items-center justify-center w-full h-full shadow-sm"><i class="fa-solid fa-circle-exclamation mr-2 text-lg"></i>請輸入地址或路名！</div>';
+                msgBox.classList.remove('hidden');
+                resetSchoolHighlight();
+                return;
+            }
+
+            const results = searchVillage(input);
+            let newVillage = "";
+            let neighborhood = null;
+            let found = results.length > 0;
+            let isPrecise = false;
+
+            if (found) {
+                isPrecise = results.some(r => r.matchType === 'condition' || r.matchType === 'tag' || r.matchType === 'village');
+                if (isPrecise) {
+                    const preciseMatch = results.find(r => r.matchType === 'condition' || r.matchType === 'tag' || r.matchType === 'village');
+                    newVillage = preciseMatch.village;
+                    if (preciseMatch.neighborhoods && preciseMatch.neighborhoods.length === 1) {
+                        neighborhood = preciseMatch.neighborhoods[0];
+                    }
+                } else {
+                    const uniqueVillages = [...new Set(results.map(r => r.village))];
+                    if (uniqueVillages.length === 1) newVillage = uniqueVillages[0];
+                    else newVillage = "AMBIGUOUS";
+                }
+            } else {
+                const cleanedInput = input.replace(/桃園市|龜山區|林口區/g, '').trim();
+                if (cleanedInput.includes('文青') || cleanedInput.includes('文藝') || cleanedInput.includes('青山路')) { newVillage = '文青里'; }
+                else if (cleanedInput.includes('文桃') || cleanedInput.includes('體大') || cleanedInput.includes('牛角坡路') || cleanedInput.includes('樂善一路') || cleanedInput.includes('文信路')) { newVillage = '文桃里'; }
+                else if (cleanedInput.includes('樂善') || cleanedInput.includes('文樂')) { newVillage = '樂善里'; }
+                else if (cleanedInput.includes('長樂') || cleanedInput.includes('長慶')) { newVillage = '長樂里'; }
+                else if (cleanedInput.includes('文德二路')) { newVillage = '樂善里'; }
+                else if (cleanedInput.includes('長庚') || cleanedInput.includes('文德')) { newVillage = '長庚里'; }
+            }
+
+            if (newVillage === "AMBIGUOUS") {
+                msgBox.innerHTML = `
+                    <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200 shadow-sm flex flex-col items-center justify-center text-center h-full w-full">
+                        <div class="text-sm text-gray-600 font-bold mb-1"><i class="fa-solid fa-triangle-exclamation text-orange-500 mr-1.5"></i>此路段涵蓋多個學區</div>
+                        <div class="text-[11px] text-gray-500 font-bold leading-relaxed">由於政府尚未公告詳細門牌，無法精確定位您的學區。<br>請向戶政機關或學校確認。</div>
+                    </div>
+                `;
+                msgBox.classList.remove('hidden');
+                resetSchoolHighlight();
+                return;
+            }
+
+            let schoolResult = "";
+            let isFree = false;
+
+            if (newVillage === '文青里' || newVillage === '文藝里') {
+                schoolResult = "文青國中小、大埔國小";
+                isFree = true;
+            } else if (newVillage === '文桃里') {
+                schoolResult = "文青國中小";
+            } else if (newVillage === '樂善里' || newVillage === '文樂里') {
+                schoolResult = "樂善國小、文青國中小";
+                isFree = true;
+            } else if (newVillage === '長樂里') {
+                if (neighborhood !== null && neighborhood >= 10 && neighborhood <= 21) {
+                    schoolResult = "樂善國小、長庚國小";
+                    isFree = true;
+                } else if (neighborhood !== null && neighborhood >= 1 && neighborhood <= 9) {
+                    schoolResult = "樂善國小、文青國中小";
+                    isFree = true;
+                } else {
+                    schoolResult = "需確認確切鄰別 (1-9鄰為樂善/文青；10-21鄰為樂善/長庚)";
+                    isFree = true;
+                }
+            } else if (newVillage === '長庚里') {
+                schoolResult = "長庚國小";
+            }
+
+            if (schoolResult) {
+                msgBox.innerHTML = `
+                    <div class="bg-white rounded-xl p-4 border border-blue-200 shadow-sm flex flex-col items-center justify-center text-center h-full w-full">
+                        <div class="text-xs text-blue-500 font-bold mb-1">根據最新區劃 (${newVillage}${neighborhood ? ' ' + neighborhood + '鄰' : ''})</div>
+                        <div class="text-lg md:text-xl font-black text-blue-800 mb-2 flex items-center justify-center flex-wrap gap-2">
+                            ${schoolResult}
+                            ${isFree ? `<span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded border border-blue-200 shadow-sm ml-1"><i class="fa-solid fa-check text-blue-400 mr-1"></i>自由學區</span>` : ''}
+                        </div>
+                        <div class="text-[11px] text-gray-500 font-bold max-w-sm border-t border-gray-100 pt-2 mt-1 w-full">※ 實際入學資格與分發順序仍以當地學校當年度審查為準。</div>
+                    </div>
+                `;
+                highlightSchoolsByVillage(newVillage);
+            } else {
+                msgBox.innerHTML = `
+                    <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200 shadow-sm flex flex-col items-center justify-center text-center h-full w-full">
+                        <div class="text-sm text-gray-600 font-bold"><i class="fa-solid fa-circle-exclamation text-yellow-500 mr-1.5"></i>無法精確判斷此地址的學區</div>
+                        <div class="text-xs text-gray-500 mt-1">請輸入包含鄰別或完整路段門牌 (如: 文青路100號)，或參考下方總表。</div>
+                    </div>
+                `;
+                resetSchoolHighlight();
+            }
+            msgBox.classList.remove('hidden');
+        }
+
+        function highlightSchoolsByVillage(village) {
+            const schoolCards = document.querySelectorAll('#school .group');
+            let found = false;
+            schoolCards.forEach(card => {
+                const text = card.textContent;
+                if (text.includes(village) || text.includes(village.replace('里', ''))) {
+                    card.classList.add('ring-4', 'ring-themeBlue', 'ring-offset-2');
+                    card.classList.remove('opacity-50');
+                    found = true;
+                } else {
+                    card.classList.remove('ring-4', 'ring-themeBlue', 'ring-offset-2');
+                    card.classList.add('opacity-50');
+                }
+            });
+
+            // 同步高亮右側學區表格對應的行政里別列
+            const tableRows = document.querySelectorAll('#village-district-tbody tr[data-village]');
+            tableRows.forEach(row => {
+                if (row.getAttribute('data-village') === village) {
+                    row.classList.add('bg-blue-50/90', 'ring-2', 'ring-inset', 'ring-blue-400');
+                } else {
+                    row.classList.remove('bg-blue-50/90', 'ring-2', 'ring-inset', 'ring-blue-400');
+                }
+            });
+
+            if (!found && village !== "AMBIGUOUS") {
+                const msgEl = document.getElementById('school-result');
+                if (msgEl) {
+                    const originalHtml = msgEl.innerHTML;
+                    msgEl.innerHTML = originalHtml + `<div class="mt-3 pt-3 border-t border-blue-100 text-sky-500 font-bold text-sm"><i class="fa-solid fa-circle-exclamation mr-1.5"></i>目前清單中尚無明確標示屬於「${village}」的學區，建議直接聯繫區公所確認喔！</div>`;
+                }
+            }
+        }
+
+
+        function resetSchoolHighlight() {
+            const schoolCards = document.querySelectorAll('#school .group');
+            schoolCards.forEach(card => { card.classList.remove('ring-4', 'ring-themeBlue', 'ring-offset-2', 'opacity-50'); });
+            const tableRows = document.querySelectorAll('#village-district-tbody tr[data-village]');
+            tableRows.forEach(row => { row.classList.remove('bg-blue-50/90', 'ring-2', 'ring-inset', 'ring-blue-400'); });
+        }
+
+        /**
+         * --- GA 與導覽優化：根據 Hashtag 動態更換標題 ---
+         */
+        const hubTitleMap = {
+            'section-dashboard': '儀表板總覽',
+            'section-medical': '醫療院所資訊',
+            'section-education-hall': '教育學習殿堂',
+            'section-emergency': '救護與緊急通報'
+        };
+
+        function syncTitleWithHash() {
+            const hash = window.location.hash.replace('#', '');
+            if (hubTitleMap[hash]) {
+                document.title = `A7 Club | 生活通 | ${hubTitleMap[hash]}`;
+            } else {
+                document.title = 'A7 Club | 生活通 - 醫療、教育、緊急救援';
+            }
+        }
+
+        window.addEventListener('hashchange', syncTitleWithHash);
+        window.addEventListener('load', syncTitleWithHash);
+
+        // 🌟 全域關鍵字高亮與捲動邏輯
+        function highlightAndScrollTo(query) {
+            if (!query) return;
+            const q = query.toLowerCase();
+            const safeQ = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const matches = [];
+            while (node = walker.nextNode()) {
+                const text = node.textContent;
+                const parent = node.parentElement;
+                if (text.toLowerCase().includes(q) && !['SCRIPT', 'STYLE', 'NAV', 'FOOTER', 'HEADER', 'BUTTON', 'I'].includes(parent.tagName)) {
+                    matches.push(node);
+                }
+            }
+
+            if (matches.length > 0) {
+                const firstMatch = matches[0];
+                const parent = firstMatch.parentElement;
+                let p = parent;
+                while (p && p !== document.body) {
+                    if (p.tagName === 'DETAILS') p.open = true;
+                    p = p.parentElement;
+                }
+                const text = firstMatch.textContent;
+                const regex = new RegExp(`(${safeQ})`, 'gi');
+                const span = document.createElement('span');
+                span.innerHTML = text.replace(regex, '<mark class="bg-yellow-200 text-gray-900 px-1 rounded shadow-sm font-black">$1</mark>');
+                parent.replaceChild(span, firstMatch);
+                setTimeout(() => {
+                    span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 800);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get('search');
+            if (query) {
+                setTimeout(() => highlightAndScrollTo(query), 1200);
+            }
+
+            const addressQuery = params.get('address');
+            if (addressQuery) {
+                const schoolInput = document.getElementById('school-address-input');
+                if (schoolInput) {
+                    schoolInput.value = addressQuery;
+                    setTimeout(() => {
+                        checkSchoolDistrict();
+                    }, 500);
+                }
+            }
+        });
+
+        // 🌟 捲動並開啟醫療分類面板
+        function scrollToMedicalCategory(keyword) {
+            const keywords = Array.isArray(keyword) ? keyword : [keyword];
+            
+            if (globalMedicalData) {
+                const grouped = {};
+                globalMedicalData.forEach(i => {
+                    const catName = i.category || '一般/其他醫療';
+                    if (!grouped[catName]) grouped[catName] = [];
+                    grouped[catName].push(i);
+                });
+                
+                const cats = Object.keys(grouped);
+                for (let c of cats) {
+                    if (keywords.some(k => c.includes(k))) {
+                        setMedicalFilter(c);
+                        setTimeout(() => {
+                            const target = document.getElementById('medical-list-container');
+                            if (target) {
+                                const headerOffset = 150;
+                                const elementPosition = target.getBoundingClientRect().top;
+                                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                            }
+                        }, 100);
+                        break;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
