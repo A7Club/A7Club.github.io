@@ -146,106 +146,106 @@
 
     <!-- 🎪 導航列 (延續品牌懸浮膠囊風格) -->
     <nav class="sticky top-3 z-40 mx-4 sm:mx-8 lg:mx-auto max-w-6xl">
+<body class="text-gray-700 antialiased min-h-screen flex flex-col relative">
+
+    <!-- 🎪 導航列 -->
+    <nav class="sticky top-4 z-40 mx-4 sm:mx-8 lg:mx-auto max-w-6xl">
         <div
-            class="bg-white/90 backdrop-blur-md rounded-full shadow-cute px-5 py-2.5 flex justify-between items-center border border-slate-200/80">
-            <div class="flex items-center cursor-pointer gap-2.5" onclick="window.location.href='index.html'">
+            class="bg-white/90 backdrop-blur-md rounded-full shadow-cute px-6 py-3 flex justify-between items-center border-2 border-white">
+            <div class="flex items-center cursor-pointer gap-2" onclick="window.location.href='index.html'">
                 <div
-                    class="w-9 h-9 bg-themeYellow rounded-full flex items-center justify-center text-white text-lg shadow-inner">
+                    class="w-10 h-10 bg-themeYellow rounded-full flex items-center justify-center text-white text-xl shadow-inner">
                     <i class="fa-solid fa-mountain-city"></i>
                 </div>
-                <span class="font-black text-xl tracking-wide text-themePink">A7<span
-                        class="text-themePurple">柒</span><span class="text-themeBlue">樂部</span></span>
+                <span class="font-black text-2xl tracking-wide text-themePink">A7<span
+                        class="text-themePurple">柒</span><span class="text-themeBlue">樂部　</span></span>
             </div>
 
-            <div class="hidden md:flex items-center space-x-1.5">
+            <div class="hidden md:flex space-x-2">
                 <button onclick="window.location.href='index.html#food'"
-                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-themePink hover:text-white transition-all">🍿
+                    class="nav-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-themePink hover:text-white transition-all">🍿
                     找美食</button>
                 <button onclick="window.location.href='index.html#shopping'"
-                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-themeYellow hover:text-white transition-all">🛍️
+                    class="nav-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-themeYellow hover:text-white transition-all">🛍️
                     買東西</button>
                 <button onclick="window.location.href='lifehub.html'" id="nav-btn-home"
-                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-black bg-themeGreen text-white shadow-sm transition-all">🩺
+                    class="nav-btn px-4 py-2 rounded-full font-black bg-themeGreen text-white shadow-md transform scale-105 transition-all">🩺
                     生活通</button>
                 <a href="explore.html"
-                    class="nav-btn px-4 py-1.5 rounded-full text-sm font-bold text-slate-500 hover:bg-themePurple hover:text-white transition-all">🎠
+                    class="nav-btn px-4 py-2 rounded-full font-bold text-gray-500 hover:bg-themePurple hover:text-white transition-all">🎠
                     探索柒</a>
             </div>
 
             <div class="md:hidden">
                 <button onclick="toggleMobileMenu()"
-                    class="text-themePink text-xl focus:outline-none w-9 h-9 bg-pink-50 rounded-full flex items-center justify-center">
+                    class="text-themePink text-2xl focus:outline-none w-10 h-10 bg-pink-50 rounded-full flex items-center justify-center">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
 
         <div id="mobile-menu"
-            class="hidden absolute top-full right-0 mt-2 bg-white rounded-3xl shadow-cute p-4 border border-pink-100 flex-col space-y-2 text-center z-50 w-48">
+            class="hidden absolute top-full right-0 mt-2 bg-white rounded-3xl shadow-cute p-5 border-2 border-pink-100 flex-col space-y-3 text-center z-50 w-max min-w-[200px]">
             <a href="index.html#food" onclick="toggleMobileMenu()"
-                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-themePink bg-pink-50/70 flex items-center justify-center gap-2">🍿
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-themePink bg-pink-50 shadow-sm active:scale-95 transition-transform flex items-center justify-center">🍿
                 美食販賣部</a>
             <a href="index.html#shopping" onclick="toggleMobileMenu()"
-                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-amber-500 bg-yellow-50/70 flex items-center justify-center gap-2">🛍️
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-themeYellow bg-yellow-50 shadow-sm active:scale-95 transition-transform flex items-center justify-center">🛍️
                 生活補給站</a>
             <a href="lifehub.html" onclick="toggleMobileMenu()"
-                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-white bg-themeGreen flex items-center justify-center gap-2">🩺
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-white bg-themeGreen shadow-sm active:scale-95 transition-transform flex items-center justify-center">🩺
                 安心支援所</a>
             <a href="explore.html" onclick="toggleMobileMenu()"
-                class="w-full py-2.5 px-4 rounded-2xl font-black text-sm text-themePurple bg-purple-50/70 flex items-center justify-center gap-2">🎠
+                class="w-full py-4 px-6 rounded-2xl font-black text-xl tracking-wider text-themePurple bg-purple-50 shadow-sm active:scale-95 transition-transform flex items-center justify-center">🎠
                 探索在地A7</a>
         </div>
     </nav>
 
     <!-- 🎈 動態內容容器 -->
-    <main id="app-root" class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-6 relative">
+    <main id="app-root" class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 relative">
         <!-- JS 將會注入內容 -->
     </main>
 
     <!-- 頁腳 -->
-    <footer class="bg-white border-t border-slate-200/70 py-6 text-center mt-auto">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <h2 class="text-sm font-black text-slate-700 flex items-center gap-2">
-                <span class="text-themePink">🎈 A7 柒樂部</span>
-                <span class="text-slate-300">|</span>
-                <span class="text-slate-500 font-bold">林口、龜山美食機能生活地圖指南</span>
-            </h2>
-            <p class="text-slate-400 text-xs font-bold">讓每天的生活都像在遊樂園一樣精彩！© 2026</p>
-        </div>
+    <footer class="bg-white border-t-4 border-dashed border-pink-200 py-8 text-center mt-auto rounded-t-[3rem]">
+        <h2 class="text-xl font-black text-themePink mb-2">🎈 林口、龜山美食機能生活地圖指南 </h2>
+        <p class="text-gray-400 text-sm font-bold">讓每天的生活都像在遊樂園一樣精彩！© 2026</p>
     </footer>
 
     <!-- 🧩 頁面模板區 -->
 
     <!-- 🏠 新首頁模板 -->
     <template id="tpl-home">
-        <div class="fade-in space-y-10">
+        <div class="fade-in">
+            <!-- 頂部主標題 (與首頁及其他分頁完全一致) -->
+            <div class="flex items-center mb-6">
+                <div
+                    class="w-12 h-12 bg-themeGreen text-white rounded-2xl flex items-center justify-center text-2xl mr-4 transform rotate-3 shadow-md">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <h2 class="text-2xl font-black text-themeGreen">安心支援所 <span
+                        class="text-lg text-gray-400 font-bold ml-2">公共與生活服務</span></h2>
+            </div>
 
-            <!-- 🌟 安心支援所頂部區塊：左搜尋 ＋ 右側「救護警消大主卡 + 醫療/教育上下雙卡」 -->
+            <!-- 🌟 安心支援所頂部儀表板：左搜尋 ＋ 右側「救護警消大主卡 + 醫療/教育上下雙卡」 -->
             <section id="section-dashboard"
-                class="relative overflow-hidden rounded-[2rem] bg-white p-5 sm:p-7 border border-slate-200/80 shadow-cute">
+                class="relative overflow-hidden rounded-[2rem] bg-white p-5 sm:p-7 border border-slate-200/80 shadow-cute mb-12">
                 
                 <!-- 背景柔和光暈裝飾 -->
                 <div class="absolute -top-24 -left-24 w-72 h-72 bg-rose-100/40 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute -bottom-24 -right-24 w-80 h-80 bg-emerald-100/40 rounded-full blur-3xl pointer-events-none"></div>
 
                 <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                    <!-- 左側 (5/12)：品牌標題 ＋ 萬用快速檢索框 -->
-                    <div class="lg:col-span-5 flex flex-col justify-between gap-5">
-                        <div class="flex items-start gap-3.5">
-                            <div class="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-themeGreen to-emerald-500 text-white flex items-center justify-center text-2xl shadow-md shadow-emerald-500/20 shrink-0 rotate-2">
-                                <i class="fa-solid fa-heart-pulse"></i>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex items-center flex-wrap gap-2">
-                                    <h1 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">安心支援所</h1>
-                                    <span class="text-[11px] font-black bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200/80">
-                                        A7 公共與生活服務
-                                    </span>
-                                </div>
-                                <p class="text-xs sm:text-sm text-slate-500 font-bold leading-relaxed">
-                                    一站式整合 24H 警消災情、周邊特約醫療與國中小學區速查。
-                                </p>
-                            </div>
+                    <!-- 左側 (5/12)：服務導覽說明 ＋ 萬用快速檢索框 -->
+                    <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+                        <div class="space-y-1.5">
+                            <span class="inline-flex items-center gap-1.5 text-xs font-black bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full border border-emerald-200/80">
+                                <i class="fa-solid fa-compass"></i> A7 生活機能快速檢索
+                            </span>
+                            <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight pt-1">需要什麼在地支援？</h3>
+                            <p class="text-xs sm:text-sm text-gray-500 font-bold leading-relaxed">
+                                一站式整合 24H 警消據點、周邊特約醫療診所與國中小學區速查。
+                            </p>
                         </div>
 
                         <div class="bg-slate-50/90 p-3.5 sm:p-4 rounded-2xl border border-slate-200/80 space-y-2.5 shadow-inner">
@@ -431,8 +431,14 @@
             <!-- 🔥 主內容區塊 -->
             <div class="space-y-14 pb-8">
 
-                <!-- 1. 龜山區即時災情與救護動態 (派出所與消防隊已整合於上方主卡，此處專注呈現即時案件) -->
+                <!-- 1. 龜山區即時災情與救護動態 -->
                 <section id="section-emergency" class="scroll-mt-24 space-y-4">
+                    <div class="flex items-center justify-between px-2">
+                        <h3 class="text-2xl font-black text-red-500 flex items-center">
+                            <i class="fa-solid fa-truck-medical mr-3"></i> 救護與緊急通報
+                        </h3>
+                    </div>
+
                     <div id="emergency-live-col" class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
                         <div class="p-4 sm:px-6 border-b border-slate-100 bg-slate-50/60 flex flex-col xl:flex-row xl:items-center justify-between gap-3">
                             <div class="flex items-center flex-wrap gap-2.5">
@@ -440,7 +446,7 @@
                                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
                                     <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
                                 </span>
-                                <h3 class="text-base sm:text-lg font-black text-slate-800">龜山區即時災情與救護動態</h3>
+                                <h4 class="text-base sm:text-lg font-black text-slate-800">龜山區即時災情與救護動態</h4>
                                 <span id="tyfd-update-time" class="text-[11px] font-bold text-slate-500 bg-white px-2.5 py-0.5 rounded-md border border-slate-200/70">正在連線消防局官網...</span>
                             </div>
 
@@ -488,15 +494,10 @@
                 <section id="section-medical" class="scroll-mt-24 space-y-4">
                     
                     <!-- 標題與衛福部查詢列 -->
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-base shadow-inner">
-                                <i class="fa-solid fa-laptop-medical"></i>
-                            </div>
-                            <h3 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight">
-                                在地醫療與特約藥局
-                            </h3>
-                        </div>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
+                        <h3 class="text-2xl font-black text-themeGreen flex items-center">
+                            <i class="fa-solid fa-laptop-medical mr-3"></i> 在地醫療與特約藥局
+                        </h3>
 
                         <div class="flex items-center gap-2">
                             <!-- 診所即時關鍵字過濾 -->
@@ -527,12 +528,9 @@
 
                 <!-- 3. 教育學習殿堂 (完整保留您喜愛的學校展示區) -->
                 <div id="section-education-hall" class="scroll-mt-24">
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <h3 class="text-xl sm:text-2xl font-black text-blue-900 flex items-center">
-                            <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-base mr-2.5 shadow-inner">
-                                <i class="fa-solid fa-book-open-reader"></i>
-                            </div>
-                            教育學習殿堂
+                    <div class="flex items-center justify-between mb-5 px-2">
+                        <h3 class="text-2xl font-black text-blue-900 flex items-center">
+                            <i class="fa-solid fa-book-open-reader mr-3"></i> 教育學習殿堂
                         </h3>
                     </div>
 
@@ -1050,7 +1048,15 @@
 
         function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
-            if (menu) menu.classList.toggle('hidden');
+            if (menu) {
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    menu.classList.add('flex');
+                } else {
+                    menu.classList.remove('flex');
+                    menu.classList.add('hidden');
+                }
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => { handleRoute(); });
