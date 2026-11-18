@@ -991,22 +991,23 @@
                         <!-- 🛡️ 生活通：龜山即時災情與安全標語 -->
                         <div id="guishan-disaster-container" class="mt-4 pt-3.5 border-t border-dashed border-emerald-200/70 flex flex-col">
                             <div class="flex items-center justify-between mb-1.5 gap-2">
-                                <a href="lifehub.html" class="text-xs sm:text-sm font-black text-gray-600 hover:text-gray-800 transition-colors flex items-center group/title">
-                                    <i class="fa-solid fa-shield-heart text-gray-400 mr-1.5 text-xs group-hover/title:text-emerald-500 transition-colors"></i>
+                                <a href="https://www.tyfd.gov.tw/cht/index.php?act=caselist" target="_blank" title="前往桃園市政府消防局即時災情" class="text-xs sm:text-sm font-black text-gray-600 hover:text-red-500 transition-colors flex items-center group/title">
+                                    <i class="fa-solid fa-truck-medical text-gray-400 mr-1.5 text-xs group-hover/title:text-red-500 transition-colors"></i>
                                     龜山消防即時訊息
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-gray-300 group-hover/title:text-red-400 ml-1"></i>
                                 </a>
                                 <div class="flex items-center gap-1.5">
                                     <span id="disaster-status-badge" class="text-[11px] font-bold text-gray-400 flex items-center gap-1">
-                                        監測中...
+                                        連線消防局中...
                                     </span>
-                                    <button onclick="rotateSafetySlogans()" title="下一則標語" class="text-xs text-gray-400 hover:text-gray-600 px-1 py-0.5 rounded transition-colors cursor-pointer">
-                                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                    <button onclick="fetchGuishanDisasters()" title="立即同步最新災情" class="text-xs text-gray-400 hover:text-emerald-600 px-1 py-0.5 rounded transition-colors cursor-pointer">
+                                        <i id="disaster-refresh-icon" class="fa-solid fa-rotate text-[10px]"></i>
                                     </button>
                                 </div>
                             </div>
                             <div id="disaster-content-area" class="flex flex-col gap-2">
                                 <div class="py-1 text-gray-400 text-xs font-bold">
-                                    <i class="fa-solid fa-spinner fa-spin mr-1.5"></i>正在同步龜山區即時通報...
+                                    <i class="fa-solid fa-spinner fa-spin mr-1.5"></i>正在同步桃園市消防局即時案件...
                                 </div>
                             </div>
                         </div>
@@ -1747,7 +1748,10 @@
 
                         fetchRealtimeTransitData();
                         if (globalMrtFetchInterval) clearInterval(globalMrtFetchInterval);
-                        globalMrtFetchInterval = setInterval(fetchRealtimeTransitData, 60000);
+                        globalMrtFetchInterval = setInterval(() => {
+                            fetchRealtimeTransitData();
+                            fetchGuishanDisasters();
+                        }, 60000);
 
                         updateMRTStatus();
                         if (globalMrtInterval) clearInterval(globalMrtInterval);
@@ -2987,22 +2991,34 @@ function renderAllTransit() {
             // 有災情或事故時：特別使用紅色高對比樣式提醒
             if (window.activeGuishanAlerts && window.activeGuishanAlerts.length > 0) {
                 badge.className = 'text-[10px] sm:text-xs font-black bg-red-500 text-white px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-sm animate-pulse';
-                badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 災情與事故提醒 (' + window.activeGuishanAlerts.length + ')';
+                badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 龜山・坪頂即時案件 (' + window.activeGuishanAlerts.length + ')';
 
-                contentArea.innerHTML = window.activeGuishanAlerts.slice(0, 2).map(alert => `
-                    <a href="${alert.link || 'lifehub.html'}" target="${alert.link ? '_blank' : '_self'}" class="flex items-start gap-2.5 p-2.5 sm:p-3 rounded-xl bg-red-50 border-2 border-red-200 shadow-sm hover:bg-red-100/80 transition-colors">
-                        <div class="w-7 h-7 rounded-lg bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                            <i class="fa-solid fa-bell text-xs animate-bounce"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between gap-2">
-                                <span class="text-xs sm:text-sm font-black text-red-700 truncate">${alert.title}</span>
-                                <span class="text-[10px] text-red-500 font-bold shrink-0">${alert.time || '即時'}</span>
+                contentArea.innerHTML = `<div class="flex flex-col gap-2 max-h-[190px] overflow-y-auto pr-1">` + window.activeGuishanAlerts.map(alert => {
+                    const isProcessing = alert.status && (alert.status.includes('處理') || alert.status.includes('派遣') || alert.status.includes('出動') || alert.status.includes('途中') || alert.status.includes('到達'));
+                    const statusBadgeClass = isProcessing
+                        ? 'bg-red-600 text-white animate-pulse'
+                        : 'bg-red-100 text-red-700 border border-red-200';
+                    const iconClass = (alert.category && alert.category.includes('火')) ? 'fa-fire' : 'fa-truck-medical';
+
+                    return `
+                        <a href="https://www.tyfd.gov.tw/cht/index.php?act=caselist" target="_blank" class="flex items-start gap-2.5 p-2.5 rounded-xl bg-red-50 border-2 border-red-200 shadow-sm hover:bg-red-100/80 transition-colors">
+                            <div class="w-7 h-7 rounded-lg bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                                <i class="fa-solid ${iconClass} text-xs ${isProcessing ? 'animate-bounce' : ''}"></i>
                             </div>
-                            <p class="text-[11px] sm:text-xs text-red-600/90 font-bold line-clamp-2 mt-0.5 leading-snug">${alert.desc}</p>
-                        </div>
-                    </a>
-                `).join('');
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                                    <div class="flex items-center gap-1.5 min-w-0">
+                                        <span class="text-xs sm:text-sm font-black text-red-700 truncate">${alert.title}</span>
+                                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded ${statusBadgeClass} shrink-0">${alert.status || '通報'}</span>
+                                    </div>
+                                    <span class="text-[10px] text-red-500 font-bold font-mono shrink-0">${alert.time || '即時'}</span>
+                                </div>
+                                <p class="text-[11px] sm:text-xs text-red-800 font-black truncate mt-1"><i class="fa-solid fa-location-dot mr-1 text-red-500"></i>${alert.location}</p>
+                                <p class="text-[10px] sm:text-[11px] text-red-600/90 font-bold truncate mt-0.5"><i class="fa-solid fa-people-group mr-1 text-red-400"></i>派遣：${alert.unit}</p>
+                            </div>
+                        </a>
+                    `;
+                }).join('') + `</div>`;
             } else {
                 // 平常無災情時：移除背景色 highlight 與特殊符號，僅顯示單行簡單標題輪播
                 badge.className = 'text-[11px] font-bold text-gray-400 flex items-center gap-1.5';
@@ -3020,71 +3036,122 @@ function renderAllTransit() {
             }
         }
 
+        // 解析桃園市政府消防局即時災情 HTML 表格
+        function parseTyfdCases(htmlText) {
+            if (!htmlText || typeof htmlText !== 'string') return null;
+            if (!htmlText.includes('即時災情') && !htmlText.includes('發生時間') && !htmlText.includes('派遣分隊')) {
+                return null;
+            }
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            const cases = [];
+
+            const cleanCell = (td, label) => {
+                let txt = (td.textContent || '').replace(/\s+/g, ' ').trim();
+                return txt.replace(new RegExp('^' + label + '\\s*[:：]?\\s*'), '').trim();
+            };
+
+            const rows = doc.querySelectorAll('table tr');
+            rows.forEach(tr => {
+                const tds = tr.querySelectorAll('td');
+                if (tds.length >= 6) {
+                    const time = cleanCell(tds[0], '發生時間');
+                    const category = cleanCell(tds[1], '案類');
+                    const subType = cleanCell(tds[2], '案別');
+                    const location = cleanCell(tds[3], '發生地點');
+                    const unit = cleanCell(tds[4], '派遣分隊');
+                    const status = cleanCell(tds[5], '案件狀態');
+
+                    if (/\d{2}:\d{2}/.test(time) && (location || unit)) {
+                        cases.push({ time, category, subType, location, unit, status });
+                    }
+                }
+            });
+
+            // 純文字正規表達式備援解析
+            if (cases.length === 0) {
+                const textContent = (doc.body ? doc.body.textContent : htmlText).replace(/\s+/g, ' ');
+                const regex = /發生時間\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})\s*案類\s*([^\s]+)\s*案別\s*([^\s]+)\s*發生地點\s*([^\s]+)\s*派遣分隊\s*([^\s]+)\s*(?:案件狀態\s*)?([^\s]+)/g;
+                let match;
+                while ((match = regex.exec(textContent)) !== null) {
+                    cases.push({
+                        time: match[1].trim(),
+                        category: match[2].trim(),
+                        subType: match[3].trim(),
+                        location: match[4].trim(),
+                        unit: match[5].trim(),
+                        status: match[6].trim()
+                    });
+                }
+            }
+
+            return cases;
+        }
+
         async function fetchGuishanDisasters() {
             const contentArea = document.getElementById('disaster-content-area');
+            const refreshIcon = document.getElementById('disaster-refresh-icon');
             if (!contentArea) return;
+            if (refreshIcon) refreshIcon.classList.add('fa-spin');
 
-            // 先隨機挑選一組起始安全標語
-            window.currentSloganIndex = Math.floor(Math.random() * SAFETY_SLOGANS.length);
-            let collectedAlerts = [];
-
-            // 1. 嘗試連線國家災害防救科技中心 (NCDR) 桃園市/龜山區即時示警 RSS
-            try {
-                const rssUrl = encodeURIComponent('https://alerts.ncdr.nat.gov.tw/RssAtomFeed.ashx');
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`;
-                const res = await fetch(apiUrl);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.items && Array.isArray(data.items)) {
-                        const now = Date.now();
-                        const matched = data.items.filter(item => {
-                            const text = ((item.title || '') + ' ' + (item.description || '')).toLowerCase();
-                            const isGuishanOrTaoyuan = text.includes('龜山') || (text.includes('桃園') && (text.includes('大雨') || text.includes('豪雨') || text.includes('強風') || text.includes('濃霧') || text.includes('地震') || text.includes('停水') || text.includes('停電') || text.includes('道路')));
-                            const pubTime = item.pubDate ? new Date(item.pubDate).getTime() : now;
-                            const isRecent = (now - pubTime) < 12 * 60 * 60 * 1000; // 12小時內
-                            return isGuishanOrTaoyuan && isRecent;
-                        }).map(item => ({
-                            title: item.title || '龜山區即時防災通報',
-                            desc: (item.description || '').replace(/<[^>]+>/g, '').trim() || '請住戶留意周邊環境與自身安全。',
-                            time: item.pubDate ? new Date(item.pubDate).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }) : '即時',
-                            link: item.link || 'lifehub.html'
-                        }));
-                        collectedAlerts.push(...matched);
-                    }
-                }
-            } catch (e) {
-                console.warn('NCDR 災情讀取略過:', e);
+            if (typeof window.currentSloganIndex !== 'number') {
+                window.currentSloganIndex = Math.floor(Math.random() * SAFETY_SLOGANS.length);
             }
 
-            // 2. 同步檢查龜山區即時突發災情新聞 (火警、車禍阻塞、停水停電等)
-            if (collectedAlerts.length === 0) {
+            const targetUrl = 'https://www.tyfd.gov.tw/cht/index.php?act=caselist';
+
+            const fetchViaProxy = async (proxyUrl, isJson = false, timeoutMs = 8000) => {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs);
                 try {
-                    const kw = encodeURIComponent('龜山 AND (火警 OR 火災 OR 停水 OR 停電 OR 坍方 OR 封閉 OR 嚴重車禍 OR 災情)');
-                    const newsRss = encodeURIComponent(`https://news.google.com/rss/search?q=${kw}&hl=zh-TW&gl=TW&ceid=TW:zh-Hant`);
-                    const newsApi = `https://api.rss2json.com/v1/api.json?rss_url=${newsRss}`;
-                    const res = await fetch(newsApi);
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data && data.items && Array.isArray(data.items)) {
-                            const now = Date.now();
-                            const recentNews = data.items.filter(item => {
-                                const pubTime = item.pubDate ? new Date(item.pubDate).getTime() : 0;
-                                return (now - pubTime) < 18 * 60 * 60 * 1000; // 18小時內突發狀況
-                            }).map(item => ({
-                                title: (item.title || '').split(' - ')[0],
-                                desc: '在地即時突發狀況通報，點此查看媒體詳細報導與影響範圍。',
-                                time: item.pubDate ? new Date(item.pubDate).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', hour12: false }) : '今日',
-                                link: item.link
-                            }));
-                            collectedAlerts.push(...recentNews);
-                        }
-                    }
-                } catch (e) {
-                    console.warn('龜山突發新聞讀取略過:', e);
+                    const res = await fetch(proxyUrl, { signal: controller.signal, cache: 'no-store' });
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const htmlText = isJson ? (await res.json()).contents : await res.text();
+                    const parsed = parseTyfdCases(htmlText);
+                    if (parsed === null) throw new Error('Invalid TYFD HTML');
+                    return parsed;
+                } finally {
+                    clearTimeout(timer);
                 }
+            };
+
+            let allCases = null;
+            try {
+                allCases = await Promise.any([
+                    fetchViaProxy(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&disableCache=true&_=${Date.now()}`, true),
+                    fetchViaProxy(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, false),
+                    fetchViaProxy(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, false),
+                    fetchViaProxy(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}&_=${Date.now()}`, false)
+                ]);
+            } catch (e) {
+                console.warn('桃園市消防局即時災情連線逾時或受阻:', e);
             }
 
-            window.activeGuishanAlerts = collectedAlerts;
+            if (Array.isArray(allCases)) {
+                // 篩選發生地點或派遣分隊包含「龜山」或「坪頂」的即時案件
+                const matchedCases = allCases.filter(c => {
+                    const combined = `${c.location || ''} ${c.unit || ''}`;
+                    return combined.includes('龜山') || combined.includes('坪頂');
+                }).map(c => {
+                    const shortTime = c.time ? c.time.replace(/^\d{4}-/, '').replace('-', '/') : '即時';
+                    const titleStr = (c.category && c.subType && c.subType !== '其他')
+                        ? `${c.category}｜${c.subType}`
+                        : (c.category || c.subType || '消防通報');
+                    return {
+                        title: titleStr,
+                        category: c.category || '',
+                        location: c.location || '桃園市龜山區',
+                        unit: c.unit || '龜山/坪頂分隊',
+                        status: c.status || '處理中',
+                        time: shortTime
+                    };
+                });
+
+                window.activeGuishanAlerts = matchedCases;
+            }
+
+            if (refreshIcon) refreshIcon.classList.remove('fa-spin');
             renderDisasterOrSlogans();
         }
 
