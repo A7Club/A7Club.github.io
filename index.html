@@ -2988,30 +2988,30 @@ function renderAllTransit() {
             const badge = document.getElementById('disaster-status-badge');
             if (!contentArea || !badge) return;
 
-            // 有災情或事故時：特別使用紅色高對比樣式提醒
-            if (window.activeGuishanAlerts && window.activeGuishanAlerts.length > 0) {
-                badge.className = 'text-[10px] sm:text-xs font-black bg-red-500 text-white px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-sm animate-pulse';
-                badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> 龜山・坪頂即時案件 (' + window.activeGuishanAlerts.length + ')';
+            const alerts = window.activeGuishanAlerts || [];
 
-                contentArea.innerHTML = `<div class="flex flex-col gap-2 max-h-[190px] overflow-y-auto pr-1">` + window.activeGuishanAlerts.map(alert => {
-                    const isProcessing = alert.status && (alert.status.includes('處理') || alert.status.includes('派遣') || alert.status.includes('出動') || alert.status.includes('途中') || alert.status.includes('到達'));
-                    const statusBadgeClass = isProcessing
-                        ? 'bg-red-600 text-white animate-pulse'
-                        : 'bg-red-100 text-red-700 border border-red-200';
-                    const iconClass = (alert.category && alert.category.includes('火')) ? 'fa-fire' : 'fa-truck-medical';
+            if (alerts.length > 0) {
+                badge.className = 'text-[11px] font-black text-white bg-red-500 px-2.5 py-0.5 rounded-full shadow-sm animate-pulse flex items-center gap-1';
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 即時案件 (${alerts.length})`;
+
+                contentArea.innerHTML = `<div class="flex flex-col gap-2 max-h-[160px] overflow-y-auto pr-1">` + alerts.map(alert => {
+                    const isFire = (alert.category || '').includes('火');
+                    const statusBadgeClass = (alert.status || '').includes('完成') || (alert.status || '').includes('結案')
+                        ? 'bg-gray-500 text-white'
+                        : 'bg-red-500 text-white animate-pulse';
 
                     return `
-                        <a href="https://www.tyfd.gov.tw/cht/index.php?act=caselist" target="_blank" class="flex items-start gap-2.5 p-2.5 rounded-xl bg-red-50 border-2 border-red-200 shadow-sm hover:bg-red-100/80 transition-colors">
-                            <div class="w-7 h-7 rounded-lg bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                                <i class="fa-solid ${iconClass} text-xs ${isProcessing ? 'animate-bounce' : ''}"></i>
+                        <a href="https://www.tyfd.gov.tw/cht/index.php?act=caselist" target="_blank" class="bg-red-50/95 hover:bg-red-100/90 border-2 border-red-200 rounded-xl p-2.5 flex items-start gap-2.5 shadow-sm transition-all group/alert">
+                            <div class="w-7 h-7 bg-red-500 text-white rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                                <i class="fa-solid ${isFire ? 'fa-fire-flame-curved' : 'fa-truck-medical'} text-xs"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                                <div class="flex items-center justify-between gap-1">
                                     <div class="flex items-center gap-1.5 min-w-0">
-                                        <span class="text-xs sm:text-sm font-black text-red-700 truncate">${alert.title}</span>
-                                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded ${statusBadgeClass} shrink-0">${alert.status || '通報'}</span>
+                                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded ${statusBadgeClass} shrink-0">${alert.status}</span>
+                                        <h4 class="font-black text-red-600 text-xs sm:text-sm truncate">${alert.title}</h4>
                                     </div>
-                                    <span class="text-[10px] text-red-500 font-bold font-mono shrink-0">${alert.time || '即時'}</span>
+                                    <span class="text-[10px] font-black text-red-700 bg-red-100 px-2 py-0.5 rounded shrink-0">${alert.time || '即時'}</span>
                                 </div>
                                 <p class="text-[11px] sm:text-xs text-red-800 font-black truncate mt-1"><i class="fa-solid fa-location-dot mr-1 text-red-500"></i>${alert.location}</p>
                                 <p class="text-[10px] sm:text-[11px] text-red-600/90 font-bold truncate mt-0.5"><i class="fa-solid fa-people-group mr-1 text-red-400"></i>派遣：${alert.unit}</p>
@@ -3022,7 +3022,9 @@ function renderAllTransit() {
             } else {
                 // 平常無災情時：移除背景色 highlight 與特殊符號，僅顯示單行簡單標題輪播
                 badge.className = 'text-[11px] font-bold text-gray-400 flex items-center gap-1.5';
-                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 平安無災情';
+                badge.innerHTML = window.guishanSyncFailed
+                    ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> 暫無法同步・點擊重試'
+                    : '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 平安無災情';
 
                 const sloganText = SAFETY_SLOGANS[window.currentSloganIndex % SAFETY_SLOGANS.length];
 
@@ -3036,57 +3038,83 @@ function renderAllTransit() {
             }
         }
 
-        // 解析桃園市政府消防局即時災情 HTML 表格
-        function parseTyfdCases(htmlText) {
-            if (!htmlText || typeof htmlText !== 'string') return null;
-            if (!htmlText.includes('即時災情') && !htmlText.includes('發生時間') && !htmlText.includes('派遣分隊')) {
+        // 解析桃園市政府消防局即時災情 HTML / 純文字內容
+        function parseTyfdCases(rawText) {
+            if (!rawText || typeof rawText !== 'string') return null;
+            if (!rawText.includes('發生時間') && !rawText.includes('派遣分隊')) {
                 return null;
             }
 
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlText, 'text/html');
             const cases = [];
 
-            const cleanCell = (td, label) => {
-                let txt = (td.textContent || '').replace(/\s+/g, ' ').trim();
-                return txt.replace(new RegExp('^' + label + '\\s*[:：]?\\s*'), '').trim();
-            };
+            // 1. 將所有 HTML 標籤與表格分隔線替換為空白，確保相鄰欄位之間必定有空白分隔
+            const cleaned = rawText
+                .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+                .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/&nbsp;/gi, ' ')
+                .replace(/\|/g, ' ')
+                .replace(/\s+/g, ' ');
 
-            const rows = doc.querySelectorAll('table tr');
-            rows.forEach(tr => {
-                const tds = tr.querySelectorAll('td');
-                if (tds.length >= 6) {
-                    const time = cleanCell(tds[0], '發生時間');
-                    const category = cleanCell(tds[1], '案類');
-                    const subType = cleanCell(tds[2], '案別');
-                    const location = cleanCell(tds[3], '發生地點');
-                    const unit = cleanCell(tds[4], '派遣分隊');
-                    const status = cleanCell(tds[5], '案件狀態');
+            // 2. 以「發生時間 + 日期時間」切分每一筆獨立案件，避免單筆格式異常影響整頁解析
+            const chunks = cleaned.split(/發生時間\s*[:：]?\s*(?=\d{4}[-/]\d{2}[-/]\d{2}\s+\d{2}:\d{2})/).slice(1);
 
-                    if (/\d{2}:\d{2}/.test(time) && (location || unit)) {
+            chunks.forEach(chunk => {
+                const rowText = chunk.split(/最後更新|«|:::|點選收合/)[0].trim();
+                const m = rowText.match(/^(\d{4}[-/]\d{2}[-/]\d{2}\s+\d{2}:\d{2}(?::\d{2})?)\s*案類\s*[:：]?\s*(.*?)\s*案別\s*[:：]?\s*(.*?)\s*發生地點\s*[:：]?\s*(.*?)\s*派遣分隊\s*[:：]?\s*(.*)$/);
+                if (m) {
+                    const time = m[1].trim();
+                    const category = m[2].trim();
+                    const subType = m[3].trim();
+                    const location = m[4].trim();
+                    let rest = m[5].replace(/案件狀態\s*[:：]?\s*/, ' ').trim();
+                    let unit = rest;
+                    let status = '處理中';
+
+                    const statusMatch = rest.match(/^(.*?)\s*(處理中|已完成|已結案|未結案|執行中|出動中|到達現場|返隊中)$/);
+                    if (statusMatch) {
+                        unit = statusMatch[1].trim();
+                        status = statusMatch[2].trim();
+                    } else {
+                        const parts = rest.split(/\s+/);
+                        if (parts.length > 1) {
+                            status = parts.pop();
+                            unit = parts.join(' ');
+                        }
+                    }
+
+                    if (location || unit) {
                         cases.push({ time, category, subType, location, unit, status });
                     }
                 }
             });
 
-            // 純文字正規表達式備援解析
+            // 3. 若傳統 DOM 表格結構存在且尚未解析出案件，作為次要備援
             if (cases.length === 0) {
-                const textContent = (doc.body ? doc.body.textContent : htmlText).replace(/\s+/g, ' ');
-                const regex = /發生時間\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})\s*案類\s*([^\s]+)\s*案別\s*([^\s]+)\s*發生地點\s*([^\s]+)\s*派遣分隊\s*([^\s]+)\s*(?:案件狀態\s*)?([^\s]+)/g;
-                let match;
-                while ((match = regex.exec(textContent)) !== null) {
-                    cases.push({
-                        time: match[1].trim(),
-                        category: match[2].trim(),
-                        subType: match[3].trim(),
-                        location: match[4].trim(),
-                        unit: match[5].trim(),
-                        status: match[6].trim()
-                    });
-                }
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(rawText, 'text/html');
+                const cleanCell = (td, label) => {
+                    let txt = (td.textContent || '').replace(/\s+/g, ' ').trim();
+                    return txt.replace(new RegExp('^' + label + '\\s*[:：]?\\s*'), '').trim();
+                };
+                doc.querySelectorAll('table tr').forEach(tr => {
+                    const tds = tr.querySelectorAll('td');
+                    if (tds.length >= 6) {
+                        const time = cleanCell(tds[0], '發生時間');
+                        const category = cleanCell(tds[1], '案類');
+                        const subType = cleanCell(tds[2], '案別');
+                        const location = cleanCell(tds[3], '發生地點');
+                        const unit = cleanCell(tds[4], '派遣分隊');
+                        const status = cleanCell(tds[5], '案件狀態');
+                        if (/\d{2}:\d{2}/.test(time) && (location || unit)) {
+                            cases.push({ time, category, subType, location, unit, status });
+                        }
+                    }
+                });
             }
 
-            return cases;
+            // 關鍵修正：桃園市全區即時災情頁必定有案件列表；若解析出 0 筆代表代理回傳不完整，應回傳 null 讓 Promise.any 採用其他成功通道
+            return cases.length > 0 ? cases : null;
         }
 
         async function fetchGuishanDisasters() {
@@ -3101,15 +3129,15 @@ function renderAllTransit() {
 
             const targetUrl = 'https://www.tyfd.gov.tw/cht/index.php?act=caselist';
 
-            const fetchViaProxy = async (proxyUrl, isJson = false, timeoutMs = 8000) => {
+            const fetchViaProxy = async (proxyUrl, isJson = false, timeoutMs = 9000) => {
                 const controller = new AbortController();
                 const timer = setTimeout(() => controller.abort(), timeoutMs);
                 try {
                     const res = await fetch(proxyUrl, { signal: controller.signal, cache: 'no-store' });
                     if (!res.ok) throw new Error('HTTP ' + res.status);
-                    const htmlText = isJson ? (await res.json()).contents : await res.text();
-                    const parsed = parseTyfdCases(htmlText);
-                    if (parsed === null) throw new Error('Invalid TYFD HTML');
+                    const rawText = isJson ? (await res.json()).contents : await res.text();
+                    const parsed = parseTyfdCases(rawText);
+                    if (!parsed || parsed.length === 0) throw new Error('Invalid or empty TYFD cases');
                     return parsed;
                 } finally {
                     clearTimeout(timer);
@@ -3119,20 +3147,23 @@ function renderAllTransit() {
             let allCases = null;
             try {
                 allCases = await Promise.any([
-                    fetchViaProxy(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&disableCache=true&_=${Date.now()}`, true),
+                    fetchViaProxy(`https://r.jina.ai/${targetUrl}`, false),
                     fetchViaProxy(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, false),
-                    fetchViaProxy(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`, false),
+                    fetchViaProxy(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&disableCache=true&_=${Date.now()}`, true),
+                    fetchViaProxy(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, false),
                     fetchViaProxy(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}&_=${Date.now()}`, false)
                 ]);
+                window.guishanSyncFailed = false;
             } catch (e) {
                 console.warn('桃園市消防局即時災情連線逾時或受阻:', e);
+                window.guishanSyncFailed = true;
             }
 
             if (Array.isArray(allCases)) {
-                // 篩選發生地點或派遣分隊包含「龜山」或「坪頂」的即時案件
+                // 篩選發生地點或派遣分隊包含「龜山」、「坪頂」或「迴龍」的即時案件
                 const matchedCases = allCases.filter(c => {
                     const combined = `${c.location || ''} ${c.unit || ''}`;
-                    return combined.includes('龜山') || combined.includes('坪頂');
+                    return combined.includes('龜山') || combined.includes('坪頂') || combined.includes('迴龍');
                 }).map(c => {
                     const shortTime = c.time ? c.time.replace(/^\d{4}-/, '').replace('-', '/') : '即時';
                     const titleStr = (c.category && c.subType && c.subType !== '其他')
